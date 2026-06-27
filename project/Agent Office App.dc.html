@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  .sb{ font-family:'Sarabun',sans-serif; }
+  .gk{ font-family:'Space Grotesk',sans-serif; font-feature-settings:'tnum' 1; }
+</style>
+</helmet>
+
+<div style="position:absolute; left:60px; top:60px; width:860px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">Design System · Agent Office App</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); padding:36px 38px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
+      <div style="width:46px; height:46px; border-radius:12px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div style="font:700 20px 'Sarabun'; color:#1C1B17; line-height:1.1;">Agent Office</div>
+        <div style="font:500 13px 'Sarabun'; color:#6B6A60;">ระบบจัดการงาน freelance RPA — เสนอราคา · ส่งมอบ · วางบิล · รับเงิน</div>
+      </div>
+    </div>
+    <p style="font:400 13px 'Sarabun'; color:#6B6A60; line-height:1.65; margin:16px 0 24px;">โทนกระดาษอุ่น สว่าง จริงจัง — เครื่องมือทำงานที่ดูสะอาดและยั่งยืน ไม่หวือหวา ใช้สีประจำเอกสาร (teal/blue/burgundy/green) เป็น “รหัสสถานะ” ที่ผูกแอปเข้ากับเอกสารทั้ง 4 ใบ</p>
+
+    <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#9A998E; margin-bottom:11px;">นิวทรัล (กระดาษอุ่น) / Neutrals</div>
+    <div style="display:flex; gap:8px; margin-bottom:24px;">
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#1C1B17;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#1C1B17 ink</div></div>
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#6B6A60;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#6B6A60</div></div>
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#E7E3D8;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#E7E3D8 line</div></div>
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#FAF8F2; border:1px solid #E7E3D8;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#FAF8F2</div></div>
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#F4F2EC; border:1px solid #E7E3D8;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#F4F2EC bg</div></div>
+      <div style="flex:1;"><div style="height:34px; border-radius:7px; background:#fff; border:1px solid #E7E3D8;"></div><div class="gk" style="font-size:10px; color:#9A998E; margin-top:5px;">#FFF</div></div>
+    </div>
+
+    <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#9A998E; margin-bottom:11px;">สีแบรนด์ + สถานะ (= สีเอกสาร) / Brand &amp; status</div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:26px;">
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#0E8F7A;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">แบรนด์ / เสนอราคา</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#0E8F7A</div></div></div>
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#2B61CC;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">ส่งมอบ / รีวิว</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#2B61CC</div></div></div>
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#9B2242;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">วางบิล / รอจ่าย</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#9B2242</div></div></div>
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#1E8A4B;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">รับเงิน / สำเร็จ</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#1E8A4B</div></div></div>
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#C98A12;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">รอดำเนินการ</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#C98A12</div></div></div>
+      <div style="border:1px solid #E7E3D8; border-radius:9px; overflow:hidden;"><div style="height:32px; background:#9A998E;"></div><div style="padding:7px 11px;"><div style="font:600 12px 'Sarabun'; color:#1C1B17;">ร่าง / ปิดงาน</div><div class="gk" style="font-size:10.5px; color:#9A998E;">#9A998E</div></div></div>
+    </div>
+
+    <div style="display:flex; gap:24px;">
+      <div style="flex:1;">
+        <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#9A998E; margin-bottom:11px;">ตัวอักษร / Type</div>
+        <div style="border:1px solid #E7E3D8; border-radius:9px; padding:14px 16px; margin-bottom:10px;"><div style="font:700 24px 'Sarabun'; color:#1C1B17; line-height:1;">Sarabun</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:5px;">UI · เนื้อหา · ภาษาไทย</div></div>
+        <div style="border:1px solid #E7E3D8; border-radius:9px; padding:14px 16px;"><div class="gk" style="font:600 24px 'Space Grotesk'; color:#1C1B17; line-height:1;">170,000 · QT-009</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:5px;">Space Grotesk · ตัวเลข/รหัส</div></div>
+      </div>
+      <div style="flex:1;">
+        <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#9A998E; margin-bottom:11px;">คอมโพเนนต์ / Components</div>
+        <div style="border:1px solid #E7E3D8; border-radius:9px; padding:14px 16px; display:flex; flex-direction:column; gap:11px;">
+          <div style="display:flex; gap:7px; flex-wrap:wrap;">
+            <span style="font:600 11px 'Sarabun'; color:#0E8F7A; background:#E7F2EF; padding:4px 11px; border-radius:20px;">กำลังทำ</span>
+            <span style="font:600 11px 'Sarabun'; color:#C98A12; background:#FBF1DC; padding:4px 11px; border-radius:20px;">รอลูกค้า</span>
+            <span style="font:600 11px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:4px 11px; border-radius:20px;">รอชำระ</span>
+            <span style="font:600 11px 'Sarabun'; color:#1E8A4B; background:#E7F4EC; padding:4px 11px; border-radius:20px;">จ่ายแล้ว</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div style="width:22px; height:22px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div style="flex:1; height:2px; background:#1E8A4B;"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:#0E8F7A; display:flex; align-items:center; justify-content:center; font:700 11px 'Space Grotesk'; color:#fff;">3</div>
+            <div style="flex:1; height:2px; background:#E7E3D8;"></div>
+            <div style="width:22px; height:22px; border-radius:50%; background:#fff; border:2px solid #E7E3D8; font:700 11px 'Space Grotesk'; color:#9A998E; display:flex; align-items:center; justify-content:center;">4</div>
+          </div>
+          <button style="font:600 12.5px 'Sarabun'; color:#fff; background:#0E8F7A; border:none; border-radius:9px; padding:9px 14px; text-align:center;">ปุ่มหลัก / Primary</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:980px; top:60px; width:1320px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">01 · Dashboard — ภาพรวมงาน</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden;">
+    <div style="display:flex; height:1040px; background:#fff;">
+
+      <div style="width:230px; background:#FAF8F2; border-right:1px solid #E7E3D8; padding:22px 16px; display:flex; flex-direction:column; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px 22px;">
+          <div style="width:34px; height:34px; border-radius:9px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div style="font:700 15px 'Sarabun'; color:#1C1B17;">Agent Office</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; background:#E7F2EF; color:#0E8F7A; font:600 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>ภาพรวม</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>งานทั้งหมด</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>เอกสาร</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 11l-8 8a4.5 4.5 0 0 1-6.4-6.4l8.5-8.5a3 3 0 0 1 4.3 4.3l-8.4 8.4a1.5 1.5 0 0 1-2.2-2.1l7.6-7.6"/></svg>ไฟล์ &amp; คอนเซป</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M22 20a5.5 5.5 0 0 0-3.5-5.1"/></svg>ลูกค้า</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:10px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></svg>ตั้งค่า</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px; background:#fff; border:1px solid #E7E3D8;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk'; flex-shrink:0;">ธ</div>
+          <div style="min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ธนารัตน์</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">เจ้าของ · Owner</div></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+        <div style="height:64px; border-bottom:1px solid #E7E3D8; padding:0 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+          <div><div style="font:700 17px 'Sarabun'; color:#1C1B17; line-height:1.1;">สวัสดี ธนารัตน์ 👋</div><div style="font:400 12px 'Sarabun'; color:#9A998E;">วันศุกร์ที่ 6 ก.พ. 2569</div></div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:9px; padding:8px 13px; width:230px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span style="font:400 12.5px 'Sarabun'; color:#9A998E;">ค้นหางาน ลูกค้า เอกสาร…</span></div>
+            <button style="display:flex; align-items:center; gap:7px; font:600 13px 'Sarabun'; color:#fff; background:#0E8F7A; border:none; border-radius:9px; padding:9px 15px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>สร้างงานใหม่</button>
+          </div>
+        </div>
+
+        <div style="flex:1; padding:26px 28px; background:#FBFAF6; overflow:hidden;">
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;">
+            <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:17px 18px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:11px;"><span style="font:500 12.5px 'Sarabun'; color:#6B6A60;">งานค้าง (กำลังทำ)</span><span style="width:9px; height:9px; border-radius:50%; background:#0E8F7A;"></span></div><div class="gk" style="font:700 30px 'Space Grotesk'; color:#1C1B17; line-height:1;">1</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:5px;">กำลังพัฒนาอยู่</div></div>
+            <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:17px 18px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:11px;"><span style="font:500 12.5px 'Sarabun'; color:#6B6A60;">งานรอ (รอลูกค้า)</span><span style="width:9px; height:9px; border-radius:50%; background:#C98A12;"></span></div><div class="gk" style="font:700 30px 'Space Grotesk'; color:#1C1B17; line-height:1;">2</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:5px;">รอตอบรับ · รอชำระ</div></div>
+            <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:17px 18px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:11px;"><span style="font:500 12.5px 'Sarabun'; color:#6B6A60;">งานรีวิว (รอตรวจรับ)</span><span style="width:9px; height:9px; border-radius:50%; background:#2B61CC;"></span></div><div class="gk" style="font:700 30px 'Space Grotesk'; color:#1C1B17; line-height:1;">1</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:5px;">ส่งมอบแล้ว รอเซ็น</div></div>
+            <div style="background:#9B2242; border-radius:13px; padding:17px 18px;"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:11px;"><span style="font:500 12.5px 'Sarabun'; color:rgba(255,255,255,.85);">เงินรอเก็บ</span><span style="width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.7);"></span></div><div class="gk" style="font:700 28px 'Space Grotesk'; color:#fff; line-height:1;">฿170,000</div><div style="font:400 11px 'Sarabun'; color:rgba(255,255,255,.8); margin-top:5px;">1 ใบแจ้งหนี้ค้างชำระ</div></div>
+          </div>
+
+          <div style="display:flex; gap:18px;">
+            <div style="flex:1.6; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font:700 14px 'Sarabun'; color:#1C1B17;">งานที่ต้องดำเนินการ</span><span style="font:500 12px 'Sarabun'; color:#0E8F7A;">ดูทั้งหมด →</span></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; overflow:hidden;">
+                <div style="display:flex; align-items:center; gap:14px; padding:15px 18px; border-bottom:1px solid #F0EDE3;">
+                  <div style="width:38px; height:38px; border-radius:10px; background:#F8E9ED; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B2242" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div>
+                  <div style="flex:1; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บันทึกใบแจ้งหนี้เข้า SAP อัตโนมัติ</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">บริษัท ตัวอย่าง จำกัด · <span class="gk">P-2026-009</span></div></div>
+                  <span style="font:600 11px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:4px 11px; border-radius:20px; flex-shrink:0;">รอชำระ</span>
+                  <span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17; width:78px; text-align:right;">฿170,000</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:15px 18px; border-bottom:1px solid #F0EDE3;">
+                  <div style="width:38px; height:38px; border-radius:10px; background:#E7F2EF; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+                  <div style="flex:1; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บอทดึงรายงานยอดขายรายวัน</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">ร้านกาแฟ มีสุข · <span class="gk">P-2026-012</span></div></div>
+                  <span style="font:600 11px 'Sarabun'; color:#0E8F7A; background:#E7F2EF; padding:4px 11px; border-radius:20px; flex-shrink:0;">กำลังทำ</span>
+                  <span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17; width:78px; text-align:right;">฿48,000</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:15px 18px; border-bottom:1px solid #F0EDE3;">
+                  <div style="width:38px; height:38px; border-radius:10px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B61CC" stroke-width="1.8"><path d="M5 12.5l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <div style="flex:1; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">RPA กระทบยอด statement ธนาคาร</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">หจก. รุ่งเรืองพาณิชย์ · <span class="gk">P-2026-013</span></div></div>
+                  <span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px; flex-shrink:0;">รอตรวจรับ</span>
+                  <span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17; width:78px; text-align:right;">฿92,000</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; padding:15px 18px;">
+                  <div style="width:38px; height:38px; border-radius:10px; background:#FBF1DC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C98A12" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg></div>
+                  <div style="flex:1; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บอทกรอกใบสมัครจาก Excel → เว็บ</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">คลินิกฟันดี · <span class="gk">P-2026-014</span></div></div>
+                  <span style="font:600 11px 'Sarabun'; color:#C98A12; background:#FBF1DC; padding:4px 11px; border-radius:20px; flex-shrink:0;">รอตอบรับ</span>
+                  <span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17; width:78px; text-align:right;">฿35,000</span>
+                </div>
+              </div>
+
+              <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin:22px 0 12px;">รายได้เดือนนี้</div>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+                <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:16px;"><div style="font:500 11.5px 'Sarabun'; color:#6B6A60;">เสนอราคาไป</div><div class="gk" style="font:700 21px 'Space Grotesk'; color:#1C1B17; margin-top:4px;">฿262,000</div></div>
+                <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:16px;"><div style="font:500 11.5px 'Sarabun'; color:#6B6A60;">รอเก็บ</div><div class="gk" style="font:700 21px 'Space Grotesk'; color:#9B2242; margin-top:4px;">฿170,000</div></div>
+                <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:16px;"><div style="font:500 11.5px 'Sarabun'; color:#6B6A60;">เก็บแล้ว</div><div class="gk" style="font:700 21px 'Space Grotesk'; color:#1E8A4B; margin-top:4px;">฿35,000</div></div>
+              </div>
+            </div>
+
+            <div style="flex:1; min-width:0;">
+              <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:12px;">กิจกรรมล่าสุด</div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:18px;">
+                <div style="display:flex; gap:12px; padding-bottom:15px;">
+                  <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:9px; height:9px; border-radius:50%; background:#9B2242; margin-top:4px;"></div><div style="flex:1; width:2px; background:#F0EDE3; margin-top:4px;"></div></div>
+                  <div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17; line-height:1.4;">ส่งใบแจ้งหนี้ <span class="gk" style="color:#9B2242;">INV-2026-021</span> ให้ บ.ตัวอย่าง</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:2px;">วันนี้ 09:14 · โดยคุณ</div></div>
+                </div>
+                <div style="display:flex; gap:12px; padding-bottom:15px;">
+                  <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:9px; height:9px; border-radius:50%; background:#2B61CC; margin-top:4px;"></div><div style="flex:1; width:2px; background:#F0EDE3; margin-top:4px;"></div></div>
+                  <div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17; line-height:1.4;">ออกใบส่งงาน <span class="gk" style="color:#2B61CC;">DN-2026-014</span></div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:2px;">เมื่อวาน 16:40 · โดยมุก (ผู้ช่วย)</div></div>
+                </div>
+                <div style="display:flex; gap:12px; padding-bottom:15px;">
+                  <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:9px; height:9px; border-radius:50%; background:#0E8F7A; margin-top:4px;"></div><div style="flex:1; width:2px; background:#F0EDE3; margin-top:4px;"></div></div>
+                  <div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17; line-height:1.4;">แก้ไขใบเสนอราคา <span class="gk" style="color:#0E8F7A;">QT-2026-013</span> (rev.2)</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:2px;">25 ก.พ. 11:02 · โดยคุณ</div></div>
+                </div>
+                <div style="display:flex; gap:12px;">
+                  <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:9px; height:9px; border-radius:50%; background:#1E8A4B; margin-top:4px;"></div></div>
+                  <div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17; line-height:1.4;">รับเงิน <span class="gk" style="color:#1E8A4B;">฿35,000</span> งานคลินิกฟันดี</div><div style="font:400 11px 'Sarabun'; color:#9A998E; margin-top:2px;">24 ก.พ. 14:32 · ปิดงานแล้ว</div></div>
+                </div>
+              </div>
+
+              <div style="background:#FAF8F2; border:1px dashed #D8D2C2; border-radius:13px; padding:16px; margin-top:16px;">
+                <div style="font:600 12.5px 'Sarabun'; color:#1C1B17; margin-bottom:9px;">ทางลัด</div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; align-items:center; gap:9px; font:500 12.5px 'Sarabun'; color:#6B6A60;"><span style="width:24px; height:24px; border-radius:7px; background:#fff; border:1px solid #E7E3D8; display:flex; align-items:center; justify-content:center; color:#0E8F7A;">+</span>สร้างใบเสนอราคา</div>
+                  <div style="display:flex; align-items:center; gap:9px; font:500 12.5px 'Sarabun'; color:#6B6A60;"><span style="width:24px; height:24px; border-radius:7px; background:#fff; border:1px solid #E7E3D8; display:flex; align-items:center; justify-content:center; color:#9B2242;">+</span>ออกใบแจ้งหนี้จากงานที่ส่งแล้ว</div>
+                  <div style="display:flex; align-items:center; gap:9px; font:500 12.5px 'Sarabun'; color:#6B6A60;"><span style="width:24px; height:24px; border-radius:7px; background:#fff; border:1px solid #E7E3D8; display:flex; align-items:center; justify-content:center; color:#9A998E;">↑</span>อัปโหลดไฟล์คอนเซป (.md/.html)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div style="position:absolute; left:2380px; top:60px; width:1320px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">02 · งานทั้งหมด — Projects</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden;">
+    <div style="display:flex; height:1040px; background:#fff;">
+
+      <div style="width:230px; background:#FAF8F2; border-right:1px solid #E7E3D8; padding:22px 16px; display:flex; flex-direction:column; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px 22px;">
+          <div style="width:34px; height:34px; border-radius:9px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div style="font:700 15px 'Sarabun'; color:#1C1B17;">Agent Office</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>ภาพรวม</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; background:#E7F2EF; color:#0E8F7A; font:600 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>งานทั้งหมด</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>เอกสาร</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 11l-8 8a4.5 4.5 0 0 1-6.4-6.4l8.5-8.5a3 3 0 0 1 4.3 4.3l-8.4 8.4a1.5 1.5 0 0 1-2.2-2.1l7.6-7.6"/></svg>ไฟล์ &amp; คอนเซป</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M22 20a5.5 5.5 0 0 0-3.5-5.1"/></svg>ลูกค้า</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:10px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></svg>ตั้งค่า</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px; background:#fff; border:1px solid #E7E3D8;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk'; flex-shrink:0;">ธ</div>
+          <div style="min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ธนารัตน์</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">เจ้าของ · Owner</div></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+        <div style="height:64px; border-bottom:1px solid #E7E3D8; padding:0 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+          <div style="font:700 17px 'Sarabun'; color:#1C1B17;">งานทั้งหมด</div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:9px; padding:8px 13px; width:210px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><span style="font:400 12.5px 'Sarabun'; color:#9A998E;">ค้นหางาน…</span></div>
+            <button style="display:flex; align-items:center; gap:7px; font:600 13px 'Sarabun'; color:#fff; background:#0E8F7A; border:none; border-radius:9px; padding:9px 15px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>สร้างงานใหม่</button>
+          </div>
+        </div>
+
+        <div style="flex:1; padding:24px 28px; background:#FBFAF6; overflow:hidden;">
+          <div style="display:flex; gap:8px; margin-bottom:18px;">
+            <span style="font:600 12.5px 'Sarabun'; color:#fff; background:#1C1B17; padding:7px 15px; border-radius:20px;">ทั้งหมด · 4</span>
+            <span style="font:500 12.5px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; padding:7px 15px; border-radius:20px;">กำลังทำ · 1</span>
+            <span style="font:500 12.5px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; padding:7px 15px; border-radius:20px;">รอลูกค้า · 2</span>
+            <span style="font:500 12.5px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; padding:7px 15px; border-radius:20px;">รอตรวจรับ · 1</span>
+            <span style="font:500 12.5px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; padding:7px 15px; border-radius:20px;">ปิดงาน · 1</span>
+          </div>
+
+          <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; overflow:hidden;">
+            <div style="display:flex; align-items:center; padding:12px 20px; border-bottom:1px solid #E7E3D8; background:#FAF8F2;">
+              <div style="flex:2.4; font:600 11px 'Space Grotesk'; letter-spacing:.08em; text-transform:uppercase; color:#9A998E;">งาน / ลูกค้า</div>
+              <div style="flex:1.4; font:600 11px 'Space Grotesk'; letter-spacing:.08em; text-transform:uppercase; color:#9A998E;">ขั้นตอน (Q→D→I→R)</div>
+              <div style="flex:0.9; font:600 11px 'Space Grotesk'; letter-spacing:.08em; text-transform:uppercase; color:#9A998E;">สถานะ</div>
+              <div style="flex:0.8; text-align:right; font:600 11px 'Space Grotesk'; letter-spacing:.08em; text-transform:uppercase; color:#9A998E;">มูลค่า</div>
+              <div style="flex:0.7; text-align:right; font:600 11px 'Space Grotesk'; letter-spacing:.08em; text-transform:uppercase; color:#9A998E;">อัปเดต</div>
+            </div>
+
+            <div style="display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #F0EDE3;">
+              <div style="flex:2.4; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บันทึกใบแจ้งหนี้เข้า SAP อัตโนมัติ</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">บริษัท ตัวอย่าง จำกัด · <span class="gk">P-2026-009</span></div></div>
+              <div style="flex:1.4; display:flex; align-items:center; gap:5px;"><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#0E8F7A; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">Q</span><span style="width:14px; height:2px; background:#2B61CC;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#2B61CC; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">D</span><span style="width:14px; height:2px; background:#9B2242;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#9B2242; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">I</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">R</span></div>
+              <div style="flex:0.9;"><span style="font:600 11px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:4px 11px; border-radius:20px;">รอชำระ</span></div>
+              <div style="flex:0.8; text-align:right;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">฿170,000</span></div>
+              <div style="flex:0.7; text-align:right; font:400 11.5px 'Sarabun'; color:#9A998E;">วันนี้</div>
+            </div>
+
+            <div style="display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #F0EDE3;">
+              <div style="flex:2.4; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บอทดึงรายงานยอดขายรายวัน</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">ร้านกาแฟ มีสุข · <span class="gk">P-2026-012</span></div></div>
+              <div style="flex:1.4; display:flex; align-items:center; gap:5px;"><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#0E8F7A; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">Q</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">D</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">I</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">R</span></div>
+              <div style="flex:0.9;"><span style="font:600 11px 'Sarabun'; color:#0E8F7A; background:#E7F2EF; padding:4px 11px; border-radius:20px;">กำลังทำ</span></div>
+              <div style="flex:0.8; text-align:right;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">฿48,000</span></div>
+              <div style="flex:0.7; text-align:right; font:400 11.5px 'Sarabun'; color:#9A998E;">เมื่อวาน</div>
+            </div>
+
+            <div style="display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #F0EDE3;">
+              <div style="flex:2.4; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">RPA กระทบยอด statement ธนาคาร</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">หจก. รุ่งเรืองพาณิชย์ · <span class="gk">P-2026-013</span></div></div>
+              <div style="flex:1.4; display:flex; align-items:center; gap:5px;"><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#0E8F7A; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">Q</span><span style="width:14px; height:2px; background:#2B61CC;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#2B61CC; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">D</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">I</span><span style="width:14px; height:2px; background:#E7E3D8;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#fff; border:1.5px solid #E7E3D8; color:#C7C3B6; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">R</span></div>
+              <div style="flex:0.9;"><span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px;">รอตรวจรับ</span></div>
+              <div style="flex:0.8; text-align:right;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">฿92,000</span></div>
+              <div style="flex:0.7; text-align:right; font:400 11.5px 'Sarabun'; color:#9A998E;">2 วันก่อน</div>
+            </div>
+
+            <div style="display:flex; align-items:center; padding:16px 20px;">
+              <div style="flex:2.4; min-width:0;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บอทกรอกใบสมัครจาก Excel → เว็บ</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">คลินิกฟันดี · <span class="gk">P-2026-007</span></div></div>
+              <div style="flex:1.4; display:flex; align-items:center; gap:5px;"><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#1E8A4B; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">Q</span><span style="width:14px; height:2px; background:#1E8A4B;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#1E8A4B; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">D</span><span style="width:14px; height:2px; background:#1E8A4B;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#1E8A4B; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">I</span><span style="width:14px; height:2px; background:#1E8A4B;"></span><span class="gk" style="width:20px; height:20px; border-radius:50%; background:#1E8A4B; color:#fff; font-size:10px; font-weight:600; display:flex; align-items:center; justify-content:center;">R</span></div>
+              <div style="flex:0.9;"><span style="font:600 11px 'Sarabun'; color:#1E8A4B; background:#E7F4EC; padding:4px 11px; border-radius:20px;">ปิดงาน</span></div>
+              <div style="flex:0.8; text-align:right;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#9A998E;">฿35,000</span></div>
+              <div style="flex:0.7; text-align:right; font:400 11.5px 'Sarabun'; color:#9A998E;">24 ก.พ.</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px; margin-top:14px; font:400 11.5px 'Sarabun'; color:#9A998E;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#0E8F7A;"></span>Q = เสนอราคา
+            <span style="width:7px; height:7px; border-radius:50%; background:#2B61CC; margin-left:8px;"></span>D = ส่งมอบ
+            <span style="width:7px; height:7px; border-radius:50%; background:#9B2242; margin-left:8px;"></span>I = วางบิล
+            <span style="width:7px; height:7px; border-radius:50%; background:#1E8A4B; margin-left:8px;"></span>R = รับเงิน
+            <span style="margin-left:auto;">วงสีทึบ = ออก/บันทึกแล้ว · วงว่าง = ยังไม่ถึงขั้นนี้</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:60px; top:1200px; width:1320px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">03 · หน้างาน — ภาพรวม + ขั้นตอน (Pipeline)</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden;">
+    <div style="display:flex; height:1040px; background:#fff;">
+
+      <div style="width:230px; background:#FAF8F2; border-right:1px solid #E7E3D8; padding:22px 16px; display:flex; flex-direction:column; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px 22px;">
+          <div style="width:34px; height:34px; border-radius:9px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div style="font:700 15px 'Sarabun'; color:#1C1B17;">Agent Office</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>ภาพรวม</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; background:#E7F2EF; color:#0E8F7A; font:600 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>งานทั้งหมด</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>เอกสาร</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 11l-8 8a4.5 4.5 0 0 1-6.4-6.4l8.5-8.5a3 3 0 0 1 4.3 4.3l-8.4 8.4a1.5 1.5 0 0 1-2.2-2.1l7.6-7.6"/></svg>ไฟล์ &amp; คอนเซป</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M22 20a5.5 5.5 0 0 0-3.5-5.1"/></svg>ลูกค้า</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:10px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></svg>ตั้งค่า</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px; background:#fff; border:1px solid #E7E3D8;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk'; flex-shrink:0;">ธ</div>
+          <div style="min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ธนารัตน์</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">เจ้าของ · Owner</div></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+        <div style="border-bottom:1px solid #E7E3D8; padding:16px 28px 0; flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:6px; font:400 11.5px 'Sarabun'; color:#9A998E; margin-bottom:8px;"><span>งานทั้งหมด</span><span>/</span><span class="gk">P-2026-009</span></div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div><div style="font:700 19px 'Sarabun'; color:#1C1B17; line-height:1.1;">บันทึกใบแจ้งหนี้เข้า SAP อัตโนมัติ</div><div style="font:400 12.5px 'Sarabun'; color:#6B6A60; margin-top:3px;">บริษัท ตัวอย่าง จำกัด · เริ่ม 5 ก.พ. 2569</div></div>
+            <div style="display:flex; gap:9px;"><span style="font:600 11.5px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:6px 14px; border-radius:20px;">รอชำระ ฿170,000</span><button style="font:600 12.5px 'Sarabun'; color:#fff; background:#0E8F7A; border:none; border-radius:9px; padding:8px 15px;">ทำขั้นต่อไป</button></div>
+          </div>
+          <div style="display:flex; gap:26px; margin-top:14px;">
+            <div style="font:600 13px 'Sarabun'; color:#0E8F7A; padding-bottom:11px; border-bottom:2px solid #0E8F7A;">ภาพรวม</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">เอกสาร</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ไฟล์ &amp; คอนเซป</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ประวัติการแก้ไข</div>
+          </div>
+        </div>
+
+        <div style="flex:1; padding:24px 28px; background:#FBFAF6; overflow:hidden; display:flex; gap:20px;">
+          <div style="flex:1.5; min-width:0;">
+            <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:13px;">ขั้นตอนงาน — ทำทีละ step</div>
+            <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:8px 20px;">
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">สร้างงาน + เสนอราคา</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:2px;">ออก <span class="gk" style="color:#0E8F7A;">QT-2026-009</span> · ฿170,000 · 5 ก.พ. 2569</div></div>
+                <span style="font:600 10.5px 'Sarabun'; color:#1E8A4B; align-self:flex-start; margin-top:2px;">✓ บันทึกแล้ว</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">ลูกค้าตอบรับข้อเสนอ</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:2px;">ยืนยันจ้างงาน · มัดจำ 50% รับแล้ว · 8 ก.พ. 2569</div></div>
+                <span style="font:600 10.5px 'Sarabun'; color:#1E8A4B; align-self:flex-start; margin-top:2px;">✓ บันทึกแล้ว</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">พัฒนางาน</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:2px;">พัฒนาเสร็จ · ทดสอบผ่าน · 27 ก.พ. 2569</div></div>
+                <span style="font:600 10.5px 'Sarabun'; color:#1E8A4B; align-self:flex-start; margin-top:2px;">✓ เสร็จ</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="flex:1; width:2px; background:#9B2242; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">ส่งมอบงาน</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:2px;">ออก <span class="gk" style="color:#2B61CC;">DN-2026-014</span> · ลูกค้าเซ็นตรวจรับแล้ว · 28 ก.พ.</div></div>
+                <span style="font:600 10.5px 'Sarabun'; color:#1E8A4B; align-self:flex-start; margin-top:2px;">✓ บันทึกแล้ว</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#9B2242; border:3px solid #F8E9ED; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 0 1px #9B2242;"><span class="gk" style="font:700 11px 'Space Grotesk'; color:#fff;">5</span></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:1px;"><div style="font:700 13.5px 'Sarabun'; color:#9B2242;">วางบิล / แจ้งหนี้ — ขั้นปัจจุบัน</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:2px;">ออก <span class="gk" style="color:#9B2242;">INV-2026-021</span> · ส่งแล้ว 1 มี.ค. · <b style="color:#9B2242;">ครบกำหนด 15 มี.ค.</b></div><button style="font:600 11.5px 'Sarabun'; color:#fff; background:#9B2242; border:none; border-radius:8px; padding:6px 13px; margin-top:9px;">บันทึกรับเงิน →</button></div>
+                <span style="font:600 10.5px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:3px 9px; border-radius:14px; align-self:flex-start; margin-top:2px;">รอชำระ</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #F4F1E8;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#fff; border:2px solid #E7E3D8; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><span class="gk" style="font:700 11px 'Space Grotesk'; color:#C7C3B6;">6</span></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:4px;"></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#9A998E;">รับเงิน + ออกใบเสร็จ</div><div style="font:400 11.5px 'Sarabun'; color:#C7C3B6; margin-top:2px;">ระบบจะสร้าง RC อัตโนมัติเมื่อบันทึกรับเงิน</div></div>
+                <span style="font:500 10.5px 'Sarabun'; color:#C7C3B6; align-self:flex-start; margin-top:2px;">ยังไม่ถึง</span>
+              </div>
+
+              <div style="display:flex; gap:14px; padding:14px 0;">
+                <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:26px; height:26px; border-radius:50%; background:#fff; border:2px solid #E7E3D8; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><span class="gk" style="font:700 11px 'Space Grotesk'; color:#C7C3B6;">7</span></div></div>
+                <div style="flex:1; padding-top:2px;"><div style="font:600 13.5px 'Sarabun'; color:#9A998E;">ปิดงาน</div><div style="font:400 11.5px 'Sarabun'; color:#C7C3B6; margin-top:2px;">เก็บเข้าคลังงานที่เสร็จสมบูรณ์</div></div>
+                <span style="font:500 10.5px 'Sarabun'; color:#C7C3B6; align-self:flex-start; margin-top:2px;">ยังไม่ถึง</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:16px;">
+            <div>
+              <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:13px;">ข้อมูลงาน</div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:16px 18px;">
+                <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font:400 12px 'Sarabun'; color:#9A998E;">ลูกค้า</span><span style="font:600 12.5px 'Sarabun'; color:#1C1B17;">บริษัท ตัวอย่าง จำกัด</span></div>
+                <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font:400 12px 'Sarabun'; color:#9A998E;">ผู้ติดต่อ</span><span style="font:600 12.5px 'Sarabun'; color:#1C1B17;">คุณสมหญิง รุ่งเรือง</span></div>
+                <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font:400 12px 'Sarabun'; color:#9A998E;">มูลค่างาน</span><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">฿170,000</span></div>
+                <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font:400 12px 'Sarabun'; color:#9A998E;">เริ่ม / ส่งมอบ</span><span style="font:600 12.5px 'Sarabun'; color:#1C1B17;">5 ก.พ. → 28 ก.พ.</span></div>
+                <div style="display:flex; justify-content:space-between; padding:6px 0;"><span style="font:400 12px 'Sarabun'; color:#9A998E;">ผู้ดูแล</span><span style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ธนารัตน์ · มุก</span></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:13px;">เอกสารในงานนี้</div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; overflow:hidden;">
+                <div style="display:flex; align-items:center; gap:11px; padding:12px 16px; border-bottom:1px solid #F4F1E8;"><span style="width:8px; height:30px; border-radius:4px; background:#0E8F7A;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบเสนอราคา</div><div class="gk" style="font:400 11px 'Space Grotesk'; color:#9A998E;">QT-2026-009</div></div><span style="font:600 10.5px 'Sarabun'; color:#1E8A4B;">ตอบรับ</span></div>
+                <div style="display:flex; align-items:center; gap:11px; padding:12px 16px; border-bottom:1px solid #F4F1E8;"><span style="width:8px; height:30px; border-radius:4px; background:#2B61CC;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบส่งงาน</div><div class="gk" style="font:400 11px 'Space Grotesk'; color:#9A998E;">DN-2026-014</div></div><span style="font:600 10.5px 'Sarabun'; color:#1E8A4B;">เซ็นรับ</span></div>
+                <div style="display:flex; align-items:center; gap:11px; padding:12px 16px; border-bottom:1px solid #F4F1E8;"><span style="width:8px; height:30px; border-radius:4px; background:#9B2242;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบแจ้งหนี้</div><div class="gk" style="font:400 11px 'Space Grotesk'; color:#9A998E;">INV-2026-021</div></div><span style="font:600 10.5px 'Sarabun'; color:#9B2242;">รอชำระ</span></div>
+                <div style="display:flex; align-items:center; gap:11px; padding:12px 16px;"><span style="width:8px; height:30px; border-radius:4px; background:#E7E3D8;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#9A998E;">ใบเสร็จรับเงิน</div><div class="gk" style="font:400 11px 'Space Grotesk'; color:#C7C3B6;">ยังไม่ออก</div></div><span style="font:500 10.5px 'Sarabun'; color:#C7C3B6;">รอ</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:1440px; top:1200px; width:1320px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#9B2242; margin-bottom:12px;">04 · หน้างาน — แท็บเอกสาร (ฝัง + พิมพ์ PDF)</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden;">
+    <div style="display:flex; height:1040px; background:#fff;">
+
+      <div style="width:230px; background:#FAF8F2; border-right:1px solid #E7E3D8; padding:22px 16px; display:flex; flex-direction:column; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px 22px;">
+          <div style="width:34px; height:34px; border-radius:9px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div style="font:700 15px 'Sarabun'; color:#1C1B17;">Agent Office</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>ภาพรวม</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; background:#E7F2EF; color:#0E8F7A; font:600 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>งานทั้งหมด</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>เอกสาร</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 11l-8 8a4.5 4.5 0 0 1-6.4-6.4l8.5-8.5a3 3 0 0 1 4.3 4.3l-8.4 8.4a1.5 1.5 0 0 1-2.2-2.1l7.6-7.6"/></svg>ไฟล์ &amp; คอนเซป</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M22 20a5.5 5.5 0 0 0-3.5-5.1"/></svg>ลูกค้า</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:10px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></svg>ตั้งค่า</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px; background:#fff; border:1px solid #E7E3D8;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk'; flex-shrink:0;">ธ</div>
+          <div style="min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ธนารัตน์</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">เจ้าของ · Owner</div></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+        <div style="border-bottom:1px solid #E7E3D8; padding:16px 28px 0; flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:6px; font:400 11.5px 'Sarabun'; color:#9A998E; margin-bottom:8px;"><span>งานทั้งหมด</span><span>/</span><span class="gk">P-2026-009</span></div>
+          <div style="font:700 19px 'Sarabun'; color:#1C1B17; line-height:1.1;">บันทึกใบแจ้งหนี้เข้า SAP อัตโนมัติ</div>
+          <div style="display:flex; gap:26px; margin-top:14px;">
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ภาพรวม</div>
+            <div style="font:600 13px 'Sarabun'; color:#0E8F7A; padding-bottom:11px; border-bottom:2px solid #0E8F7A;">เอกสาร</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ไฟล์ &amp; คอนเซป</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ประวัติการแก้ไข</div>
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; min-width:0; background:#FBFAF6;">
+          <div style="width:268px; border-right:1px solid #E7E3D8; padding:20px 18px; flex-shrink:0;">
+            <div style="font:700 13px 'Sarabun'; color:#1C1B17; margin-bottom:12px;">เอกสารทั้งหมด (4)</div>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:12px 13px;"><div style="display:flex; align-items:center; gap:9px;"><span style="width:7px; height:26px; border-radius:4px; background:#0E8F7A;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบเสนอราคา</div><div class="gk" style="font:400 10.5px 'Space Grotesk'; color:#9A998E;">QT-2026-009 · rev.1</div></div></div></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:12px 13px;"><div style="display:flex; align-items:center; gap:9px;"><span style="width:7px; height:26px; border-radius:4px; background:#2B61CC;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบส่งงาน</div><div class="gk" style="font:400 10.5px 'Space Grotesk'; color:#9A998E;">DN-2026-014 · rev.1</div></div></div></div>
+              <div style="background:#fff; border:2px solid #9B2242; border-radius:11px; padding:12px 13px;"><div style="display:flex; align-items:center; gap:9px;"><span style="width:7px; height:26px; border-radius:4px; background:#9B2242;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ใบแจ้งหนี้</div><div class="gk" style="font:400 10.5px 'Space Grotesk'; color:#9B2242;">INV-2026-021 · กำลังดู</div></div></div></div>
+              <div style="background:#FAF8F2; border:1px dashed #D8D2C2; border-radius:11px; padding:12px 13px;"><div style="display:flex; align-items:center; gap:9px;"><span style="width:7px; height:26px; border-radius:4px; background:#E7E3D8;"></span><div style="flex:1;"><div style="font:600 12.5px 'Sarabun'; color:#9A998E;">ใบเสร็จรับเงิน</div><div class="gk" style="font:400 10.5px 'Space Grotesk'; color:#C7C3B6;">ยังไม่ออก</div></div></div></div>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <div style="height:52px; border-bottom:1px solid #E7E3D8; padding:0 22px; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0;">
+              <div style="display:flex; align-items:center; gap:9px;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">INV-2026-021</span><span style="font:600 10.5px 'Sarabun'; color:#9B2242; background:#F8E9ED; padding:3px 10px; border-radius:14px;">รอชำระ</span></div>
+              <div style="display:flex; gap:8px;">
+                <button style="display:flex; align-items:center; gap:6px; font:600 12px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; border-radius:8px; padding:7px 12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>แก้ไข</button>
+                <button style="display:flex; align-items:center; gap:6px; font:600 12px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; border-radius:8px; padding:7px 12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6M6 18h12v3H6zM6 14h12v4H6z"/><path d="M6 9h12a3 3 0 0 1 3 3v3H3v-3a3 3 0 0 1 3-3z"/></svg>พิมพ์ PDF</button>
+                <button style="display:flex; align-items:center; gap:6px; font:600 12px 'Sarabun'; color:#fff; background:#9B2242; border:none; border-radius:8px; padding:7px 12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>ส่งให้ลูกค้า</button>
+              </div>
+            </div>
+
+            <div style="flex:1; overflow:hidden; background:#EFEDE5; display:flex; justify-content:center; padding:26px 20px;">
+              <div style="width:480px; background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.1); position:relative; overflow:hidden; border-radius:3px;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:5px; background:#9B2242;"></div>
+                <div style="padding:30px 32px;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="display:flex; gap:9px;"><div style="width:30px; height:30px; border-radius:8px; background:#1C1B17; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><div><div style="font:700 11px 'Sarabun'; color:#1C1B17;">ธนารัตน์ สหวิริยกุล</div><div style="font:400 8px 'Sarabun'; color:#6B6A60;">RPA Developer &amp; Consultant</div></div></div>
+                    <div style="text-align:right;"><div class="gk" style="font:700 18px 'Space Grotesk'; color:#9B2242; line-height:1;">INVOICE</div><div style="font:600 9px 'Sarabun'; color:#1C1B17;">ใบแจ้งหนี้</div></div>
+                  </div>
+                  <div style="display:flex; gap:10px; margin-top:16px;">
+                    <div style="flex:1;"><div style="font:600 7px 'Space Grotesk'; letter-spacing:.1em; text-transform:uppercase; color:#9A998E; margin-bottom:3px;">Bill to</div><div style="font:700 10px 'Sarabun'; color:#1C1B17;">บริษัท ตัวอย่าง จำกัด</div><div style="font:400 8px 'Sarabun'; color:#6B6A60; line-height:1.5;">199/45 ถ.สุขุมวิท คลองเตย กทม.</div></div>
+                    <div style="width:170px; background:#9B2242; border-radius:8px; padding:11px 13px; color:#fff;"><div style="font:500 8px 'Sarabun'; color:rgba(255,255,255,.85);">ยอดที่ต้องชำระ</div><div class="gk" style="font:700 23px 'Space Grotesk'; line-height:1.1;">฿170,000</div><div style="height:1px; background:rgba(255,255,255,.25); margin:7px 0;"></div><div style="display:flex; justify-content:space-between;"><span style="font:400 8px 'Sarabun'; color:rgba(255,255,255,.85);">ครบกำหนด</span><span style="font:700 9px 'Sarabun';">15 มี.ค. 69</span></div></div>
+                  </div>
+                  <div style="margin-top:14px; border-radius:6px; overflow:hidden; border:1px solid #F0EDE3;">
+                    <div style="display:flex; background:#1C1B17; padding:6px 10px;"><span style="flex:1; font:600 7.5px 'Sarabun'; color:#fff;">รายละเอียด</span><span style="font:600 7.5px 'Sarabun'; color:#fff;">รวม</span></div>
+                    <div style="display:flex; padding:7px 10px; border-bottom:1px solid #F4F1E8;"><span style="flex:1; font:500 8px 'Sarabun'; color:#1C1B17;">พัฒนา RPA Bot อ่านใบแจ้งหนี้ → SAP</span><span class="gk" style="font:600 8px 'Space Grotesk'; color:#1C1B17;">85,000</span></div>
+                    <div style="display:flex; padding:7px 10px; border-bottom:1px solid #F4F1E8;"><span style="flex:1; font:500 8px 'Sarabun'; color:#1C1B17;">Workflow + เชื่อม API ธนาคาร</span><span class="gk" style="font:600 8px 'Space Grotesk'; color:#1C1B17;">45,000</span></div>
+                    <div style="display:flex; padding:7px 10px; border-bottom:1px solid #F4F1E8;"><span style="flex:1; font:500 8px 'Sarabun'; color:#1C1B17;">Orchestrator + Monitoring</span><span class="gk" style="font:600 8px 'Space Grotesk'; color:#1C1B17;">28,000</span></div>
+                    <div style="display:flex; padding:7px 10px;"><span style="flex:1; font:500 8px 'Sarabun'; color:#1C1B17;">อบรม + เอกสาร</span><span class="gk" style="font:600 8px 'Space Grotesk'; color:#1C1B17;">12,000</span></div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; background:#F8E9ED; border:1px solid #9B2242; border-radius:8px; padding:9px 13px;"><span style="font:700 9px 'Sarabun'; color:#9B2242;">ยอดที่ต้องชำระ</span><span class="gk" style="font:700 15px 'Space Grotesk'; color:#9B2242;">฿170,000</span></div>
+                  <div style="margin-top:12px; border:1px solid #F0EDE3; border-radius:8px; padding:9px 12px;"><div style="font:600 8px 'Sarabun'; color:#1C1B17;">ธนาคารกสิกรไทย · ออมทรัพย์</div><div class="gk" style="font:600 12px 'Space Grotesk'; color:#1C1B17;">123-4-56789-0</div><div style="font:400 7.5px 'Sarabun'; color:#6B6A60;">PromptPay 081-234-5678</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:2820px; top:1200px; width:1320px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">05 · แท็บไฟล์ &amp; คอนเซป — viewer .md / .html</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden;">
+    <div style="display:flex; height:1040px; background:#fff;">
+
+      <div style="width:230px; background:#FAF8F2; border-right:1px solid #E7E3D8; padding:22px 16px; display:flex; flex-direction:column; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px 22px;">
+          <div style="width:34px; height:34px; border-radius:9px; background:#1C1B17; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div style="font:700 15px 'Sarabun'; color:#1C1B17;">Agent Office</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>ภาพรวม</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; background:#E7F2EF; color:#0E8F7A; font:600 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>งานทั้งหมด</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>เอกสาร</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 11l-8 8a4.5 4.5 0 0 1-6.4-6.4l8.5-8.5a3 3 0 0 1 4.3 4.3l-8.4 8.4a1.5 1.5 0 0 1-2.2-2.1l7.6-7.6"/></svg>ไฟล์ &amp; คอนเซป</div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:3px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M22 20a5.5 5.5 0 0 0-3.5-5.1"/></svg>ลูกค้า</div>
+        <div style="flex:1;"></div>
+        <div style="display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:9px; color:#6B6A60; font:500 13.5px 'Sarabun'; margin-bottom:10px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></svg>ตั้งค่า</div>
+        <div style="display:flex; align-items:center; gap:10px; padding:10px; border-radius:11px; background:#fff; border:1px solid #E7E3D8;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk'; flex-shrink:0;">ธ</div>
+          <div style="min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17;">ธนารัตน์</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">เจ้าของ · Owner</div></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+        <div style="border-bottom:1px solid #E7E3D8; padding:16px 28px 0; flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:6px; font:400 11.5px 'Sarabun'; color:#9A998E; margin-bottom:8px;"><span>งานทั้งหมด</span><span>/</span><span class="gk">P-2026-009</span></div>
+          <div style="font:700 19px 'Sarabun'; color:#1C1B17; line-height:1.1;">บันทึกใบแจ้งหนี้เข้า SAP อัตโนมัติ</div>
+          <div style="display:flex; gap:26px; margin-top:14px;">
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ภาพรวม</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">เอกสาร</div>
+            <div style="font:600 13px 'Sarabun'; color:#0E8F7A; padding-bottom:11px; border-bottom:2px solid #0E8F7A;">ไฟล์ &amp; คอนเซป</div>
+            <div style="font:500 13px 'Sarabun'; color:#9A998E; padding-bottom:11px;">ประวัติการแก้ไข</div>
+          </div>
+        </div>
+
+        <div style="flex:1; display:flex; min-width:0; background:#FBFAF6;">
+          <div style="width:300px; border-right:1px solid #E7E3D8; padding:20px 18px; flex-shrink:0;">
+            <button style="width:100%; display:flex; align-items:center; justify-content:center; gap:7px; font:600 12.5px 'Sarabun'; color:#0E8F7A; background:#fff; border:1px dashed #0E8F7A; border-radius:10px; padding:11px; margin-bottom:16px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="2"><path d="M12 16V4M6 10l6-6 6 6M4 20h16" stroke-linecap="round" stroke-linejoin="round"/></svg>อัปโหลดไฟล์ (.md, .html, …)</button>
+            <div style="font:600 11px 'Space Grotesk'; letter-spacing:.1em; text-transform:uppercase; color:#9A998E; margin-bottom:10px;">ไฟล์ในงานนี้ · 5</div>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+              <div style="background:#fff; border:2px solid #0E8F7A; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;"><span style="font:700 9px 'Space Grotesk'; color:#fff; background:#2B61CC; padding:3px 6px; border-radius:5px;">MD</span><div style="flex:1; min-width:0;"><div style="font:600 12px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">concept-solution.md</div><div style="font:400 10px 'Sarabun'; color:#9A998E;">12 KB · กำลังดู</div></div></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;"><span style="font:700 9px 'Space Grotesk'; color:#fff; background:#C98A12; padding:3px 6px; border-radius:5px;">HTML</span><div style="flex:1; min-width:0;"><div style="font:600 12px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">architecture-diagram.html</div><div style="font:400 10px 'Sarabun'; color:#9A998E;">48 KB</div></div></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;"><span style="font:700 9px 'Space Grotesk'; color:#fff; background:#2B61CC; padding:3px 6px; border-radius:5px;">MD</span><div style="flex:1; min-width:0;"><div style="font:600 12px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">runbook.md</div><div style="font:400 10px 'Sarabun'; color:#9A998E;">8 KB</div></div></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;"><span style="font:700 9px 'Space Grotesk'; color:#fff; background:#9B2242; padding:3px 6px; border-radius:5px;">PDF</span><div style="flex:1; min-width:0;"><div style="font:600 12px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">requirement-เดิม.pdf</div><div style="font:400 10px 'Sarabun'; color:#9A998E;">2.1 MB</div></div></div>
+              <div style="background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:10px 12px; display:flex; align-items:center; gap:10px;"><span style="font:700 9px 'Space Grotesk'; color:#fff; background:#6B6A60; padding:3px 6px; border-radius:5px;">XLSX</span><div style="flex:1; min-width:0;"><div style="font:600 12px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">test-cases.xlsx</div><div style="font:400 10px 'Sarabun'; color:#9A998E;">320 KB</div></div></div>
+            </div>
+          </div>
+
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <div style="height:48px; border-bottom:1px solid #E7E3D8; padding:0 22px; display:flex; align-items:center; justify-content:space-between; background:#fff; flex-shrink:0;">
+              <div style="display:flex; align-items:center; gap:8px;"><span style="font:700 8px 'Space Grotesk'; color:#fff; background:#2B61CC; padding:3px 6px; border-radius:5px;">MD</span><span style="font:600 13px 'Sarabun'; color:#1C1B17;">concept-solution.md</span><span style="font:400 11px 'Sarabun'; color:#9A998E;">· เรนเดอร์เป็นเอกสารอ่านง่าย</span></div>
+              <div style="display:flex; gap:7px;"><span style="font:600 11px 'Sarabun'; color:#0E8F7A; background:#E7F2EF; padding:5px 11px; border-radius:7px;">อ่าน</span><span style="font:500 11px 'Sarabun'; color:#9A998E; padding:5px 11px;">โค้ด</span></div>
+            </div>
+            <div style="flex:1; overflow:hidden; background:#fff; padding:30px 40px;">
+              <div style="font:700 22px 'Sarabun'; color:#1C1B17; margin-bottom:4px;">คอนเซปงาน: Invoice-to-SAP Automation</div>
+              <div style="font:400 12.5px 'Sarabun'; color:#9A998E; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #F0EDE3;">เวอร์ชัน 1.2 · ปรับปรุงล่าสุด 26 ก.พ. 2569</div>
+              <div style="font:700 16px 'Sarabun'; color:#1C1B17; margin-bottom:9px;">ปัญหาเดิมของลูกค้า</div>
+              <p style="font:400 13.5px 'Sarabun'; color:#3F3E37; line-height:1.7; margin:0 0 18px;">ทีมบัญชีต้องคีย์ใบแจ้งหนี้จากซัพพลายเออร์ ~200 ใบ/เดือนเข้าระบบ SAP ด้วยมือ ใช้เวลา 3–4 ชม./วัน และเกิดข้อผิดพลาดบ่อยในช่อง VAT กับเลขที่เอกสาร</p>
+              <div style="font:700 16px 'Sarabun'; color:#1C1B17; margin-bottom:9px;">แนวทางที่เสนอ</div>
+              <div style="background:#FAF8F2; border-left:3px solid #0E8F7A; border-radius:0 8px 8px 0; padding:13px 16px; margin-bottom:18px;">
+                <div style="display:flex; gap:9px; margin-bottom:8px;"><span style="color:#0E8F7A; font-weight:700;">1.</span><span style="font:400 13px 'Sarabun'; color:#3F3E37; line-height:1.5;">บอทอ่านอีเมลขาเข้า ดึงไฟล์แนบ PDF/รูป แล้วทำ OCR</span></div>
+                <div style="display:flex; gap:9px; margin-bottom:8px;"><span style="color:#0E8F7A; font-weight:700;">2.</span><span style="font:400 13px 'Sarabun'; color:#3F3E37; line-height:1.5;">Validation เทียบกับ PO ก่อนบันทึก ลดข้อมูลผิด</span></div>
+                <div style="display:flex; gap:9px;"><span style="color:#0E8F7A; font-weight:700;">3.</span><span style="font:400 13px 'Sarabun'; color:#3F3E37; line-height:1.5;">บันทึกเข้า SAP ผ่าน UiPath + แจ้งเตือนเมื่อต้องตรวจสอบ</span></div>
+              </div>
+              <div style="font:700 16px 'Sarabun'; color:#1C1B17; margin-bottom:9px;">ผลที่คาดหวัง</div>
+              <div style="display:flex; gap:12px;">
+                <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:14px;"><div class="gk" style="font:700 22px 'Space Grotesk'; color:#0E8F7A;">−85%</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:2px;">เวลาคีย์ข้อมูล</div></div>
+                <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:14px;"><div class="gk" style="font:700 22px 'Space Grotesk'; color:#0E8F7A;">~200</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:2px;">ใบ/เดือน อัตโนมัติ</div></div>
+                <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:10px; padding:14px;"><div class="gk" style="font:700 22px 'Space Grotesk'; color:#0E8F7A;">6 สัปดาห์</div><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; margin-top:2px;">ระยะส่งมอบ</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:60px; top:2340px; width:880px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">06 · ตัวสร้างเอกสาร — Wizard ง่าย (ดึงจาก QT)</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; height:760px; display:flex; flex-direction:column;">
+    <div style="height:58px; border-bottom:1px solid #E7E3D8; padding:0 26px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:8px; background:#9B2242; display:flex; align-items:center; justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div><div style="font:700 15px 'Sarabun'; color:#1C1B17;">สร้างใบแจ้งหนี้</div><div style="font:400 11px 'Sarabun'; color:#9A998E;">จากงาน P-2026-009</div></div></div>
+      <span style="font:400 18px 'Sarabun'; color:#C7C3B6;">✕</span>
+    </div>
+
+    <div style="padding:18px 26px; border-bottom:1px solid #F0EDE3; display:flex; align-items:center; gap:0; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:8px;"><div style="width:26px; height:26px; border-radius:50%; background:#1E8A4B; display:flex; align-items:center; justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span style="font:600 12px 'Sarabun'; color:#1C1B17;">เลือกลูกค้า</span></div>
+      <div style="flex:1; height:2px; background:#1E8A4B; margin:0 12px;"></div>
+      <div style="display:flex; align-items:center; gap:8px;"><div style="width:26px; height:26px; border-radius:50%; background:#9B2242; display:flex; align-items:center; justify-content:center; color:#fff; font:700 12px 'Space Grotesk';">2</div><span style="font:600 12px 'Sarabun'; color:#9B2242;">รายการ</span></div>
+      <div style="flex:1; height:2px; background:#E7E3D8; margin:0 12px;"></div>
+      <div style="display:flex; align-items:center; gap:8px;"><div style="width:26px; height:26px; border-radius:50%; background:#fff; border:2px solid #E7E3D8; color:#C7C3B6; display:flex; align-items:center; justify-content:center; font:700 12px 'Space Grotesk';">3</div><span style="font:500 12px 'Sarabun'; color:#9A998E;">เงื่อนไข</span></div>
+      <div style="flex:1; height:2px; background:#E7E3D8; margin:0 12px;"></div>
+      <div style="display:flex; align-items:center; gap:8px;"><div style="width:26px; height:26px; border-radius:50%; background:#fff; border:2px solid #E7E3D8; color:#C7C3B6; display:flex; align-items:center; justify-content:center; font:700 12px 'Space Grotesk';">4</div><span style="font:500 12px 'Sarabun'; color:#9A998E;">ตรวจ &amp; ออก</span></div>
+    </div>
+
+    <div style="flex:1; padding:22px 26px; background:#FBFAF6; overflow:hidden;">
+      <div style="background:#E7F2EF; border:1px solid #B8DDD5; border-radius:10px; padding:11px 15px; display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" stroke-linecap="round"/></svg>
+        <span style="font:500 12.5px 'Sarabun'; color:#0E7062;">ดึงรายการจากใบเสนอราคา <b class="gk">QT-2026-009</b> มาให้แล้ว — แก้ได้ตามจริง</span>
+      </div>
+
+      <div style="font:700 13px 'Sarabun'; color:#1C1B17; margin-bottom:11px;">รายการในใบแจ้งหนี้</div>
+      <div style="background:#fff; border:1px solid #E7E3D8; border-radius:11px; overflow:hidden; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; padding:11px 15px; border-bottom:1px solid #F4F1E8;"><div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17;">พัฒนา RPA Bot อ่านใบแจ้งหนี้ → SAP</div></div><div style="display:flex; align-items:center; gap:7px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:7px; padding:5px 11px;"><span class="gk" style="font:600 12.5px 'Space Grotesk'; color:#1C1B17;">85,000</span></div></div>
+        <div style="display:flex; align-items:center; padding:11px 15px; border-bottom:1px solid #F4F1E8;"><div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17;">Workflow + เชื่อม API ธนาคาร</div></div><div style="display:flex; align-items:center; gap:7px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:7px; padding:5px 11px;"><span class="gk" style="font:600 12.5px 'Space Grotesk'; color:#1C1B17;">45,000</span></div></div>
+        <div style="display:flex; align-items:center; padding:11px 15px; border-bottom:1px solid #F4F1E8;"><div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17;">Orchestrator + Monitoring</div></div><div style="display:flex; align-items:center; gap:7px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:7px; padding:5px 11px;"><span class="gk" style="font:600 12.5px 'Space Grotesk'; color:#1C1B17;">28,000</span></div></div>
+        <div style="display:flex; align-items:center; padding:11px 15px;"><div style="flex:1;"><div style="font:500 12.5px 'Sarabun'; color:#1C1B17;">อบรม + เอกสาร</div></div><div style="display:flex; align-items:center; gap:7px; background:#FAF8F2; border:1px solid #E7E3D8; border-radius:7px; padding:5px 11px;"><span class="gk" style="font:600 12.5px 'Space Grotesk'; color:#1C1B17;">12,000</span></div></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px; font:500 12.5px 'Sarabun'; color:#0E8F7A; margin-bottom:16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>เพิ่มรายการ</div>
+
+      <div style="display:flex; justify-content:flex-end;"><div style="width:260px; background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:13px 16px;"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font:600 13px 'Sarabun'; color:#1C1B17;">ยอดที่ต้องชำระ</span><span class="gk" style="font:700 19px 'Space Grotesk'; color:#9B2242;">฿170,000</span></div></div></div>
+    </div>
+
+    <div style="height:62px; border-top:1px solid #E7E3D8; padding:0 26px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <button style="font:600 12.5px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:9px 18px;">← ย้อนกลับ</button>
+      <button style="font:600 12.5px 'Sarabun'; color:#fff; background:#9B2242; border:none; border-radius:9px; padding:9px 22px;">ถัดไป: เงื่อนไข →</button>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:1000px; top:2340px; width:880px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">07 · ตั้งค่า — ข้อมูลที่แสดงบนเอกสาร (Config)</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; height:760px; display:flex; flex-direction:column;">
+    <div style="height:58px; border-bottom:1px solid #E7E3D8; padding:0 26px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div><div style="font:700 16px 'Sarabun'; color:#1C1B17;">ตั้งค่าระบบ</div><div style="font:400 11px 'Sarabun'; color:#9A998E;">เฉพาะเจ้าของแก้ไขได้ · ไหลขึ้นทุกเอกสารอัตโนมัติ</div></div>
+      <button style="font:600 12.5px 'Sarabun'; color:#fff; background:#0E8F7A; border:none; border-radius:9px; padding:9px 18px;">บันทึก</button>
+    </div>
+    <div style="flex:1; display:flex; min-width:0; background:#FBFAF6;">
+      <div style="width:190px; border-right:1px solid #E7E3D8; padding:16px 12px; flex-shrink:0;">
+        <div style="font:600 12.5px 'Sarabun'; color:#fff; background:#1C1B17; border-radius:8px; padding:8px 12px; margin-bottom:5px;">ข้อมูลผู้ออกเอกสาร</div>
+        <div style="font:500 12.5px 'Sarabun'; color:#6B6A60; padding:8px 12px; margin-bottom:5px;">บัญชี &amp; การชำระเงิน</div>
+        <div style="font:500 12.5px 'Sarabun'; color:#6B6A60; padding:8px 12px; margin-bottom:5px;">เลขรันเอกสาร</div>
+        <div style="font:500 12.5px 'Sarabun'; color:#6B6A60; padding:8px 12px; margin-bottom:5px;">ผู้ใช้ &amp; สิทธิ์</div>
+        <div style="font:500 12.5px 'Sarabun'; color:#6B6A60; padding:8px 12px;">โลโก้ &amp; แบรนด์</div>
+      </div>
+      <div style="flex:1; min-width:0; padding:22px 26px; overflow:hidden;">
+        <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:16px;">ข้อมูลผู้ออกเอกสาร</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">ชื่อ-นามสกุล</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">ธนารัตน์ สหวิริยกุล</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">ตำแหน่ง / บริการ</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">RPA Developer &amp; Consultant</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">อีเมล (แสดงบนเอกสาร)</div><div style="background:#fff; border:2px solid #0E8F7A; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">tanarat.sah@gmail.com</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">เบอร์โทร</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">081-234-5678</div></div>
+          <div style="grid-column:span 2;"><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">เลขประจำตัวผู้เสียภาษี</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Space Grotesk'; color:#1C1B17;">1 1037 01234 56 7</div></div>
+        </div>
+        <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin:22px 0 16px;">บัญชี &amp; การชำระเงิน</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">ธนาคาร</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">กสิกรไทย (ออมทรัพย์)</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">เลขบัญชี</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Space Grotesk'; color:#1C1B17;">123-4-56789-0</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">ชื่อบัญชี</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Sarabun'; color:#1C1B17;">ธนารัตน์ สหวิริยกุล</div></div>
+          <div><div style="font:500 11.5px 'Sarabun'; color:#6B6A60; margin-bottom:6px;">PromptPay</div><div style="background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:10px 13px; font:500 13px 'Space Grotesk'; color:#1C1B17;">081-234-5678</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:1940px; top:2340px; width:880px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">08 · ประวัติการแก้ไข — Revisions</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; height:760px; display:flex; flex-direction:column;">
+    <div style="height:58px; border-bottom:1px solid #E7E3D8; padding:0 26px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div><div style="font:700 16px 'Sarabun'; color:#1C1B17;">ประวัติการแก้ไข</div><div style="font:400 11px 'Sarabun'; color:#9A998E;">งาน P-2026-009 · ทุกการเปลี่ยนแปลงถูกบันทึก</div></div>
+      <span style="font:600 11px 'Sarabun'; color:#6B6A60; background:#FAF8F2; border:1px solid #E7E3D8; padding:6px 12px; border-radius:8px;">ทุกเอกสาร ▾</span>
+    </div>
+    <div style="flex:1; padding:22px 26px; background:#FBFAF6; overflow:hidden;">
+      <div style="position:relative; padding-left:8px;">
+
+        <div style="display:flex; gap:14px; padding-bottom:18px;">
+          <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:32px; height:32px; border-radius:9px; background:#9B2242; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:5px;"></div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div style="font:600 13px 'Sarabun'; color:#1C1B17;">ออกใบแจ้งหนี้ <span class="gk" style="color:#9B2242;">INV-2026-021</span></div><span style="font:400 11px 'Sarabun'; color:#9A998E;">วันนี้ 09:14</span></div>
+            <div style="font:400 12px 'Sarabun'; color:#6B6A60; line-height:1.5;">สร้างจาก QT-2026-009 · ยอด ฿170,000 · ครบกำหนด 15 มี.ค.</div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:9px;"><div style="width:20px; height:20px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 9px 'Space Grotesk';">ธ</div><span style="font:500 11px 'Sarabun'; color:#9A998E;">โดย ธนารัตน์ (เจ้าของ)</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px; padding-bottom:18px;">
+          <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:32px; height:32px; border-radius:9px; background:#C98A12; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:5px;"></div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div style="font:600 13px 'Sarabun'; color:#1C1B17;">แก้ไขใบส่งงาน <span class="gk" style="color:#2B61CC;">DN-2026-014</span> <span style="font:500 10.5px 'Sarabun'; color:#C98A12; background:#FBF1DC; padding:2px 7px; border-radius:10px;">rev.1 → rev.2</span></div><span style="font:400 11px 'Sarabun'; color:#9A998E;">เมื่อวาน 16:40</span></div>
+            <div style="background:#FBFAF6; border-radius:8px; padding:9px 12px; margin-top:4px;"><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; line-height:1.6;"><span style="color:#9B2242;">− วันส่งมอบ 27 ก.พ.</span><br><span style="color:#1E8A4B;">+ วันส่งมอบ 28 ก.พ. (เลื่อนตามลูกค้า)</span></div></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:9px;"><div style="width:20px; height:20px; border-radius:50%; background:#C98A12; color:#fff; display:flex; align-items:center; justify-content:center; font:700 9px 'Space Grotesk';">ม</div><span style="font:500 11px 'Sarabun'; color:#9A998E;">โดย มุก (ผู้ช่วย)</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px; padding-bottom:18px;">
+          <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:32px; height:32px; border-radius:9px; background:#0E8F7A; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div><div style="flex:1; width:2px; background:#E7E3D8; margin-top:5px;"></div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div style="font:600 13px 'Sarabun'; color:#1C1B17;">แก้ไขใบเสนอราคา <span class="gk" style="color:#0E8F7A;">QT-2026-009</span> <span style="font:500 10.5px 'Sarabun'; color:#C98A12; background:#FBF1DC; padding:2px 7px; border-radius:10px;">rev.1 → rev.2</span></div><span style="font:400 11px 'Sarabun'; color:#9A998E;">6 ก.พ. 11:02</span></div>
+            <div style="background:#FBFAF6; border-radius:8px; padding:9px 12px; margin-top:4px;"><div style="font:400 11.5px 'Sarabun'; color:#6B6A60; line-height:1.6;"><span style="color:#9B2242;">− รายการ Orchestrator ฿32,000</span><br><span style="color:#1E8A4B;">+ รายการ Orchestrator ฿28,000 (ปรับตามที่ตกลง)</span></div></div>
+            <div style="display:flex; align-items:center; gap:7px; margin-top:9px;"><div style="width:20px; height:20px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 9px 'Space Grotesk';">ธ</div><span style="font:500 11px 'Sarabun'; color:#9A998E;">โดย ธนารัตน์ (เจ้าของ)</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:14px;">
+          <div style="display:flex; flex-direction:column; align-items:center;"><div style="width:32px; height:32px; border-radius:9px; background:#1E8A4B; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:11px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div style="font:600 13px 'Sarabun'; color:#1C1B17;">สร้างงาน + ใบเสนอราคาแรก</div><span style="font:400 11px 'Sarabun'; color:#9A998E;">5 ก.พ. 10:20</span></div>
+            <div style="font:400 12px 'Sarabun'; color:#6B6A60; line-height:1.5;">เปิดงาน P-2026-009 · แนบไฟล์ concept-solution.md</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:60px; top:3260px; width:1180px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">09 · โหมดผู้ช่วย (แฟน) — เรียบ ทำตามขั้นตอน</div>
+  <div style="background:#fff; border-radius:14px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; height:740px; display:flex; flex-direction:column;">
+    <div style="height:62px; background:#0E8F7A; padding:0 28px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:11px;"><div style="width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><div><div style="font:700 15px 'Sarabun'; color:#fff;">Agent Office</div><div style="font:400 11px 'Sarabun'; color:rgba(255,255,255,.8);">โหมดผู้ช่วย</div></div></div>
+      <div style="display:flex; align-items:center; gap:9px;"><span style="font:500 12px 'Sarabun'; color:#fff;">สวัสดี มุก 💚</span><div style="width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.25); color:#fff; display:flex; align-items:center; justify-content:center; font:700 12px 'Space Grotesk';">ม</div></div>
+    </div>
+    <div style="flex:1; padding:28px 32px; background:#FBFAF6; overflow:hidden;">
+      <div style="font:700 19px 'Sarabun'; color:#1C1B17;">วันนี้มีอะไรให้ช่วยบ้าง?</div>
+      <div style="font:400 13px 'Sarabun'; color:#9A998E; margin-bottom:22px;">เลือกสิ่งที่ต้องทำ ระบบจะพาไปทีละขั้น ไม่ต้องคิดเยอะ</div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:26px;">
+        <div style="background:#fff; border:1px solid #E7E3D8; border-radius:14px; padding:20px; text-align:center;"><div style="width:48px; height:48px; border-radius:13px; background:#E7F2EF; display:flex; align-items:center; justify-content:center; margin:0 auto 13px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div style="font:700 14px 'Sarabun'; color:#1C1B17;">สร้างใบเสนอราคา</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:3px;">เริ่มงานใหม่ให้ลูกค้า</div></div>
+        <div style="background:#fff; border:2px solid #9B2242; border-radius:14px; padding:20px; text-align:center; position:relative;"><span style="position:absolute; top:11px; right:11px; font:600 9.5px 'Sarabun'; color:#fff; background:#9B2242; padding:2px 8px; border-radius:10px;">มีงานรอ 1</span><div style="width:48px; height:48px; border-radius:13px; background:#F8E9ED; display:flex; align-items:center; justify-content:center; margin:0 auto 13px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9B2242" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><div style="font:700 14px 'Sarabun'; color:#1C1B17;">ออกใบแจ้งหนี้</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:3px;">จากงานที่ส่งมอบแล้ว</div></div>
+        <div style="background:#fff; border:1px solid #E7E3D8; border-radius:14px; padding:20px; text-align:center;"><div style="width:48px; height:48px; border-radius:13px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; margin:0 auto 13px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2B61CC" stroke-width="1.8"><path d="M5 12.5l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="font:700 14px 'Sarabun'; color:#1C1B17;">ออกใบส่งงาน</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:3px;">เมื่องานเสร็จพร้อมส่ง</div></div>
+      </div>
+
+      <div style="font:700 14px 'Sarabun'; color:#1C1B17; margin-bottom:12px;">งานที่รอคุณช่วย</div>
+      <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; overflow:hidden;">
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid #F0EDE3;">
+          <div style="width:40px; height:40px; border-radius:11px; background:#F8E9ED; display:flex; align-items:center; justify-content:center; flex-shrink:0; font:700 14px 'Sarabun'; color:#9B2242;">1</div>
+          <div style="flex:1;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">ออกใบแจ้งหนี้งาน “บันทึกใบแจ้งหนี้เข้า SAP”</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">บริษัท ตัวอย่าง จำกัด · ธนารัตน์ส่งมอบงานแล้ว รอวางบิล</div></div>
+          <button style="font:600 12px 'Sarabun'; color:#fff; background:#9B2242; border:none; border-radius:9px; padding:9px 16px; flex-shrink:0;">เริ่มทำ →</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 20px;">
+          <div style="width:40px; height:40px; border-radius:11px; background:#FBF1DC; display:flex; align-items:center; justify-content:center; flex-shrink:0; font:700 14px 'Sarabun'; color:#C98A12;">2</div>
+          <div style="flex:1;"><div style="font:600 13.5px 'Sarabun'; color:#1C1B17;">ตามใบเสนอราคาคลินิกฟันดี</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E;">ส่งไป 3 วันแล้ว · ลองโทรถามลูกค้า</div></div>
+          <button style="font:600 12px 'Sarabun'; color:#6B6A60; background:#fff; border:1px solid #E7E3D8; border-radius:9px; padding:9px 16px; flex-shrink:0;">ดูรายละเอียด</button>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:9px; margin-top:18px; background:#FAF8F2; border:1px dashed #D8D2C2; border-radius:11px; padding:13px 16px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg>
+        <span style="font:400 12px 'Sarabun'; color:#6B6A60;">ข้อมูลบัญชี อีเมล และเลขผู้เสียภาษี ธนารัตน์ตั้งไว้แล้ว ระบบจะเติมให้อัตโนมัติ — คุณแค่ใส่รายการกับยอดเงิน</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:1300px; top:3260px; width:360px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">10 · Mobile — iPhone</div>
+  <div style="width:340px; height:710px; background:#1C1B17; border-radius:46px; padding:11px; box-shadow:0 10px 34px rgba(0,0,0,.2);">
+    <div style="width:100%; height:100%; background:#FBFAF6; border-radius:36px; overflow:hidden; position:relative;">
+      <div style="height:50px; background:#FBFAF6; display:flex; align-items:flex-end; justify-content:space-between; padding:0 26px 6px;"><span class="gk" style="font:600 13px 'Space Grotesk'; color:#1C1B17;">9:41</span><div style="width:108px; height:30px; background:#1C1B17; border-radius:18px; position:absolute; left:50%; transform:translateX(-50%); top:9px;"></div><div style="display:flex; gap:4px; align-items:center;"><svg width="17" height="12" viewBox="0 0 24 16" fill="#1C1B17"><rect x="0" y="9" width="3" height="6" rx="1"/><rect x="5" y="6" width="3" height="9" rx="1"/><rect x="10" y="3" width="3" height="12" rx="1"/><rect x="15" y="0" width="3" height="15" rx="1"/></svg><svg width="22" height="12" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="#1C1B17" stroke-opacity=".4"/><rect x="2.5" y="2.5" width="16" height="8" rx="1.5" fill="#1C1B17"/><rect x="23" y="4.5" width="1.6" height="4" rx="1" fill="#1C1B17"/></svg></div></div>
+
+      <div style="padding:8px 20px 14px; display:flex; align-items:center; justify-content:space-between;"><div><div style="font:700 17px 'Sarabun'; color:#1C1B17;">ภาพรวม</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">ศุกร์ 6 ก.พ. 2569</div></div><div style="width:34px; height:34px; border-radius:50%; background:#0E8F7A; color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px 'Space Grotesk';">ธ</div></div>
+
+      <div style="padding:0 20px; display:flex; flex-direction:column; gap:11px;">
+        <div style="background:#9B2242; border-radius:15px; padding:16px 18px;"><div style="font:500 11.5px 'Sarabun'; color:rgba(255,255,255,.85);">เงินรอเก็บ</div><div class="gk" style="font:700 27px 'Space Grotesk'; color:#fff; line-height:1.2;">฿170,000</div><div style="font:400 10.5px 'Sarabun'; color:rgba(255,255,255,.8);">1 ใบแจ้งหนี้ค้างชำระ</div></div>
+        <div style="display:flex; gap:11px;">
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:13px 14px;"><div style="font:500 11px 'Sarabun'; color:#6B6A60;">งานค้าง</div><div class="gk" style="font:700 22px 'Space Grotesk'; color:#0E8F7A;">1</div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:13px 14px;"><div style="font:500 11px 'Sarabun'; color:#6B6A60;">งานรอ</div><div class="gk" style="font:700 22px 'Space Grotesk'; color:#C98A12;">2</div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:13px 14px;"><div style="font:500 11px 'Sarabun'; color:#6B6A60;">รีวิว</div><div class="gk" style="font:700 22px 'Space Grotesk'; color:#2B61CC;">1</div></div>
+        </div>
+        <div style="font:700 13px 'Sarabun'; color:#1C1B17; margin-top:4px;">งานที่ต้องดำเนินการ</div>
+        <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:13px 15px; display:flex; align-items:center; gap:11px;"><span style="width:7px; height:34px; border-radius:4px; background:#9B2242;"></span><div style="flex:1; min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บันทึกใบแจ้งหนี้เข้า SAP</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">บ.ตัวอย่าง · รอชำระ</div></div><span class="gk" style="font:600 12px 'Space Grotesk'; color:#1C1B17;">฿170k</span></div>
+        <div style="background:#fff; border:1px solid #E7E3D8; border-radius:13px; padding:13px 15px; display:flex; align-items:center; gap:11px;"><span style="width:7px; height:34px; border-radius:4px; background:#0E8F7A;"></span><div style="flex:1; min-width:0;"><div style="font:600 12.5px 'Sarabun'; color:#1C1B17; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">บอทดึงรายงานยอดขาย</div><div style="font:400 10.5px 'Sarabun'; color:#9A998E;">ร้านกาแฟ · กำลังทำ</div></div><span class="gk" style="font:600 12px 'Space Grotesk'; color:#1C1B17;">฿48k</span></div>
+      </div>
+
+      <div style="position:absolute; bottom:0; left:0; right:0; height:64px; background:#fff; border-top:1px solid #E7E3D8; display:flex; align-items:flex-start; justify-content:space-around; padding-top:11px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:3px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="1.9"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span style="font:600 9px 'Sarabun'; color:#0E8F7A;">ภาพรวม</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:3px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="1.9"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span style="font:500 9px 'Sarabun'; color:#9A998E;">งาน</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:3px;"><div style="width:38px; height:38px; border-radius:50%; background:#0E8F7A; display:flex; align-items:center; justify-content:center; margin-top:-13px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></div></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:3px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="1.9"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg><span style="font:500 9px 'Sarabun'; color:#9A998E;">เอกสาร</span></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:3px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="1.9"><circle cx="12" cy="8" r="3.4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span style="font:500 9px 'Sarabun'; color:#9A998E;">ฉัน</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:1720px; top:3260px; width:360px;" class="sb">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">11 · Mobile — Samsung (โหมดผู้ช่วย)</div>
+  <div style="width:340px; height:710px; background:#15140F; border-radius:34px; padding:7px; box-shadow:0 10px 34px rgba(0,0,0,.2);">
+    <div style="width:100%; height:100%; background:#FBFAF6; border-radius:28px; overflow:hidden; position:relative;">
+      <div style="height:40px; background:#0E8F7A; display:flex; align-items:center; justify-content:space-between; padding:0 20px;"><span class="gk" style="font:600 12px 'Space Grotesk'; color:#fff;">9:41</span><div style="width:10px; height:10px; border-radius:50%; background:rgba(0,0,0,.25); position:absolute; left:50%; transform:translateX(-50%); top:13px;"></div><div style="display:flex; gap:4px; align-items:center;"><svg width="15" height="11" viewBox="0 0 24 16" fill="#fff"><rect x="0" y="9" width="3" height="6" rx="1"/><rect x="5" y="6" width="3" height="9" rx="1"/><rect x="10" y="3" width="3" height="12" rx="1"/><rect x="15" y="0" width="3" height="15" rx="1"/></svg><svg width="20" height="11" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="#fff"/><rect x="2.5" y="2.5" width="14" height="8" rx="1.5" fill="#fff"/></svg></div></div>
+
+      <div style="background:#0E8F7A; padding:6px 20px 18px;"><div style="font:700 17px 'Sarabun'; color:#fff;">สวัสดี มุก 💚</div><div style="font:400 11px 'Sarabun'; color:rgba(255,255,255,.85);">วันนี้มี 1 งานรอช่วย</div></div>
+
+      <div style="padding:18px 18px 0; display:flex; flex-direction:column; gap:11px;">
+        <div style="background:#fff; border:2px solid #9B2242; border-radius:15px; padding:17px; position:relative;"><span style="position:absolute; top:13px; right:13px; font:600 9px 'Sarabun'; color:#fff; background:#9B2242; padding:2px 8px; border-radius:10px;">รอทำ</span><div style="width:44px; height:44px; border-radius:12px; background:#F8E9ED; display:flex; align-items:center; justify-content:center; margin-bottom:12px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9B2242" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div><div style="font:700 14.5px 'Sarabun'; color:#1C1B17;">ออกใบแจ้งหนี้</div><div style="font:400 11.5px 'Sarabun'; color:#9A998E; margin-top:2px; line-height:1.4;">งาน “บันทึกใบแจ้งหนี้เข้า SAP”<br>บริษัท ตัวอย่าง จำกัด</div><button style="width:100%; font:600 12.5px 'Sarabun'; color:#fff; background:#9B2242; border:none; border-radius:10px; padding:11px; margin-top:13px;">เริ่มทำเลย →</button></div>
+
+        <div style="display:flex; gap:11px;">
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:14px; padding:15px 13px; text-align:center;"><div style="width:38px; height:38px; border-radius:11px; background:#E7F2EF; display:flex; align-items:center; justify-content:center; margin:0 auto 9px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0E8F7A" stroke-width="1.8"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></div><div style="font:600 12px 'Sarabun'; color:#1C1B17; line-height:1.3;">สร้างใบ<br>เสนอราคา</div></div>
+          <div style="flex:1; background:#fff; border:1px solid #E7E3D8; border-radius:14px; padding:15px 13px; text-align:center;"><div style="width:38px; height:38px; border-radius:11px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; margin:0 auto 9px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2B61CC" stroke-width="1.8"><path d="M5 12.5l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="font:600 12px 'Sarabun'; color:#1C1B17; line-height:1.3;">ออกใบ<br>ส่งงาน</div></div>
+        </div>
+
+        <div style="background:#FAF8F2; border:1px dashed #D8D2C2; border-radius:12px; padding:12px 14px; display:flex; gap:9px; align-items:flex-start;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9A998E" stroke-width="1.8" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round"/></svg><span style="font:400 11px 'Sarabun'; color:#6B6A60; line-height:1.5;">บัญชี/อีเมลตั้งไว้แล้ว แค่ใส่รายการกับยอด เดี๋ยวระบบทำเอกสารให้</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

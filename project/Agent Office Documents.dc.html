@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --ink:#16181D; --ink2:#5B6470; --ink3:#8A929E; --line:#E3E6EB; --line2:#EDEFF3; --panel:#F6F7F9; --paper:#FFFFFF;
+         --qt:#0E8F7A; --qt-bg:#E7F4F1; --dn:#2B61CC; --dn-bg:#E8EFFC; --inv:#9B2242; --inv-bg:#F8E9ED; --rc:#1E8A4B; --rc-bg:#E7F4EC; }
+  *{ box-sizing:border-box; }
+  .sarabun{ font-family:'Sarabun',sans-serif; }
+  .mono{ font-family:'Space Grotesk',sans-serif; font-feature-settings:'tnum' 1; }
+  table{ border-collapse:collapse; width:100%; }
+</style>
+</helmet>
+
+<div style="position:absolute; left:60px; top:60px; width:640px;" class="sarabun">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#8A929E; margin-bottom:12px;">Design System · Agent Office</div>
+  <div style="background:#fff; border-radius:3px; box-shadow:0 1px 3px rgba(0,0,0,.08); padding:34px 36px;">
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+      <div style="width:46px; height:46px; border-radius:11px; background:#16181D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div style="font:700 19px 'Sarabun'; color:#16181D; line-height:1.1;">Agent Office</div>
+        <div style="font:500 12.5px 'Sarabun'; color:#5B6470;">ระบบเอกสารงาน RPA — ตระกูลเดียวกัน 4 ใบ</div>
+      </div>
+    </div>
+    <p style="font:400 13px 'Sarabun'; color:#5B6470; line-height:1.6; margin:14px 0 22px;">โครงเดียว ฟอนต์เดียว กริดเดียว — แต่ <b style="color:#16181D;">เปลี่ยน “สีประจำใบ” + “ตัวเอกของ layout”</b> ให้แต่ละใบทำหน้าที่ของตัวเอง มองแวบเดียวรู้ทันทีว่าใบไหน</p>
+
+    <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#8A929E; margin-bottom:11px;">สีประจำเอกสาร / Document colors</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px;">
+      <div style="border:1px solid #E3E6EB; border-radius:8px; overflow:hidden;"><div style="height:34px; background:#0E8F7A;"></div><div style="padding:8px 11px;"><div style="font:600 12.5px 'Sarabun'; color:#16181D;">ใบเสนอราคา</div><div class="mono" style="font-size:11px; color:#8A929E;">#0E8F7A · Teal</div></div></div>
+      <div style="border:1px solid #E3E6EB; border-radius:8px; overflow:hidden;"><div style="height:34px; background:#2B61CC;"></div><div style="padding:8px 11px;"><div style="font:600 12.5px 'Sarabun'; color:#16181D;">ใบส่งงาน</div><div class="mono" style="font-size:11px; color:#8A929E;">#2B61CC · Blue</div></div></div>
+      <div style="border:1px solid #E3E6EB; border-radius:8px; overflow:hidden;"><div style="height:34px; background:#9B2242;"></div><div style="padding:8px 11px;"><div style="font:600 12.5px 'Sarabun'; color:#16181D;">ใบแจ้งหนี้</div><div class="mono" style="font-size:11px; color:#8A929E;">#9B2242 · Burgundy</div></div></div>
+      <div style="border:1px solid #E3E6EB; border-radius:8px; overflow:hidden;"><div style="height:34px; background:#1E8A4B;"></div><div style="padding:8px 11px;"><div style="font:600 12.5px 'Sarabun'; color:#16181D;">ใบเสร็จรับเงิน</div><div class="mono" style="font-size:11px; color:#8A929E;">#1E8A4B · Green</div></div></div>
+    </div>
+
+    <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#8A929E; margin-bottom:11px;">นิวทรัล / Neutrals</div>
+    <div style="display:flex; gap:8px; margin-bottom:24px;">
+      <div style="flex:1;"><div style="height:30px; border-radius:6px; background:#16181D; border:1px solid #E3E6EB;"></div><div class="mono" style="font-size:10px; color:#8A929E; margin-top:5px;">#16181D</div></div>
+      <div style="flex:1;"><div style="height:30px; border-radius:6px; background:#5B6470; border:1px solid #E3E6EB;"></div><div class="mono" style="font-size:10px; color:#8A929E; margin-top:5px;">#5B6470</div></div>
+      <div style="flex:1;"><div style="height:30px; border-radius:6px; background:#E3E6EB;"></div><div class="mono" style="font-size:10px; color:#8A929E; margin-top:5px;">#E3E6EB</div></div>
+      <div style="flex:1;"><div style="height:30px; border-radius:6px; background:#F6F7F9; border:1px solid #E3E6EB;"></div><div class="mono" style="font-size:10px; color:#8A929E; margin-top:5px;">#F6F7F9</div></div>
+      <div style="flex:1;"><div style="height:30px; border-radius:6px; background:#FFFFFF; border:1px solid #E3E6EB;"></div><div class="mono" style="font-size:10px; color:#8A929E; margin-top:5px;">#FFFFFF</div></div>
+    </div>
+
+    <div style="font:600 11px 'Space Grotesk'; letter-spacing:.14em; text-transform:uppercase; color:#8A929E; margin-bottom:11px;">ตัวอักษร / Type</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div style="border:1px solid #E3E6EB; border-radius:8px; padding:13px 15px;">
+        <div style="font:700 26px 'Sarabun'; color:#16181D; line-height:1;">Sarabun</div>
+        <div style="font:400 12px 'Sarabun'; color:#5B6470; margin-top:6px;">เนื้อหา ป้ายกำกับ ตาราง ภาษาไทย · 300–800</div>
+      </div>
+      <div style="border:1px solid #E3E6EB; border-radius:8px; padding:13px 15px;">
+        <div class="mono" style="font:600 26px 'Space Grotesk'; color:#16181D; line-height:1;">170,000</div>
+        <div style="font:400 12px 'Sarabun'; color:#5B6470; margin-top:6px;">Space Grotesk — ตัวเลข ยอดเงิน เลขที่เอกสาร</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:760px; top:60px; width:794px;" class="sarabun">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#0E8F7A; margin-bottom:12px;">01 · ใบเสนอราคา / Quotation</div>
+  <div style="background:#fff; width:794px; min-height:1123px; box-shadow:0 1px 3px rgba(0,0,0,.1); position:relative; overflow:hidden;">
+    <div style="position:absolute; left:0; top:0; bottom:0; width:7px; background:#0E8F7A;"></div>
+    <div style="padding:46px 50px 50px 54px;">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="display:flex; gap:13px;">
+          <div style="width:44px; height:44px; border-radius:11px; background:#16181D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font:700 16px 'Sarabun'; color:#16181D; line-height:1.15;">ธนารัตน์ สหวิริยกุล</div>
+            <div style="font:500 11.5px 'Sarabun'; color:#5B6470; line-height:1.45; margin-top:2px;">RPA Developer &amp; Consultant · UiPath Certified<br>tanarat.sah@gmail.com · 081-234-5678</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font:700 30px 'Space Grotesk'; color:#0E8F7A; letter-spacing:.01em; line-height:1;">QUOTATION</div>
+          <div style="font:600 14px 'Sarabun'; color:#16181D; margin-top:3px;">ใบเสนอราคา</div>
+        </div>
+      </div>
+
+      <div style="height:1px; background:#E3E6EB; margin:22px 0 0;"></div>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">เสนอราคาให้ / Prepared for</div>
+          <div style="font:700 14.5px 'Sarabun'; color:#16181D;">บริษัท ตัวอย่าง จำกัด (สำนักงานใหญ่)</div>
+          <div style="font:400 12px 'Sarabun'; color:#5B6470; line-height:1.55; margin-top:4px;">ผู้ติดต่อ: คุณสมหญิง รุ่งเรือง (ฝ่ายจัดซื้อ)<br>199/45 อาคารทรงไทย ชั้น 12 ถ.สุขุมวิท<br>แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110<br>เลขประจำตัวผู้เสียภาษี 0 1055 60123 45 6</div>
+        </div>
+        <div style="width:236px; background:#F6F7F9; border-radius:9px; padding:16px 18px;">
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">เลขที่เอกสาร</span><span class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">QT-2026-009</span></div>
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">วันที่</span><span style="font:600 12.5px 'Sarabun'; color:#16181D;">5 ก.พ. 2569</span></div>
+          <div style="height:1px; background:#E3E6EB; margin:7px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0;"><span style="font:600 12px 'Sarabun'; color:#0E8F7A;">ยืนราคาถึง</span><span style="font:700 13px 'Sarabun'; color:#0E8F7A;">5 มี.ค. 2569</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; background:#E7F4F1; border-left:3px solid #0E8F7A; border-radius:0 8px 8px 0; padding:13px 17px;">
+        <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#0E8F7A; margin-bottom:4px;">ขอบเขตงาน / Scope</div>
+        <div style="font:400 12.5px 'Sarabun'; color:#16181D; line-height:1.55;">ออกแบบและพัฒนา RPA Bot ด้วย UiPath สำหรับงานบันทึกใบแจ้งหนี้เข้าระบบ SAP แบบอัตโนมัติ พร้อมเชื่อมต่อ API ธนาคารเพื่อกระทบยอด ติดตั้ง Orchestrator ตั้งเวลาทำงาน และส่งมอบเอกสารการใช้งานครบชุด</div>
+      </div>
+
+      <table style="margin-top:22px;">
+        <thead>
+          <tr style="background:#16181D;">
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:center; padding:10px 8px; width:40px; border-radius:6px 0 0 0;">#</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:left; padding:10px 12px;">รายละเอียด / Description</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:center; padding:10px 8px; width:56px;">จำนวน</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:right; padding:10px 12px; width:104px;">ราคา/หน่วย</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:right; padding:10px 14px; width:108px; border-radius:0 6px 0 0;">รวม (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:12px 8px; color:#8A929E; font-size:12px;">1</td><td style="padding:12px; font:500 12.5px 'Sarabun'; color:#16181D;">พัฒนา RPA Bot อ่านใบแจ้งหนี้จากอีเมลและบันทึกลง SAP <span style="display:block; font-weight:400; font-size:11.5px; color:#8A929E;">รองรับ PDF/รูปภาพ + OCR + validation</span></td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:12px; font-size:12.5px; color:#16181D;">85,000.00</td><td class="mono" style="text-align:right; padding:12px 14px; font-size:12.5px; color:#16181D; font-weight:600;">85,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:12px 8px; color:#8A929E; font-size:12px;">2</td><td style="padding:12px; font:500 12.5px 'Sarabun'; color:#16181D;">ออกแบบ Workflow + เชื่อม API ธนาคารเพื่อกระทบยอด <span style="display:block; font-weight:400; font-size:11.5px; color:#8A929E;">Reconcile รายการเดินบัญชีอัตโนมัติ</span></td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:12px; font-size:12.5px; color:#16181D;">45,000.00</td><td class="mono" style="text-align:right; padding:12px 14px; font-size:12.5px; color:#16181D; font-weight:600;">45,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:12px 8px; color:#8A929E; font-size:12px;">3</td><td style="padding:12px; font:500 12.5px 'Sarabun'; color:#16181D;">ติดตั้ง UiPath Orchestrator + ตั้ง Schedule + Monitoring <span style="display:block; font-weight:400; font-size:11.5px; color:#8A929E;">Dashboard แจ้งเตือนเมื่อบอททำงานผิดพลาด</span></td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:12px; font-size:12.5px; color:#16181D;">28,000.00</td><td class="mono" style="text-align:right; padding:12px 14px; font-size:12.5px; color:#16181D; font-weight:600;">28,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:12px 8px; color:#8A929E; font-size:12px;">4</td><td style="padding:12px; font:500 12.5px 'Sarabun'; color:#16181D;">อบรมการใช้งาน + ส่งมอบเอกสาร (User Manual + Runbook) <span style="display:block; font-weight:400; font-size:11.5px; color:#8A929E;">อบรม 1 รอบ + รับประกัน 30 วัน</span></td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:12px; font-size:12.5px; color:#16181D;">12,000.00</td><td class="mono" style="text-align:right; padding:12px 14px; font-size:12.5px; color:#16181D; font-weight:600;">12,000.00</td></tr>
+        </tbody>
+      </table>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:8px;">สิ่งที่คุณจะได้รับ / Deliverables</div>
+          <div style="display:flex; flex-direction:column; gap:7px;">
+            <div style="display:flex; gap:8px; align-items:flex-start;"><span style="color:#0E8F7A; font-weight:700; line-height:1.4;">✓</span><span style="font:400 12px 'Sarabun'; color:#16181D; line-height:1.4;">RPA Bot พร้อมใช้งานจริงบนเครื่องลูกค้า</span></div>
+            <div style="display:flex; gap:8px; align-items:flex-start;"><span style="color:#0E8F7A; font-weight:700; line-height:1.4;">✓</span><span style="font:400 12px 'Sarabun'; color:#16181D; line-height:1.4;">Source code + Workflow ทั้งหมด (.xaml)</span></div>
+            <div style="display:flex; gap:8px; align-items:flex-start;"><span style="color:#0E8F7A; font-weight:700; line-height:1.4;">✓</span><span style="font:400 12px 'Sarabun'; color:#16181D; line-height:1.4;">User Manual + Runbook ภาษาไทย</span></div>
+            <div style="display:flex; gap:8px; align-items:flex-start;"><span style="color:#0E8F7A; font-weight:700; line-height:1.4;">✓</span><span style="font:400 12px 'Sarabun'; color:#16181D; line-height:1.4;">รับประกันแก้ไขบั๊ก 30 วันหลังส่งมอบ</span></div>
+          </div>
+        </div>
+        <div style="width:300px;">
+          <div style="display:flex; justify-content:space-between; padding:8px 4px; border-bottom:1px solid #EDEFF3;"><span style="font:400 12.5px 'Sarabun'; color:#5B6470;">รวมเป็นเงิน</span><span class="mono" style="font:500 13px 'Space Grotesk'; color:#16181D;">170,000.00</span></div>
+          <div style="display:flex; justify-content:space-between; padding:8px 4px; border-bottom:1px solid #EDEFF3;"><span style="font:400 12px 'Sarabun'; color:#8A929E;">ภาษีมูลค่าเพิ่ม (ไม่จด VAT)</span><span class="mono" style="font:500 12.5px 'Space Grotesk'; color:#8A929E;">—</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:11px; background:#0E8F7A; border-radius:9px; padding:13px 16px;"><span style="font:600 13px 'Sarabun'; color:#fff;">ยอดรวมทั้งสิ้น</span><span class="mono" style="font:700 21px 'Space Grotesk'; color:#fff;">฿170,000</span></div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:76px; display:flex; gap:20px; align-items:flex-end;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">เงื่อนไขการชำระเงิน / Terms</div>
+          <div style="font:400 11.5px 'Sarabun'; color:#5B6470; line-height:1.6;">• แบ่งชำระ 2 งวด: มัดจำ 50% เมื่อตกลงจ้าง · ส่วนที่เหลือ 50% เมื่อส่งมอบงาน<br>• ระยะเวลาดำเนินงานประมาณ 6 สัปดาห์หลังได้รับมัดจำ<br>• ราคานี้ยังไม่รวมค่า License UiPath (หากต้องการ แจ้งเพิ่มได้)</div>
+        </div>
+        <div style="width:200px; text-align:center;">
+          <div style="height:46px;"></div>
+          <div style="height:1px; background:#16181D;"></div>
+          <div style="font:600 12px 'Sarabun'; color:#16181D; margin-top:7px;">ธนารัตน์ สหวิริยกุล</div>
+          <div style="font:400 11px 'Sarabun'; color:#8A929E;">ผู้เสนอราคา · 5 ก.พ. 2569</div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:30px; display:flex; justify-content:space-between; align-items:center; padding-top:13px; border-top:1px solid #E3E6EB;">
+        <span style="font:400 10.5px 'Sarabun'; color:#8A929E;">ขอบคุณที่ให้โอกาสนำเสนอ — ยินดีปรับขอบเขตงานตามความเหมาะสม</span>
+        <span class="mono" style="font:500 10.5px 'Space Grotesk'; color:#8A929E;">Agent Office · QT-2026-009</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<div style="position:absolute; left:1640px; top:60px; width:794px;" class="sarabun">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#2B61CC; margin-bottom:12px;">02 · ใบส่งงาน / Delivery Note</div>
+  <div style="background:#fff; width:794px; min-height:1123px; box-shadow:0 1px 3px rgba(0,0,0,.1); position:relative; overflow:hidden;">
+    <div style="position:absolute; left:0; top:0; bottom:0; width:7px; background:#2B61CC;"></div>
+    <div style="padding:46px 50px 50px 54px;">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="display:flex; gap:13px;">
+          <div style="width:44px; height:44px; border-radius:11px; background:#16181D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font:700 16px 'Sarabun'; color:#16181D; line-height:1.15;">ธนารัตน์ สหวิริยกุล</div>
+            <div style="font:500 11.5px 'Sarabun'; color:#5B6470; line-height:1.45; margin-top:2px;">RPA Developer &amp; Consultant · UiPath Certified<br>tanarat.sah@gmail.com · 081-234-5678</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font:700 30px 'Space Grotesk'; color:#2B61CC; letter-spacing:.01em; line-height:1;">DELIVERY</div>
+          <div style="font:600 14px 'Sarabun'; color:#16181D; margin-top:3px;">ใบส่งงาน</div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px; background:#2B61CC; border-radius:11px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:13px;">
+          <div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <div style="font:700 16px 'Sarabun'; color:#fff; line-height:1.1;">ส่งมอบงานเรียบร้อย</div>
+            <div style="font:400 12px 'Sarabun'; color:rgba(255,255,255,.82);">สถานะ: เสร็จสมบูรณ์ · พร้อมให้ตรวจรับ</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font:400 11px 'Sarabun'; color:rgba(255,255,255,.78);">วันที่ส่งมอบจริง</div>
+          <div style="font:700 17px 'Sarabun'; color:#fff;">28 ก.พ. 2569</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">ส่งมอบให้ / Delivered to</div>
+          <div style="font:700 14.5px 'Sarabun'; color:#16181D;">บริษัท ตัวอย่าง จำกัด (สำนักงานใหญ่)</div>
+          <div style="font:400 12px 'Sarabun'; color:#5B6470; line-height:1.55; margin-top:4px;">ผู้รับมอบงาน: คุณสมหญิง รุ่งเรือง (ฝ่ายจัดซื้อ)<br>199/45 อาคารทรงไทย ชั้น 12 ถ.สุขุมวิท<br>แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110</div>
+        </div>
+        <div style="width:236px; background:#F6F7F9; border-radius:9px; padding:16px 18px;">
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">เลขที่เอกสาร</span><span class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">DN-2026-014</span></div>
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">วันที่ออก</span><span style="font:600 12.5px 'Sarabun'; color:#16181D;">28 ก.พ. 2569</span></div>
+          <div style="height:1px; background:#E3E6EB; margin:7px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0;"><span style="font:600 12px 'Sarabun'; color:#2B61CC;">อ้างอิงใบเสนอราคา</span><span class="mono" style="font:700 12.5px 'Space Grotesk'; color:#2B61CC;">QT-2026-009</span></div>
+        </div>
+      </div>
+
+      <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin:24px 0 10px;">รายการงานที่ส่งมอบ / Deliverables checklist</div>
+      <div style="border:1px solid #E3E6EB; border-radius:10px; overflow:hidden;">
+        <div style="display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #EDEFF3;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#2B61CC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1;"><div style="font:600 13px 'Sarabun'; color:#16181D;">RPA Bot อ่านใบแจ้งหนี้ → SAP</div><div style="font:400 11.5px 'Sarabun'; color:#8A929E;">ติดตั้งบนเครื่อง Production · ทดสอบผ่าน 50 รายการ</div></div>
+          <span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px;">เสร็จสมบูรณ์</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #EDEFF3;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#2B61CC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1;"><div style="font:600 13px 'Sarabun'; color:#16181D;">Workflow + เชื่อม API ธนาคาร (Reconcile)</div><div style="font:400 11.5px 'Sarabun'; color:#8A929E;">เชื่อมต่อสำเร็จ · กระทบยอดอัตโนมัติทุกวัน 08:00</div></div>
+          <span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px;">เสร็จสมบูรณ์</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #EDEFF3;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#2B61CC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1;"><div style="font:600 13px 'Sarabun'; color:#16181D;">UiPath Orchestrator + Schedule + Monitoring</div><div style="font:400 11.5px 'Sarabun'; color:#8A929E;">Dashboard + แจ้งเตือน Line Notify เมื่อบอทล้มเหลว</div></div>
+          <span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px;">เสร็จสมบูรณ์</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:13px; padding:13px 16px;">
+          <div style="width:24px; height:24px; border-radius:7px; background:#E8EFFC; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="#2B61CC" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1;"><div style="font:600 13px 'Sarabun'; color:#16181D;">อบรมการใช้งาน + เอกสาร (Manual + Runbook)</div><div style="font:400 11.5px 'Sarabun'; color:#8A929E;">อบรมทีม 4 คน · ส่งไฟล์ PDF + วิดีโอบันทึก</div></div>
+          <span style="font:600 11px 'Sarabun'; color:#2B61CC; background:#E8EFFC; padding:4px 11px; border-radius:20px;">เสร็จสมบูรณ์</span>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:0 4px;">
+        <span style="font:400 11.5px 'Sarabun'; color:#8A929E;">มูลค่างานตามใบเสนอราคา (เพื่ออ้างอิงเท่านั้น — ออกใบแจ้งหนี้แยกต่างหาก)</span>
+        <span class="mono" style="font:500 13px 'Space Grotesk'; color:#8A929E;">฿170,000.00</span>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:76px; border:1.5px solid #2B61CC; border-radius:11px; padding:16px 20px 18px;">
+        <div style="font:700 12.5px 'Sarabun'; color:#2B61CC; margin-bottom:4px;">การตรวจรับงาน / Acceptance &amp; Sign-off</div>
+        <div style="font:400 11.5px 'Sarabun'; color:#5B6470; margin-bottom:20px;">โปรดตรวจสอบรายการข้างต้น หากครบถ้วนถูกต้อง กรุณาลงนามเพื่อยืนยันการรับมอบงาน</div>
+        <div style="display:flex; gap:30px;">
+          <div style="flex:1; text-align:center;">
+            <div style="height:42px;"></div>
+            <div style="height:1px; background:#16181D;"></div>
+            <div style="font:600 12px 'Sarabun'; color:#16181D; margin-top:7px;">ผู้ส่งมอบงาน</div>
+            <div style="font:400 11px 'Sarabun'; color:#8A929E;">ธนารัตน์ สหวิริยกุล</div>
+            <div style="font:400 11px 'Sarabun'; color:#8A929E; margin-top:3px;">วันที่ ____ / ____ / ______</div>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="height:42px;"></div>
+            <div style="height:1px; background:#16181D;"></div>
+            <div style="font:600 12px 'Sarabun'; color:#16181D; margin-top:7px;">ผู้ตรวจรับงาน</div>
+            <div style="font:400 11px 'Sarabun'; color:#8A929E;">(ตัวแทนบริษัท ตัวอย่าง จำกัด)</div>
+            <div style="font:400 11px 'Sarabun'; color:#8A929E; margin-top:3px;">วันที่ ____ / ____ / ______</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:30px; display:flex; justify-content:space-between; align-items:center; padding-top:13px; border-top:1px solid #E3E6EB;">
+        <span style="font:400 10.5px 'Sarabun'; color:#8A929E;">เอกสารนี้ใช้ยืนยันการส่งมอบงาน ไม่ใช่ใบเรียกเก็บเงิน</span>
+        <span class="mono" style="font:500 10.5px 'Space Grotesk'; color:#8A929E;">Agent Office · DN-2026-014 → QT-2026-009</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="position:absolute; left:2520px; top:60px; width:794px;" class="sarabun">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#9B2242; margin-bottom:12px;">03 · ใบวางบิล / ใบแจ้งหนี้ / Invoice</div>
+  <div style="background:#fff; width:794px; min-height:1123px; box-shadow:0 1px 3px rgba(0,0,0,.1); position:relative; overflow:hidden;">
+    <div style="position:absolute; left:0; top:0; bottom:0; width:7px; background:#9B2242;"></div>
+    <div style="padding:46px 50px 50px 54px;">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="display:flex; gap:13px;">
+          <div style="width:44px; height:44px; border-radius:11px; background:#16181D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font:700 16px 'Sarabun'; color:#16181D; line-height:1.15;">ธนารัตน์ สหวิริยกุล</div>
+            <div style="font:500 11.5px 'Sarabun'; color:#5B6470; line-height:1.45; margin-top:2px;">RPA Developer &amp; Consultant · UiPath Certified<br>เลขประจำตัวผู้เสียภาษี 1 1037 01234 56 7</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font:700 30px 'Space Grotesk'; color:#9B2242; letter-spacing:.01em; line-height:1;">INVOICE</div>
+          <div style="font:600 14px 'Sarabun'; color:#16181D; margin-top:3px;">ใบวางบิล / ใบแจ้งหนี้</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:18px; margin-top:22px; align-items:stretch;">
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">เรียกเก็บเงินจาก / Bill to</div>
+          <div style="font:700 14.5px 'Sarabun'; color:#16181D;">บริษัท ตัวอย่าง จำกัด (สำนักงานใหญ่)</div>
+          <div style="font:400 12px 'Sarabun'; color:#5B6470; line-height:1.55; margin-top:4px;">199/45 อาคารทรงไทย ชั้น 12 ถ.สุขุมวิท<br>แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110<br>เลขประจำตัวผู้เสียภาษี 0 1055 60123 45 6</div>
+        </div>
+        <div style="width:320px; background:#9B2242; border-radius:13px; padding:18px 22px; color:#fff;">
+          <div style="font:500 11.5px 'Sarabun'; color:rgba(255,255,255,.82); letter-spacing:.04em;">ยอดที่ต้องชำระ / Amount due</div>
+          <div class="mono" style="font:700 42px 'Space Grotesk'; line-height:1.05; margin:5px 0 2px;">฿170,000<span style="font-size:22px;">.00</span></div>
+          <div style="height:1px; background:rgba(255,255,255,.22); margin:11px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font:400 11.5px 'Sarabun'; color:rgba(255,255,255,.82);">ครบกำหนดชำระ</span>
+            <span style="font:700 14px 'Sarabun'; color:#fff;">15 มี.ค. 2569</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:18px;">
+        <div style="flex:1; background:#F6F7F9; border-radius:8px; padding:10px 13px;"><div style="font:400 10.5px 'Sarabun'; color:#8A929E;">เลขที่</div><div class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">INV-2026-021</div></div>
+        <div style="flex:1; background:#F6F7F9; border-radius:8px; padding:10px 13px;"><div style="font:400 10.5px 'Sarabun'; color:#8A929E;">วันที่</div><div style="font:600 12.5px 'Sarabun'; color:#16181D;">1 มี.ค. 2569</div></div>
+        <div style="flex:1; background:#F6F7F9; border-radius:8px; padding:10px 13px;"><div style="font:400 10.5px 'Sarabun'; color:#8A929E;">อ้างอิงใบเสนอราคา</div><div class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">QT-2026-009</div></div>
+        <div style="flex:1; background:#F6F7F9; border-radius:8px; padding:10px 13px;"><div style="font:400 10.5px 'Sarabun'; color:#8A929E;">อ้างอิงใบส่งงาน</div><div class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">DN-2026-014</div></div>
+      </div>
+
+      <table style="margin-top:20px;">
+        <thead>
+          <tr style="background:#16181D;">
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:center; padding:10px 8px; width:40px; border-radius:6px 0 0 0;">#</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:left; padding:10px 12px;">รายละเอียด / Description</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:center; padding:10px 8px; width:56px;">จำนวน</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:right; padding:10px 12px; width:104px;">ราคา/หน่วย</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:right; padding:10px 14px; width:108px; border-radius:0 6px 0 0;">รวม (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:11px 8px; color:#8A929E; font-size:12px;">1</td><td style="padding:11px 12px; font:500 12.5px 'Sarabun'; color:#16181D;">พัฒนา RPA Bot อ่านใบแจ้งหนี้และบันทึกลง SAP</td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:11px 12px; font-size:12.5px; color:#16181D;">85,000.00</td><td class="mono" style="text-align:right; padding:11px 14px; font-size:12.5px; color:#16181D; font-weight:600;">85,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:11px 8px; color:#8A929E; font-size:12px;">2</td><td style="padding:11px 12px; font:500 12.5px 'Sarabun'; color:#16181D;">ออกแบบ Workflow + เชื่อม API ธนาคาร (Reconcile)</td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:11px 12px; font-size:12.5px; color:#16181D;">45,000.00</td><td class="mono" style="text-align:right; padding:11px 14px; font-size:12.5px; color:#16181D; font-weight:600;">45,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:11px 8px; color:#8A929E; font-size:12px;">3</td><td style="padding:11px 12px; font:500 12.5px 'Sarabun'; color:#16181D;">ติดตั้ง Orchestrator + Schedule + Monitoring</td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:11px 12px; font-size:12.5px; color:#16181D;">28,000.00</td><td class="mono" style="text-align:right; padding:11px 14px; font-size:12.5px; color:#16181D; font-weight:600;">28,000.00</td></tr>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:11px 8px; color:#8A929E; font-size:12px;">4</td><td style="padding:11px 12px; font:500 12.5px 'Sarabun'; color:#16181D;">อบรมการใช้งาน + ส่งมอบเอกสาร (Manual + Runbook)</td><td class="mono" style="text-align:center; font-size:12.5px; color:#5B6470;">1</td><td class="mono" style="text-align:right; padding:11px 12px; font-size:12.5px; color:#16181D;">12,000.00</td><td class="mono" style="text-align:right; padding:11px 14px; font-size:12.5px; color:#16181D; font-weight:600;">12,000.00</td></tr>
+        </tbody>
+      </table>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#9B2242; margin-bottom:9px;">ช่องทางชำระเงิน / Payment</div>
+          <div style="border:1px solid #E3E6EB; border-radius:10px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;">
+              <span style="font:600 12.5px 'Sarabun'; color:#16181D;">ธนาคารกสิกรไทย</span>
+              <span style="font:400 11px 'Sarabun'; color:#8A929E;">ออมทรัพย์</span>
+            </div>
+            <div class="mono" style="font:600 19px 'Space Grotesk'; color:#16181D; letter-spacing:.04em;">123-4-56789-0</div>
+            <div style="font:400 11.5px 'Sarabun'; color:#5B6470; margin-top:2px;">ชื่อบัญชี ธนารัตน์ สหวิริยกุล</div>
+            <div style="height:1px; background:#EDEFF3; margin:11px 0;"></div>
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span style="font:700 10.5px 'Space Grotesk'; color:#fff; background:#16181D; padding:3px 8px; border-radius:5px; letter-spacing:.05em;">PromptPay</span>
+              <span class="mono" style="font:600 15px 'Space Grotesk'; color:#16181D;">081-234-5678</span>
+            </div>
+          </div>
+        </div>
+        <div style="width:316px;">
+          <div style="display:flex; justify-content:space-between; padding:7px 4px;"><span style="font:400 12.5px 'Sarabun'; color:#5B6470;">รวมเป็นเงิน</span><span class="mono" style="font:500 13px 'Space Grotesk'; color:#16181D;">170,000.00</span></div>
+          <div style="display:flex; justify-content:space-between; padding:7px 4px; border-top:1px solid #EDEFF3;"><span style="font:400 12px 'Sarabun'; color:#8A929E;">ภาษีมูลค่าเพิ่ม (ไม่จด VAT)</span><span class="mono" style="font:500 12.5px 'Space Grotesk'; color:#8A929E;">—</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; background:#F8E9ED; border:1.5px solid #9B2242; border-radius:11px; padding:14px 17px;">
+            <div><div style="font:700 13px 'Sarabun'; color:#9B2242;">ยอดที่ต้องชำระ</div><div style="font:400 10.5px 'Sarabun'; color:#9B2242; opacity:.75;">Total amount due</div></div>
+            <span class="mono" style="font:700 24px 'Space Grotesk'; color:#9B2242;">฿170,000</span>
+          </div>
+          <div style="font:400 10.5px 'Sarabun'; color:#8A929E; text-align:right; margin-top:6px; line-height:1.45;">โอนแล้วส่งสลิปยืนยันมาที่<br>tanarat.sah@gmail.com</div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:76px; display:flex; gap:20px; align-items:flex-end;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">เงื่อนไขการชำระ / Terms</div>
+          <div style="font:400 11.5px 'Sarabun'; color:#5B6470; line-height:1.6;">• ชำระภายในวันครบกำหนด (15 มี.ค. 2569)<br>• โอนแล้วกรุณาส่งสลิปยืนยันทาง email หรือ Line<br>• เอกสารนี้เป็นใบแจ้งหนี้/วางบิล มิใช่ใบเสร็จรับเงิน</div>
+        </div>
+        <div style="width:200px; text-align:center;">
+          <div style="height:42px;"></div>
+          <div style="height:1px; background:#16181D;"></div>
+          <div style="font:600 12px 'Sarabun'; color:#16181D; margin-top:7px;">ธนารัตน์ สหวิริยกุล</div>
+          <div style="font:400 11px 'Sarabun'; color:#8A929E;">ผู้วางบิล · 1 มี.ค. 2569</div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:30px; display:flex; justify-content:space-between; align-items:center; padding-top:13px; border-top:1px solid #E3E6EB;">
+        <span style="font:400 10.5px 'Sarabun'; color:#8A929E;">โปรดชำระตามยอด ฿170,000.00 ภายในวันครบกำหนด</span>
+        <span class="mono" style="font:500 10.5px 'Space Grotesk'; color:#8A929E;">Agent Office · INV-2026-021</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<sc-if value="{{ showReceipt }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute; left:3400px; top:60px; width:794px;" class="sarabun">
+  <div data-drags-parent="1" style="font:600 12px 'Space Grotesk'; letter-spacing:.16em; text-transform:uppercase; color:#1E8A4B; margin-bottom:12px;">04 · ใบเสร็จรับเงิน / Receipt <span style="color:#8A929E; text-transform:none; letter-spacing:0; font-weight:400;">— แถมให้เพื่อปิดวงจรงาน</span></div>
+  <div style="background:#fff; width:794px; min-height:1123px; box-shadow:0 1px 3px rgba(0,0,0,.1); position:relative; overflow:hidden;">
+    <div style="position:absolute; left:0; top:0; bottom:0; width:7px; background:#1E8A4B;"></div>
+
+    <div style="position:absolute; top:770px; left:300px; transform:rotate(-11deg); border:3px solid #1E8A4B; border-radius:12px; padding:6px 18px; opacity:.92; z-index:2;">
+      <div style="font:800 26px 'Sarabun'; color:#1E8A4B; line-height:1; letter-spacing:.02em;">ชำระเงินแล้ว</div>
+      <div class="mono" style="font:600 12px 'Space Grotesk'; color:#1E8A4B; text-align:center; letter-spacing:.22em; margin-top:2px;">PAID</div>
+    </div>
+
+    <div style="padding:46px 50px 50px 54px;">
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="display:flex; gap:13px;">
+          <div style="width:44px; height:44px; border-radius:11px; background:#16181D; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" stroke-width="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font:700 16px 'Sarabun'; color:#16181D; line-height:1.15;">ธนารัตน์ สหวิริยกุล</div>
+            <div style="font:500 11.5px 'Sarabun'; color:#5B6470; line-height:1.45; margin-top:2px;">RPA Developer &amp; Consultant · UiPath Certified<br>เลขประจำตัวผู้เสียภาษี 1 1037 01234 56 7</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font:700 30px 'Space Grotesk'; color:#1E8A4B; letter-spacing:.01em; line-height:1;">RECEIPT</div>
+          <div style="font:600 14px 'Sarabun'; color:#16181D; margin-top:3px;">ใบเสร็จรับเงิน</div>
+        </div>
+      </div>
+
+      <div style="height:1px; background:#E3E6EB; margin:22px 0 0;"></div>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:7px;">ได้รับเงินจาก / Received from</div>
+          <div style="font:700 14.5px 'Sarabun'; color:#16181D;">บริษัท ตัวอย่าง จำกัด (สำนักงานใหญ่)</div>
+          <div style="font:400 12px 'Sarabun'; color:#5B6470; line-height:1.55; margin-top:4px;">199/45 อาคารทรงไทย ชั้น 12 ถ.สุขุมวิท<br>แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110<br>เลขประจำตัวผู้เสียภาษี 0 1055 60123 45 6</div>
+        </div>
+        <div style="width:236px; background:#F6F7F9; border-radius:9px; padding:16px 18px;">
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">เลขที่เอกสาร</span><span class="mono" style="font:600 12.5px 'Space Grotesk'; color:#16181D;">RC-2026-025</span></div>
+          <div style="display:flex; justify-content:space-between; padding:5px 0;"><span style="font:400 12px 'Sarabun'; color:#5B6470;">วันที่รับเงิน</span><span style="font:600 12.5px 'Sarabun'; color:#16181D;">12 มี.ค. 2569</span></div>
+          <div style="height:1px; background:#E3E6EB; margin:7px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:3px 0;"><span style="font:600 12px 'Sarabun'; color:#1E8A4B;">อ้างอิงใบแจ้งหนี้</span><span class="mono" style="font:700 12.5px 'Space Grotesk'; color:#1E8A4B;">INV-2026-021</span></div>
+        </div>
+      </div>
+
+      <table style="margin-top:22px;">
+        <thead>
+          <tr style="background:#16181D;">
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:center; padding:10px 8px; width:40px; border-radius:6px 0 0 0;">#</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:left; padding:10px 12px;">รายการ / Description</th>
+            <th style="font:600 11px 'Sarabun'; color:#fff; text-align:right; padding:10px 14px; width:130px; border-radius:0 6px 0 0;">จำนวนเงิน (บาท)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #EDEFF3;"><td class="mono" style="text-align:center; padding:13px 8px; color:#8A929E; font-size:12px;">1</td><td style="padding:13px 12px; font:500 12.5px 'Sarabun'; color:#16181D;">ค่าพัฒนาระบบ RPA Automation (UiPath) ตามใบแจ้งหนี้ INV-2026-021</td><td class="mono" style="text-align:right; padding:13px 14px; font-size:12.5px; color:#16181D; font-weight:600;">170,000.00</td></tr>
+        </tbody>
+      </table>
+
+      <div style="display:flex; gap:20px; margin-top:22px;">
+        <div style="flex:1;">
+          <div style="font:600 10px 'Space Grotesk'; letter-spacing:.13em; text-transform:uppercase; color:#8A929E; margin-bottom:9px;">วิธีการชำระเงิน / Method</div>
+          <div style="border:1px solid #E3E6EB; border-radius:10px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:8px;"><span style="font:700 10.5px 'Space Grotesk'; color:#fff; background:#1E8A4B; padding:3px 9px; border-radius:5px; letter-spacing:.04em;">โอนเงิน</span><span style="font:500 12.5px 'Sarabun'; color:#16181D;">PromptPay / Mobile Banking</span></div>
+            <div style="font:400 11.5px 'Sarabun'; color:#5B6470; line-height:1.55;">เข้าบัญชี ธ.กสิกรไทย 123-4-56789-0<br>วันที่ 12 มี.ค. 2569 เวลา 14:32 น.<br>เลขอ้างอิงรายการ 0312256914327788</div>
+          </div>
+        </div>
+        <div style="width:316px;">
+          <div style="display:flex; justify-content:space-between; padding:7px 4px;"><span style="font:400 12.5px 'Sarabun'; color:#5B6470;">ยอดตามใบแจ้งหนี้</span><span class="mono" style="font:500 13px 'Space Grotesk'; color:#16181D;">170,000.00</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; background:#1E8A4B; border-radius:11px; padding:14px 17px;">
+            <div><div style="font:700 13px 'Sarabun'; color:#fff;">ยอดเงินที่รับชำระ</div><div style="font:400 10.5px 'Sarabun'; color:rgba(255,255,255,.8);">Amount received</div></div>
+            <span class="mono" style="font:700 24px 'Space Grotesk'; color:#fff;">฿170,000</span>
+          </div>
+          <div style="font:400 10.5px 'Sarabun'; color:#8A929E; text-align:right; margin-top:6px;">ผู้รับเงินได้รับชำระครบถ้วนแล้ว</div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:76px; display:flex; gap:20px; align-items:flex-end;">
+        <div style="flex:1;">
+          <div style="font:400 11.5px 'Sarabun'; color:#8A929E; line-height:1.6;">เอกสารนี้เป็นใบเสร็จรับเงินยืนยันการรับชำระเงินครบถ้วน<br>ขอบคุณที่ใช้บริการ — หวังว่าจะได้ร่วมงานกันอีกครับ</div>
+        </div>
+        <div style="width:220px; text-align:center;">
+          <div style="height:46px;"></div>
+          <div style="height:1px; background:#16181D;"></div>
+          <div style="font:600 12px 'Sarabun'; color:#16181D; margin-top:7px;">ธนารัตน์ สหวิริยกุล</div>
+          <div style="font:400 11px 'Sarabun'; color:#8A929E;">ผู้รับเงิน · 12 มี.ค. 2569</div>
+        </div>
+      </div>
+
+      <div style="position:absolute; left:54px; right:50px; bottom:30px; display:flex; justify-content:space-between; align-items:center; padding-top:13px; border-top:1px solid #E3E6EB;">
+        <span style="font:400 10.5px 'Sarabun'; color:#8A929E;">ปิดวงจรงาน: เสนอราคา → ส่งมอบ → วางบิล → รับเงิน ✓</span>
+        <span class="mono" style="font:500 10.5px 'Space Grotesk'; color:#8A929E;">Agent Office · RC-2026-025 → INV-2026-021</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1500,&quot;height&quot;:900},&quot;showReceipt&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;แสดงผล&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showReceipt: this.props.showReceipt ?? true };
+  }
+}
+</script>
+</body>
+</html>
