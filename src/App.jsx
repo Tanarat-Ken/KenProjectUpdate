@@ -9,7 +9,6 @@ import { PartnerMode } from './screens/PartnerMode'
 import { DocumentsList } from './screens/DocumentsList'
 import { FilesList } from './screens/FilesList'
 import { ClientsList } from './screens/ClientsList'
-import { CatMascot } from './components/CatMascot'
 import { SettingsProvider } from './lib/settings'
 
 export default function App() {
@@ -22,7 +21,6 @@ export default function App() {
   return (
     <SettingsProvider>
       <AppShell nav={nav} navigate={navigate} />
-      <CatMascot />
     </SettingsProvider>
   )
 }

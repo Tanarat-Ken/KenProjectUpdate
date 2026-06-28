@@ -501,6 +501,72 @@ export async function createDocument({ type, project, items, issueDate, dueDate,
   return { number, created }
 }
 
+/* ---------------------------------------------------------------- create project */
+
+async function nextProjectCode() {
+  const year = new Date().getFullYear()
+  const { data, error } = await supabase
+    .from('agentoffice_projects')
+    .select('code')
+    .like('code', `P-${year}-%`)
+  if (error) throw error
+  const max = (data || []).reduce((m, r) => {
+    const n = parseInt(String(r.code).split('-')[2], 10)
+    return Math.max(m, Number.isNaN(n) ? 0 : n)
+  }, 0)
+  return `P-${year}-${String(max + 1).padStart(3, '0')}`
+}
+
+// Create a brand-new job: resolve/create the customer, insert the project,
+// then issue its first quotation (QT) from the line items.
+export async function createProject({ customer, name, description, items }) {
+  let customerId = customer?.id || null
+  let customerName = customer?.name || ''
+  if (!customerId && customer?.name) {
+    const c = await saveCustomer({
+      name: customer.name,
+      contact_name: customer.contact_name || null,
+      phone: customer.phone || null,
+      email: customer.email || null,
+    })
+    customerId = c.id
+    customerName = c.name
+  }
+
+  const settings = await getSettings()
+  const code = await nextProjectCode()
+  const cleanItems = (items || []).filter((it) => it.desc)
+  const total = itemsTotal(toItems(cleanItems))
+
+  const { data: project, error } = await supabase
+    .from('agentoffice_projects')
+    .insert({
+      code,
+      name: name || 'งานใหม่',
+      customer_id: customerId,
+      value: total,
+      status: 'กำลังทำ',
+      description: description || null,
+      current_step: 1,
+      start_date: new Date().toISOString().slice(0, 10),
+      managers: settings.short_name || null,
+    })
+    .select()
+    .single()
+  if (error) throw error
+
+  let quotation = null
+  if (cleanItems.length) {
+    const res = await createDocument({
+      type: 'QT',
+      project: { uuid: project.id, customerId, client: customerName, value: total, id: code },
+      items: cleanItems,
+    })
+    quotation = res.number
+  }
+  return { code, uuid: project.id, quotation }
+}
+
 /* ---------------------------------------------------------------- dashboard */
 
 export async function getDashboard() {

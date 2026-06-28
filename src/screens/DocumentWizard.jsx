@@ -75,7 +75,6 @@ export function DocumentWizard({ navigate, initial }) {
     setSubmitting(true)
     try {
       const { number } = await createDocument({ type, project, items: items.filter((it) => it.desc), dueDate, note })
-      window.dispatchEvent(new CustomEvent('agentoffice:cat-react', { detail: { action: 'happy' } }))
       alert(`ออก${dt.label}สำเร็จ: ${number}`)
       navigate('project', { projectId: project.id })
     } catch (err) {
