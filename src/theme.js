@@ -40,6 +40,13 @@ export const STATUS_COLOR = {
   'ปิดงาน':   { bg: C.greenLight,    text: C.green },
   'ตอบรับ':    { bg: C.greenLight,    text: C.green },
   'เซ็นรับ':   { bg: C.greenLight,    text: C.green },
+  'ชำระแล้ว':  { bg: C.greenLight,    text: C.green },
+  'ออกแล้ว':   { bg: C.greenLight,    text: C.green },
+  'ส่งแล้ว':   { bg: C.blueLight,     text: C.blue },
+  'เกินกำหนด': { bg: C.burgundyLight, text: C.burgundy },
+  'ร่าง':      { bg: C.panelAlt,      text: C.grayMed },
+  'รอ':        { bg: C.amberLight,    text: C.amber },
+  'ปฏิเสธ':    { bg: C.burgundyLight, text: C.burgundy },
 }
 
 export const card = {

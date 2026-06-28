@@ -23,6 +23,10 @@ body {
 ::-webkit-scrollbar-thumb { background: #E7E3D8; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #9A998E; }
 
+/* Spinner */
+@keyframes ao-spin { to { transform: rotate(360deg); } }
+.ao-spinner { animation: ao-spin 0.7s linear infinite; }
+
 /* Transitions */
 .nav-item { transition: background 0.15s, color 0.15s; }
 .btn { transition: opacity 0.15s, transform 0.1s; }

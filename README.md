@@ -1,25 +1,79 @@
-# CODING AGENTS: READ THIS FIRST
+# Agent Office
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+ระบบจัดการเอกสารธุรกิจสำหรับฟรีแลนซ์สาย RPA — จัดการงาน (โปรเจกต์) และเอกสารเป็นสายเดียวกัน:
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+> ใบเสนอราคา (QT) → ใบส่งงาน (DN) → ใบแจ้งหนี้ (INV) → รับเงิน / ใบเสร็จ (RC)
 
-## What you should do — IMPORTANT
+เว็บแอป React (Vite) เชื่อมต่อกับ **Supabase** เป็นฐานข้อมูลจริง
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+---
 
-**Read `project/Agent Office App.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Tech stack
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+- **React 18 + Vite 6** — single-page app, inline-style design system (ดู `src/theme.js`)
+- **Supabase** (Postgres + Storage) — ข้อมูลทั้งหมด: งาน, ลูกค้า, เอกสาร, ไฟล์แนบ, ประวัติแก้ไข, การตั้งค่า
+- ฟอนต์: Sarabun (ไทย/เนื้อหา) + Space Grotesk (ตัวเลข/เลขเอกสาร)
 
-## About the design files
+## เริ่มใช้งาน (local)
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+```bash
+npm install
+cp .env.example .env   # ใส่ค่า Supabase URL + publishable key
+npm run dev            # http://localhost:5173
+npm run build          # production build → dist/
+```
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+### Environment variables
 
-## Bundle contents
+| ตัวแปร | ความหมาย |
+| --- | --- |
+| `VITE_SUPABASE_URL` | URL ของ Supabase project |
+| `VITE_SUPABASE_ANON_KEY` | publishable / anon key (ปลอดภัยที่จะเปิดเผยฝั่ง client) |
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Agent Office document family design` project files (HTML prototypes, assets, components)
+ถ้าไม่ตั้ง env ไว้ โค้ดมี fallback เป็นค่าของ project `glbndfloqirjjoqfjdlw` ใน `src/lib/supabase.js`
+
+## โครงสร้างโค้ด
+
+```
+src/
+  App.jsx              Router อย่างง่าย (state-based) + SettingsProvider
+  theme.js             ระบบสี / การ์ด / สถานะ
+  lib/
+    supabase.js        Supabase client
+    api.js             Data-access layer ทั้งหมด (map DB ↔ UI)
+    format.js          ฟอร์แมตวันที่ไทย (พ.ศ.) / เงินบาท
+    settings.jsx       Context ของการตั้งค่า + useOwner()
+    useAsync.js        hook โหลดข้อมูล (loading/error/reload)
+  components/          Sidebar, Pipeline, StatusBadge, FileViewer, Markdown, States…
+  screens/
+    Dashboard.jsx      ภาพรวม: งานค้าง/รอ/รีวิว + เงินรอเก็บ + กิจกรรมล่าสุด
+    ProjectsList.jsx   ตารางงานทั้งหมด + pipeline ย่อ + ค้นหา/กรอง
+    ProjectDetail.jsx  4 แท็บ: ภาพรวม+ขั้นตอน / เอกสาร / ไฟล์&คอนเซป / ประวัติแก้ไข
+    DocumentsList.jsx  เอกสารทุกใบข้ามงาน
+    FilesList.jsx      คลังไฟล์ .md/.html + viewer + อัปโหลด
+    ClientsList.jsx    ลูกค้า (เพิ่ม/แก้ไข/ลบ)
+    DocumentWizard.jsx สร้างเอกสารจริง (เลือกงาน→รายการ→เงื่อนไข→ออก)
+    Settings.jsx       แก้ config ผู้ออกเอกสาร/บัญชี/เลขรัน — บันทึกลง DB
+    PartnerMode.jsx    โหมดผู้ช่วย (แฟน) — งานที่รอช่วยแบบง่าย
+```
+
+## โครงฐานข้อมูล (Supabase, prefix `agentoffice_`)
+
+| ตาราง | หน้าที่ |
+| --- | --- |
+| `agentoffice_projects` | **แกนกลาง** — งาน/ดีล (ลูกค้า, ชื่องาน, มูลค่า, สถานะ, step) |
+| `agentoffice_customers` | ลูกค้า (ใช้ซ้ำข้ามงาน) |
+| `agentoffice_quotations` / `_delivery_notes` / `_invoices` | เอกสารในสายโซ่ ผูกกับ `project_id` |
+| `agentoffice_payments` | การรับเงิน (= ใบเสร็จ RC) |
+| `agentoffice_revisions` | ประวัติแก้ไข / กิจกรรมต่อโปรเจกต์ |
+| `agentoffice_attachments` | ไฟล์แนบ (`deal_id` = project id) เก็บไฟล์จริงใน Storage bucket `agentoffice-files` |
+| `agentoffice_settings` | การตั้งค่าผู้ออกเอกสาร (singleton row id=1) |
+
+> RLS เปิดให้ `anon` เข้าถึงได้ (ออกแบบสำหรับผู้ใช้คนเดียว — เจ้าของ + ผู้ช่วย ไม่มีระบบ login)
+
+## หมายเหตุการพัฒนา
+
+- เลขเอกสารออกอัตโนมัติจาก prefix + เลขถัดไป ในตาราง `agentoffice_settings` (แก้ได้ในหน้า “ตั้งค่า”)
+- การสร้างเอกสารผ่าน Wizard จะบันทึกจริง, อัปเดตสถานะ/step ของงาน และเพิ่มรายการใน `agentoffice_revisions`
+- ฟอร์แมตวันที่ใช้ปี พ.ศ. (ดู `src/lib/format.js`)
+- ดีไซน์อ้างอิงจาก prototype เดิมใน `project/` และ transcript ใน `chats/`
