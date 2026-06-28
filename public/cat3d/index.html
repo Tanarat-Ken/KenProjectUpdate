@@ -87,14 +87,13 @@
 
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  "three": "./vendor/three.module.js"
 } }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './vendor/OrbitControls.js';
 
 const EMBED = new URLSearchParams(location.search).has('embed');
 if (EMBED) document.body.classList.add('embed');
@@ -461,6 +460,7 @@ function blinkUpdate(dt) {
 const easeInOut = (p) => p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
 
 animate();
+window.__CAT_OK = true; // signals the whole module initialised without throwing
 setTimeout(() => document.getElementById('loader').classList.add('hide'), 500);
 
 addEventListener('resize', () => {

@@ -70,7 +70,7 @@ export function CatMascot() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 8px 8px 13px', borderBottom: `1px solid ${C.borderLight}` }}>
         <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 12.5, color: C.ink }}>น้องเหมียว 🐈</span>
         <div style={{ display: 'flex', gap: 4 }}>
-          <a href="/cat3d/" target="_blank" rel="noreferrer" title="เปิดเต็มจอ" style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 7, color: C.grayMed, textDecoration: 'none', fontSize: 13 }}>⤢</a>
+          <a href="/cat3d/index.html" target="_blank" rel="noreferrer" title="เปิดเต็มจอ" style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 7, color: C.grayMed, textDecoration: 'none', fontSize: 13 }}>⤢</a>
           <button onClick={() => setOpen(false)} title="ย่อ" style={{ width: 24, height: 24, borderRadius: 7, border: 'none', background: C.panelAlt, color: C.grayMed, cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>—</button>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function CatMascot() {
       <div style={{ height: 168, background: `radial-gradient(circle at 50% 35%, ${C.tealLight}, ${C.panel})` }}>
         <iframe
           ref={iframeRef}
-          src="/cat3d/?embed=1"
+          src="/cat3d/index.html?embed=1"
           title="3D cat mascot"
           style={{ width: '100%', height: '100%', border: 'none', background: 'transparent' }}
           allowtransparency="true"
