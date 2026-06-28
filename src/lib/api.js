@@ -13,10 +13,22 @@ export const DOC_META = {
 // Map raw DB document status -> Thai badge label
 const DOC_STATUS_TH = {
   draft: 'ร่าง', sent: 'ส่งแล้ว', accepted: 'ตอบรับ', rejected: 'ปฏิเสธ',
-  delivered: 'เซ็นรับ', signed: 'เซ็นรับ', paid: 'ชำระแล้ว', overdue: 'เกินกำหนด',
+  pending: 'รอตรวจรับ', delivered: 'เซ็นรับ', signed: 'เซ็นรับ',
+  issued: 'รอชำระ', billed: 'วางบิล', paid: 'ชำระแล้ว', overdue: 'เกินกำหนด',
   unpaid: 'รอชำระ', open: 'รอชำระ',
 }
 export const docStatusTh = (s) => DOC_STATUS_TH[s] || s || '—'
+
+// agentoffice_attachments.kind has a CHECK constraint — only these values allowed.
+// We keep the real extension in `title`; `kind` is just the broad category.
+function kindOf(ext) {
+  const e = (ext || '').toLowerCase()
+  if (e === 'pdf') return 'pdf'
+  if (['xls', 'xlsx', 'csv'].includes(e)) return 'excel'
+  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp', 'heic'].includes(e)) return 'image'
+  if (['mp4', 'mov', 'webm', 'mkv', 'avi', 'm4v'].includes(e)) return 'video'
+  return 'file'
+}
 
 /* ---------------------------------------------------------------- settings */
 
@@ -293,7 +305,7 @@ export async function uploadFile(dealId, file, note = '') {
     .from('agentoffice_attachments')
     .insert({
       deal_id: dealId || 'unsorted',
-      kind: ext || 'file',
+      kind: kindOf(ext),
       title: file.name,
       url: pub.publicUrl,
       storage_path: path,
@@ -438,7 +450,9 @@ export async function createDocument({ type, project, items, issueDate, dueDate,
       customer_id: project.customerId || project.customer?.id || null,
       project_id: project.uuid,
       issue_date: today,
-      status: type === 'QT' ? 'sent' : type === 'DN' ? 'delivered' : 'sent',
+      // statuses must satisfy each table's CHECK constraint:
+      // QT: draft|sent|accepted|rejected · DN: pending|delivered|accepted · INV: issued|billed|paid|overdue
+      status: type === 'QT' ? 'sent' : type === 'DN' ? 'delivered' : 'issued',
       note: note || null,
       items: storedItems,
     }
