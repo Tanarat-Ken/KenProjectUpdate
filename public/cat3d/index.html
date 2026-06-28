@@ -3,508 +3,498 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>เหมียว 3D — แมวโต้ตอบได้</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<title>เหมียว 3D</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #2a2440; }
-  body { font-family: 'Sarabun', sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: #2a2440; }
   body.embed { background: transparent; }
   #app { position: fixed; inset: 0; }
   canvas { display: block; }
-
-  .ui {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
-    display: flex; gap: 10px; align-items: center; justify-content: center;
-    flex-wrap: wrap;
-    background: linear-gradient(to top, rgba(20,16,34,.55), transparent);
-    pointer-events: none; z-index: 5;
-  }
-  .panel {
-    pointer-events: auto;
-    display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.22);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-radius: 18px; padding: 11px 13px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.25); max-width: 760px;
-  }
-  .btn {
-    pointer-events: auto; cursor: pointer; user-select: none;
-    font-family: 'Sarabun', sans-serif; font-size: 13px; font-weight: 700;
-    color: #2a2440; background: rgba(255,255,255,.82); border: 2px solid transparent; border-radius: 13px;
-    padding: 9px 13px; box-shadow: 0 4px 12px rgba(0,0,0,.22);
-    transition: transform .1s, background .15s, border-color .15s; white-space: nowrap;
-  }
-  .btn:active { transform: scale(.9); }
-  .btn.active { background: #ffd36e; border-color: #fff; }
-  .ctl { display: flex; flex-direction: column; gap: 4px; padding: 0 4px; }
-  .ctl label { font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.85); }
-  input[type=range] {
-    -webkit-appearance: none; appearance: none; height: 5px; border-radius: 5px;
-    background: rgba(255,255,255,.3); outline: none; width: 96px; cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #ffd36e; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
-  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; border: none; background: #ffd36e; }
-
-  .title { position: fixed; top: 0; left: 0; right: 0; padding: 18px 22px; text-align: center; pointer-events: none; z-index: 5; }
-  .title h1 { font-weight: 700; font-size: 21px; color: #fff; text-shadow: 0 2px 14px rgba(0,0,0,.4); }
-  .title p { font-size: 12px; color: rgba(255,255,255,.78); margin-top: 3px; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
-
-  .loader { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #2a2440; z-index: 10; transition: opacity .6s; color: #fff; flex-direction: column; gap: 14px; }
-  body.embed .loader { background: transparent; }
-  .loader .paw { font-size: 40px; animation: bob 1s ease-in-out infinite; }
-  @keyframes bob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-12px) } }
-  .hide { opacity: 0; pointer-events: none; }
-  body.embed .title, body.embed .ui { display: none; }
 </style>
 </head>
 <body>
 <div id="app"></div>
 
-<div class="title">
-  <h1>เหมียว 3D 🐈</h1>
-  <p>กดปุ่มสั่งน้องได้ทุกปุ่ม · ลากหมุนกล้อง · แตะตัวน้องให้ร้องเหมียว</p>
-</div>
-
-<div class="ui">
-  <div class="panel" id="panel">
-    <button class="btn" data-act="walk">เดิน</button>
-    <button class="btn" data-act="sit">นั่ง</button>
-    <button class="btn" data-act="sleep">นอน</button>
-    <button class="btn" data-act="jump">กระโดด</button>
-    <button class="btn" data-act="meow">เหมียว</button>
-    <button class="btn" data-act="happy">ดีใจ</button>
-    <button class="btn" data-act="groom">เลียขน</button>
-    <button class="btn" data-act="spin">หมุนตัว</button>
-    <button class="btn" data-act="camera">หมุนกล้อง</button>
-    <div class="ctl"><label>ความเร็วเดิน</label><input id="speed" type="range" min="0.2" max="2.4" step="0.01" value="1" /></div>
-  </div>
-</div>
-
-<div class="loader" id="loader"><div class="paw">🐾</div><div>กำลังปั้นน้องแมว…</div></div>
-
 <script type="importmap">
-{ "imports": {
-  "three": "./vendor/three.module.js"
-} }
+{ "imports": { "three": "./vendor/three.module.js" } }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from './vendor/OrbitControls.js';
 
-const EMBED = new URLSearchParams(location.search).has('embed');
+const Q = new URLSearchParams(location.search);
+const EMBED = Q.has('embed');
+const ROAM = Q.has('roam');
 if (EMBED) document.body.classList.add('embed');
 
-/* ---------------------------------------------------------------- renderer */
-const app = document.getElementById('app');
+/* ============================================================ renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
 if (EMBED) renderer.setClearColor(0x000000, 0);
-app.appendChild(renderer.domElement);
+document.getElementById('app').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-if (!EMBED) { scene.background = new THREE.Color('#2a2440'); scene.fog = new THREE.Fog('#2a2440', 9, 22); }
+if (!EMBED) scene.background = new THREE.Color('#2b2546');
 
-const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
-camera.position.set(4.2, 2.6, 5.6);
+const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 100);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true; controls.dampingFactor = 0.06;
-controls.target.set(0, 0.85, 0);
-controls.minDistance = 3; controls.maxDistance = 12;
-controls.maxPolarAngle = Math.PI * 0.52;
-controls.autoRotateSpeed = 1.1;
-controls.enablePan = false;
-if (EMBED) { controls.enableZoom = false; camera.position.set(3.2, 2.2, 4.6); }
-
-/* ---------------------------------------------------------------- lights */
-scene.add(new THREE.HemisphereLight('#fff4e0', '#43406b', 0.85));
-const key = new THREE.DirectionalLight('#fff1d8', 2.1);
-key.position.set(5, 8, 6); key.castShadow = true;
+/* ============================================================ lights */
+scene.add(new THREE.HemisphereLight('#fff6e8', '#3b3a55', 0.9));
+const key = new THREE.DirectionalLight('#fff2dc', 2.0);
+key.position.set(4, 7, 5);
+key.castShadow = true;
 key.shadow.mapSize.set(2048, 2048);
-key.shadow.camera.near = 1; key.shadow.camera.far = 30;
-key.shadow.camera.left = -7; key.shadow.camera.right = 7; key.shadow.camera.top = 7; key.shadow.camera.bottom = -7;
-key.shadow.bias = -0.0004; key.shadow.radius = 5;
+key.shadow.camera.near = 0.5; key.shadow.camera.far = 40;
+key.shadow.camera.left = -10; key.shadow.camera.right = 10;
+key.shadow.camera.top = 10; key.shadow.camera.bottom = -10;
+key.shadow.bias = -0.0003; key.shadow.normalBias = 0.02; key.shadow.radius = 6;
 scene.add(key);
-const rim = new THREE.DirectionalLight('#8ea0ff', 0.9); rim.position.set(-6, 4, -5); scene.add(rim);
+const fill = new THREE.DirectionalLight('#cfd8ff', 0.5); fill.position.set(-5, 3, 2); scene.add(fill);
+const rim = new THREE.DirectionalLight('#ffd9a8', 0.7); rim.position.set(-3, 4, -6); scene.add(rim);
 
-/* ---------------------------------------------------------------- ground */
-let tileTex, bokeh;
-if (!EMBED) {
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(40, 64),
-    new THREE.MeshStandardMaterial({ color: '#6f6796', roughness: 1 }));
-  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+/* ============================================================ ground / shadow */
+const groundMat = EMBED
+  ? new THREE.ShadowMaterial({ opacity: 0.22 })
+  : new THREE.MeshStandardMaterial({ color: '#6b6498', roughness: 1 });
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
 
-  tileTex = makeTileTexture();
-  tileTex.wrapS = tileTex.wrapT = THREE.RepeatWrapping; tileTex.repeat.set(14, 14);
-  const tiles = new THREE.Mesh(new THREE.CircleGeometry(40, 64),
-    new THREE.MeshStandardMaterial({ map: tileTex, transparent: true, opacity: 0.5, roughness: 1 }));
-  tiles.rotation.x = -Math.PI / 2; tiles.position.y = 0.002; tiles.receiveShadow = true; scene.add(tiles);
-
-  bokeh = new THREE.Group(); scene.add(bokeh);
-  const cols = ['#ffd36e', '#ff8fb1', '#8ea0ff', '#7ee0c8'];
-  for (let i = 0; i < 26; i++) {
-    const s = 0.12 + Math.random() * 0.32;
-    const m = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 12),
-      new THREE.MeshBasicMaterial({ color: cols[i % 4], transparent: true, opacity: 0.5 }));
-    m.position.set((Math.random() - 0.5) * 22, 0.6 + Math.random() * 5.5, -3 - Math.random() * 14);
-    m.userData.sp = 0.4 + Math.random() * 0.8; bokeh.add(m);
+/* ============================================================ fur texture (silver mackerel tabby) */
+function furTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 1024;
+  const x = c.getContext('2d');
+  // base silver gradient
+  const g = x.createLinearGradient(0, 0, 0, 1024);
+  g.addColorStop(0, '#d7d2c8'); g.addColorStop(0.55, '#c4beb2'); g.addColorStop(1, '#ddd8cd');
+  x.fillStyle = g; x.fillRect(0, 0, 1024, 1024);
+  // fine fur grain
+  for (let i = 0; i < 9000; i++) {
+    const a = Math.random() * 0.05;
+    x.fillStyle = `rgba(${110 + Math.random() * 40},${105 + Math.random() * 35},${95 + Math.random() * 35},${a})`;
+    x.fillRect(Math.random() * 1024, Math.random() * 1024, 2.4, 2.4);
   }
-} else {
-  // invisible shadow-catcher so the cat keeps a soft shadow when embedded
-  const sc = new THREE.Mesh(new THREE.CircleGeometry(40, 48), new THREE.ShadowMaterial({ opacity: 0.25 }));
-  sc.rotation.x = -Math.PI / 2; sc.receiveShadow = true; scene.add(sc);
+  // soft mackerel stripes — short, broken, gently curved (silver tabby, not woodgrain)
+  x.save(); x.filter = 'blur(2px)'; x.lineCap = 'round';
+  for (let s = -2; s < 26; s++) {
+    const bx = s * 42 + 16;
+    // each "column" is a few short broken dashes rather than one long line
+    for (let seg = 0; seg < 4; seg++) {
+      const y0 = seg * 250 + Math.random() * 80;
+      const len = 90 + Math.random() * 70;
+      x.beginPath();
+      x.strokeStyle = `rgba(124,116,103,${0.1 + Math.random() * 0.08})`;
+      x.lineWidth = 8 + Math.random() * 8;
+      for (let yy = y0; yy <= y0 + len; yy += 14) {
+        const xx = bx + Math.sin(yy * 0.02 + s) * 9;
+        x[yy === y0 ? 'moveTo' : 'lineTo'](xx, yy);
+      }
+      x.stroke();
+    }
+  }
+  x.restore();
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
 }
 
-/* ---------------------------------------------------------------- materials */
-const FUR_DARK = '#6f685c', CREAM = '#e8e1d2', PINK = '#d98b94';
-const furTex = makeTabbyTexture();
-const furMat = new THREE.MeshStandardMaterial({ map: furTex, roughness: 0.92 });
-const creamMat = new THREE.MeshStandardMaterial({ color: CREAM, roughness: 0.9 });
-const darkMat = new THREE.MeshStandardMaterial({ color: FUR_DARK, roughness: 0.9 });
-const pinkMat = new THREE.MeshStandardMaterial({ color: PINK, roughness: 0.6 });
-const mouthMat = new THREE.MeshStandardMaterial({ color: '#7a3b42', roughness: 0.5 });
+const TEX = furTexture();
+const matFur   = new THREE.MeshStandardMaterial({ map: TEX, roughness: 0.85, metalness: 0 });
+const matCream = new THREE.MeshStandardMaterial({ color: '#efe9db', roughness: 0.8 });
+const matDark  = new THREE.MeshStandardMaterial({ color: '#7b7468', roughness: 0.85 });
+const matPink  = new THREE.MeshStandardMaterial({ color: '#e3a0ab', roughness: 0.5 });
+const matInner = new THREE.MeshStandardMaterial({ color: '#e7aeb6', roughness: 0.6 });
+const matEye   = new THREE.MeshStandardMaterial({ color: '#2a3a20', roughness: 0.16, metalness: 0.0, emissive: '#11200c', emissiveIntensity: 0.35 });
+const matIris  = new THREE.MeshStandardMaterial({ color: '#aac95f', roughness: 0.22, emissive: '#3f5121', emissiveIntensity: 0.6 });
+const matWhite = new THREE.MeshBasicMaterial({ color: '#ffffff' });
+const matNoseShine = new THREE.MeshStandardMaterial({ color: '#caa37e', roughness: 0.4 });
 
-function ball(r, mat, sx = 1, sy = 1, sz = 1) {
-  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), mat);
-  m.scale.set(sx, sy, sz); m.castShadow = true; m.receiveShadow = true; return m;
-}
+function sph(r, mat, seg = 32) { const m = new THREE.Mesh(new THREE.SphereGeometry(r, seg, Math.max(12, seg * 0.7 | 0)), mat); m.castShadow = true; m.receiveShadow = true; return m; }
+function cap(r, len, mat) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 10, 20), mat); m.castShadow = true; m.receiveShadow = true; return m; }
 
-/* ---------------------------------------------------------------- cat rig */
-const cat = new THREE.Group(); scene.add(cat);
-const flexRoot = new THREE.Group(); cat.add(flexRoot);
+/* ============================================================ THE CAT */
+const root = new THREE.Group();           // world transform (x,z,yaw)
+scene.add(root);
+const bob = new THREE.Group();            // vertical bob / breathing
+root.add(bob);
+const bodyG = new THREE.Group();          // whole body, faces +Z
+bob.add(bodyG);
 
-const body = ball(0.95, furMat, 1.0, 0.82, 1.25); body.position.set(0, 0.95, 0); flexRoot.add(body);
-const chest = ball(0.7, furMat); chest.position.set(0, 0.85, 0.8); flexRoot.add(chest);
-const belly = ball(0.62, creamMat, 1.0, 0.7, 1.05); belly.position.set(0, 0.6, 0.35); flexRoot.add(belly);
+// ---- torso: elongated capsule (cat-like, not a ball) + haunches + chest ----
+const torso = cap(0.44, 0.72, matFur);
+torso.rotation.x = Math.PI / 2;           // lie along Z
+torso.position.set(0, 0.64, -0.06);
+torso.scale.set(1, 1, 1);
+bodyG.add(torso);
 
-const head = new THREE.Group(); head.position.set(0, 1.18, 1.25); flexRoot.add(head);
-head.add(ball(0.62, furMat, 1.05, 0.98, 0.95));
-const cheekL = ball(0.3, furMat); cheekL.position.set(-0.38, -0.12, 0.18); head.add(cheekL);
-const cheekR = ball(0.3, furMat); cheekR.position.set(0.38, -0.12, 0.18); head.add(cheekR);
-const muzzle = ball(0.26, creamMat, 1.2, 0.85, 0.9); muzzle.position.set(0, -0.18, 0.5); head.add(muzzle);
-const nose = ball(0.07, pinkMat, 1.3, 0.9, 0.8); nose.position.set(0, -0.1, 0.74); head.add(nose);
+const haunch = sph(0.45, matFur);         // rounded rump (a bit smaller, blends in)
+haunch.position.set(0, 0.6, -0.56);
+haunch.scale.set(1.0, 0.96, 1.06);
+bodyG.add(haunch);
 
-// mouth + tongue (for meow / groom)
-const mouth = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 16), mouthMat);
-mouth.position.set(0, -0.28, 0.56); mouth.scale.set(1, 0.05, 0.6); head.add(mouth);
-const tongue = ball(0.08, pinkMat, 1, 0.5, 1.2); tongue.position.set(0, -0.3, 0.66); tongue.scale.setScalar(0); head.add(tongue);
+const shoulder = sph(0.42, matFur);
+shoulder.position.set(0, 0.66, 0.46);
+bodyG.add(shoulder);
 
-function ear(side) {
+const belly = sph(0.4, matCream);
+belly.position.set(0, 0.4, 0.04);
+belly.scale.set(0.9, 0.66, 1.35);
+bodyG.add(belly);
+
+// ---- neck + head pivot ----
+const headPivot = new THREE.Group();
+headPivot.position.set(0, 0.92, 0.62);
+bodyG.add(headPivot);
+
+const neck = sph(0.3, matFur);
+neck.position.set(0, -0.12, -0.05);
+headPivot.add(neck);
+
+const head = new THREE.Group();
+headPivot.add(head);
+
+// skull — slightly wider than tall (round cute face)
+const skull = sph(0.5, matFur);
+skull.scale.set(1.12, 1.0, 0.98);
+head.add(skull);
+
+// chubby cheeks
+const cheekL = sph(0.27, matFur); cheekL.position.set(-0.34, -0.16, 0.2); head.add(cheekL);
+const cheekR = sph(0.27, matFur); cheekR.position.set(0.34, -0.16, 0.2); head.add(cheekR);
+// cream muzzle + chin
+const muzzle = sph(0.27, matCream); muzzle.position.set(0, -0.16, 0.36); muzzle.scale.set(1.15, 0.82, 0.85); head.add(muzzle);
+
+// nose (small soft triangle-ish)
+const nose = sph(0.06, matPink); nose.position.set(0, -0.07, 0.58); nose.scale.set(1.4, 1.0, 0.8); head.add(nose);
+// subtle smile (two short dark arcs) via thin tori
+const smileMat = new THREE.MeshStandardMaterial({ color: '#8c8378', roughness: 0.7 });
+[-1, 1].forEach(s => {
+  const m = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.012, 8, 16, Math.PI * 0.9), smileMat);
+  m.position.set(0.06 * s, -0.2, 0.5); m.rotation.z = s > 0 ? Math.PI * 0.15 : Math.PI - Math.PI * 0.15; m.rotation.x = 0.3;
+  head.add(m);
+});
+
+// ---- EYES: inset almond, cute (NOT bulging) ----
+function makeEye(side) {
   const g = new THREE.Group();
-  const outer = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.42, 24), furMat); outer.castShadow = true;
-  const inner = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.3, 20), pinkMat); inner.position.set(0, -0.02, 0.05);
+  // almond eyeball, flattened in Z so it hugs the face
+  const ball = sph(0.135, matEye, 28);
+  ball.scale.set(1.0, 1.12, 0.55);
+  g.add(ball);
+  // green iris ring sitting just in front, large + soft
+  const iris = sph(0.092, matIris, 24);
+  iris.scale.set(1, 1.08, 0.4);
+  iris.position.z = 0.05;
+  g.add(iris);
+  // pupil (round, big = cute)
+  const pupil = sph(0.058, new THREE.MeshBasicMaterial({ color: '#0c1206' }), 18);
+  pupil.scale.set(1, 1.04, 0.4);
+  pupil.position.z = 0.085;
+  g.add(pupil);
+  // big catchlight + small one (the soul of cuteness)
+  const glint = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 12), matWhite);
+  glint.position.set(0.035 * side, 0.05, 0.11); g.add(glint);
+  const glint2 = new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 10), matWhite);
+  glint2.position.set(-0.03 * side, -0.04, 0.1); g.add(glint2);
+  // upper lid (fur) to seat the eye into the face — kills the googly look
+  const lid = sph(0.16, matFur, 20);
+  lid.scale.set(1.05, 0.7, 0.5);
+  lid.position.set(0, 0.13, -0.02);
+  g.add(lid);
+  g.userData = { ball, lid, pupil };
+  return g;
+}
+const eyeL = makeEye(-1); eyeL.position.set(-0.2, 0.05, 0.42); eyeL.rotation.y = 0.2; head.add(eyeL);
+const eyeR = makeEye(1);  eyeR.position.set(0.2, 0.05, 0.42);  eyeR.rotation.y = -0.2; head.add(eyeR);
+
+// ---- ears: small & rounded (British shorthair), not pointy/devilish ----
+function makeEar(side) {
+  const g = new THREE.Group();
+  const outer = sph(0.2, matFur, 20); outer.scale.set(0.85, 1.05, 0.5);
+  const inner = sph(0.14, matInner, 16); inner.scale.set(0.8, 1.0, 0.45); inner.position.set(0, -0.01, 0.06);
   g.add(outer, inner);
-  g.position.set(0.34 * side, 0.52, 0.02); g.rotation.z = -0.32 * side; g.rotation.x = -0.18;
-  g.userData.baseZ = -0.32 * side; return g;
+  g.position.set(0.3 * side, 0.42, -0.02);
+  g.rotation.z = -0.22 * side; g.rotation.x = -0.12;
+  g.userData.baseZ = -0.12;
+  return g;
 }
-const earL = ear(-1), earR = ear(1); head.add(earL, earR);
+const earL = makeEar(-1), earR = makeEar(1); head.add(earL, earR);
 
-function eye(side) {
-  const g = new THREE.Group();
-  const w = new THREE.Mesh(new THREE.SphereGeometry(0.16, 24, 24), new THREE.MeshStandardMaterial({ color: '#9fb46a', roughness: 0.35 }));
-  const iris = new THREE.Mesh(new THREE.SphereGeometry(0.108, 24, 24), new THREE.MeshStandardMaterial({ color: '#6f9540', roughness: 0.3, emissive: '#2c3d18', emissiveIntensity: 0.4 })); iris.position.z = 0.07;
-  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.055, 16, 16), new THREE.MeshStandardMaterial({ color: '#111' })); pupil.position.z = 0.15; pupil.scale.set(0.7, 1, 1);
-  const glint = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 10), new THREE.MeshBasicMaterial({ color: '#fff' })); glint.position.set(0.04, 0.05, 0.18);
-  g.add(w, iris, pupil, glint);
-  g.position.set(0.26 * side, 0.06, 0.46); g.rotation.y = 0.25 * side; g.userData.pupil = pupil; return g;
+// forehead tabby "M" hint (3 short dark strokes)
+for (let i = -1; i <= 1; i++) {
+  const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.12, 4, 8), matDark);
+  m.position.set(i * 0.1, 0.26, 0.34); m.rotation.x = -0.5; m.rotation.z = i * 0.2;
+  head.add(m);
 }
-const eyeL = eye(-1), eyeR = eye(1); head.add(eyeL, eyeR);
 
-const wMat = new THREE.LineBasicMaterial({ color: '#efe9dd', transparent: true, opacity: 0.65 });
-[-1, 1].forEach(side => { for (let i = 0; i < 3; i++) { const y = -0.12 + i * 0.07;
-  head.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(
-    [new THREE.Vector3(0.18 * side, y, 0.55), new THREE.Vector3(0.95 * side, y + (i - 1) * 0.05, 0.35)]), wMat)); } });
+// whiskers
+const wMat = new THREE.LineBasicMaterial({ color: '#f3eee2', transparent: true, opacity: 0.55 });
+[-1, 1].forEach(side => { for (let i = 0; i < 3; i++) {
+  const y = -0.16 + i * 0.06;
+  const pts = [new THREE.Vector3(0.16 * side, y, 0.46), new THREE.Vector3(0.62 * side, y + (i - 1) * 0.05, 0.28)];
+  head.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), wMat));
+} });
 
-// legs
+// ---- legs (capsules + paws) ----
 const legs = [];
 function makeLeg(x, z, front) {
-  const hip = new THREE.Group(); hip.position.set(x, 0.62, z); flexRoot.add(hip);
-  const thigh = ball(0.26, furMat, 1, 1.4, 1); thigh.position.y = -0.18; hip.add(thigh);
-  const shin = new THREE.Group(); shin.position.y = -0.42; hip.add(shin);
-  const lower = ball(0.18, furMat, 1, 1.3, 1); lower.position.set(0, -0.16, 0); shin.add(lower);
-  const paw = ball(0.2, creamMat, 1.1, 0.7, 1.25); paw.position.set(0, -0.34, 0.06); shin.add(paw);
-  hip.userData = { shin, front, side: Math.sign(x), paw }; legs.push(hip); return hip;
+  const hip = new THREE.Group(); hip.position.set(x, 0.5, z); bodyG.add(hip);
+  const upper = cap(0.135, 0.18, matFur); upper.position.y = -0.16; hip.add(upper);
+  const knee = new THREE.Group(); knee.position.y = -0.3; hip.add(knee);
+  const lower = cap(0.11, 0.16, matFur); lower.position.y = -0.12; knee.add(lower);
+  const paw = sph(0.14, matCream); paw.position.set(0, -0.24, 0.04); paw.scale.set(1.05, 0.8, 1.2); knee.add(paw);
+  hip.userData = { knee, front, side: Math.sign(x) || 1 };
+  legs.push(hip); return hip;
 }
-makeLeg(-0.45, 0.75, true); makeLeg(0.45, 0.75, true);
-makeLeg(-0.5, -0.7, false); makeLeg(0.5, -0.7, false);
+makeLeg(-0.27, 0.46, true); makeLeg(0.27, 0.46, true);
+makeLeg(-0.3, -0.56, false); makeLeg(0.3, -0.56, false);
 
-// tail
-const tailSegs = []; const tailBase = new THREE.Group(); tailBase.position.set(0, 1.0, -1.15); flexRoot.add(tailBase);
+// ---- tail (fluffy, banded, gentle upward curve) ----
+const tailSegs = [];
+const tailBase = new THREE.Group(); tailBase.position.set(0, 0.75, -0.92); bodyG.add(tailBase);
 let tp = tailBase;
-for (let i = 0; i < 8; i++) { const seg = new THREE.Group(); seg.position.z = -0.26;
-  seg.add(ball(0.2 - i * 0.016, i % 2 === 0 ? furMat : darkMat, 1, 1, 1.2)); tp.add(seg); tailSegs.push(seg); tp = seg; }
+for (let i = 0; i < 11; i++) {
+  const seg = new THREE.Group(); seg.position.z = -0.135;
+  const r = 0.16 - i * 0.009;
+  const m = sph(r, matFur, 18); m.scale.set(1, 1, 1.35);
+  // subtle ring banding via a slightly darker thin band every other segment
+  if (i % 2) { const band = sph(r * 1.02, matDark, 16); band.scale.set(1, 1, 0.5); seg.add(band); }
+  seg.add(m);
+  seg.userData.rest = (i < 4 ? 0.04 : 0.14); // curls up toward the tip
+  tp.add(seg); tailSegs.push(seg); tp = seg;
+}
 
-// collar + bell
-const collar = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.06, 16, 40), new THREE.MeshStandardMaterial({ color: '#33312e', roughness: 0.6 }));
-collar.rotation.x = Math.PI / 2; collar.position.set(0, 0.78, 1.02); collar.scale.set(1, 1, 0.8); flexRoot.add(collar);
-const bell = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 20), new THREE.MeshStandardMaterial({ color: '#f2c14e', roughness: 0.3, metalness: 0.7 }));
-bell.position.set(0, 0.55, 1.4); flexRoot.add(bell);
+// ---- collar + bell ----
+const collar = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.04, 14, 36), new THREE.MeshStandardMaterial({ color: '#33312e', roughness: 0.5 }));
+collar.rotation.x = Math.PI / 2; collar.position.set(0, 0.74, 0.5); collar.scale.set(1.15, 1, 0.8); bodyG.add(collar);
+const bell = new THREE.Mesh(new THREE.SphereGeometry(0.07, 18, 18), new THREE.MeshStandardMaterial({ color: '#f0c14b', roughness: 0.3, metalness: 0.6 }));
+bell.position.set(0, 0.6, 0.74); bodyG.add(bell);
 
-const blob = new THREE.Mesh(new THREE.CircleGeometry(1.25, 32), new THREE.MeshBasicMaterial({ color: '#000', transparent: true, opacity: EMBED ? 0 : 0.22 }));
-blob.rotation.x = -Math.PI / 2; blob.position.y = 0.01; cat.add(blob);
+// speech bubble + hearts (reactions)
+const meow = makeMeow(); meow.position.set(0.7, 1.7, 0.5); meow.scale.setScalar(0); bob.add(meow);
+const hearts = []; for (let i = 0; i < 5; i++) { const h = makeHeart(); h.scale.setScalar(0); bob.add(h); hearts.push(h); }
 
-const meowSprite = makeMeow(); meowSprite.position.set(0.9, 2.4, 1); meowSprite.scale.setScalar(0); cat.add(meowSprite);
+/* ============================================================ camera + controls per mode */
+let controls = null;
+if (ROAM) {
+  camera.position.set(0, 6.6, 9.2);
+  camera.lookAt(0, 0.3, 0);
+} else {
+  camera.position.set(2.5, 1.7, 3.7);
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.06;
+  controls.target.set(0, 0.62, 0); controls.minDistance = 2.2; controls.maxDistance = 10;
+  controls.maxPolarAngle = Math.PI * 0.54; controls.enablePan = false;
+  if (EMBED) controls.enableZoom = false;
+}
 
-// little hearts for "happy"
-const hearts = [];
-for (let i = 0; i < 5; i++) { const h = makeHeart(); h.scale.setScalar(0); cat.add(h); hearts.push(h); }
-
-/* ---------------------------------------------------------------- poses */
-const POSES = {
-  stand: { walk: 0, pitch: 0, height: 0, crouch: 0, front: 0, back: 0, headP: -0.02, ear: 0, eye: 1, tail: 0 },
-  walk:  { walk: 1, pitch: 0, height: 0, crouch: 0, front: 0, back: 0, headP: -0.02, ear: 0, eye: 1, tail: 0 },
-  sit:   { walk: 0, pitch: -0.16, height: -0.06, crouch: 0.04, front: 0, back: 1.25, headP: 0.06, ear: 0, eye: 1, tail: -0.55 },
-  sleep: { walk: 0, pitch: 0, height: -0.5, crouch: 0.55, front: 1.0, back: 1.45, headP: 0.28, ear: 0.65, eye: 0.06, tail: 0.25 },
+/* ============================================================ roam AI */
+const roam = {
+  state: 'walk', target: new THREE.Vector3(2, 0, 0), timer: 0,
+  yaw: 0, speed: 0, walkAmt: 0, stride: 0,
+  boundsX: 6.2, boundsZ: 2.6,
 };
-let state = 'walk';
-const cur = { ...POSES.walk };       // smoothly-lerped current pose
+function pickTarget() {
+  roam.target.set((Math.random() * 2 - 1) * roam.boundsX, 0, (Math.random() * 2 - 1) * roam.boundsZ);
+}
+function idleAction() {
+  const r = Math.random();
+  roam.state = r < 0.42 ? 'sit' : r < 0.6 ? 'groom' : r < 0.8 ? 'look' : r < 0.92 ? 'idle' : 'sleep';
+  roam.timer = roam.state === 'sleep' ? 4 + Math.random() * 3 : 1.4 + Math.random() * 2.4;
+}
+if (ROAM) { root.position.set(-3, 0, 0); roam.yaw = Math.PI / 2; pickTarget(); }
+
+/* ============================================================ pose targets (for sit/sleep blends) */
+const POSE = {
+  stand: { crouch: 0, sitBack: 0, headDown: 0, eyeOpen: 1, lieDown: 0 },
+  sit:   { crouch: 0.05, sitBack: 1, headDown: -0.05, eyeOpen: 1, lieDown: 0 },
+  groom: { crouch: 0.05, sitBack: 1, headDown: 0.25, eyeOpen: 0.8, lieDown: 0 },
+  sleep: { crouch: 0.5, sitBack: 0, headDown: 0.2, eyeOpen: 0.05, lieDown: 1 },
+  look:  { crouch: 0, sitBack: 0, headDown: 0, eyeOpen: 1, lieDown: 0 },
+  idle:  { crouch: 0, sitBack: 0, headDown: 0, eyeOpen: 1, lieDown: 0 },
+  walk:  { crouch: 0, sitBack: 0, headDown: 0, eyeOpen: 1, lieDown: 0 },
+};
+const curPose = { ...POSE.stand };
+
+/* ============================================================ one-shot reactions (postMessage / click) */
+let meowT = 0, jumpT = 0, happyT = 0;
+function doMeow() { meowT = 1.6; }
+function doJump() { if (jumpT <= 0) jumpT = 0.6; }
+function doHappy() { happyT = 1.8; hearts.forEach(h => { h.userData.t = Math.random() * 0.5; h.userData.x = (Math.random() - 0.5) * 1.2; }); }
+const ACT = { meow: doMeow, jump: doJump, happy: doHappy,
+  sit: () => { if (ROAM) { roam.state = 'sit'; roam.timer = 3; } },
+  sleep: () => { if (ROAM) { roam.state = 'sleep'; roam.timer = 5; } },
+  walk: () => { if (ROAM) { roam.state = 'walk'; pickTarget(); } } };
+addEventListener('message', e => { const d = e.data; if (d && d.type === 'cat' && ACT[d.action]) ACT[d.action](); });
+try { if (parent && parent !== window) parent.postMessage({ type: 'cat-ready' }, '*'); } catch (_) {}
+
+// click to pet (only when interactive)
+const ray = new THREE.Raycaster(); const pv = new THREE.Vector2();
+renderer.domElement.addEventListener('pointerdown', e => {
+  pv.x = (e.clientX / innerWidth) * 2 - 1; pv.y = -(e.clientY / innerHeight) * 2 + 1;
+  ray.setFromCamera(pv, camera);
+  if (ray.intersectObject(root, true).length) { doMeow(); doHappy(); }
+});
+
+/* ============================================================ animation */
+const clock = new THREE.Clock();
+let blinkT = 0, nextBlink = 2, blinkLid = 1, tWalk = 0;
 const lerp = (a, b, t) => a + (b - a) * t;
+const shortAngle = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 
-/* ---------------------------------------------------------------- one-shots */
-let meowT = 0, jumpT = 0, happyT = 0, groomT = 0, spinT = 0, startleT = 0, spinFrom = 0;
-
-function setPose(s) { if (POSES[s]) { state = s; updateActiveBtn(); } }
-function meow() { meowT = 1.6; }
-function jump() { if (jumpT <= 0) jumpT = 0.7; }
-function happy() { happyT = 1.8; for (const h of hearts) { h.userData.t = Math.random() * 0.4; h.userData.x = (Math.random() - 0.5) * 1.2; } }
-function groom() { groomT = 2.2; }
-function spin() { if (spinT <= 0) { spinT = 1.0; spinFrom = cat.rotation.y; } }
-function startle() { startleT = 1.2; }
-
-const ACTIONS = {
-  walk: () => setPose(state === 'walk' ? 'stand' : 'walk'),
-  sit: () => setPose('sit'),
-  sleep: () => setPose('sleep'),
-  stand: () => setPose('stand'),
-  jump: () => { if (state === 'sleep' || state === 'sit') setPose('stand'); jump(); },
-  meow: () => meow(),
-  happy: () => { if (state === 'sleep') setPose('stand'); happy(); },
-  groom: () => groom(),
-  spin: () => spin(),
-  startle: () => startle(),
-  camera: () => toggleCamera(),
-};
-function doAction(a) { if (ACTIONS[a]) ACTIONS[a](); }
-
-// allow the host web page to drive the cat: postMessage({type:'cat', action:'happy'})
-addEventListener('message', (e) => { const d = e.data; if (d && d.type === 'cat' && typeof d.action === 'string') doAction(d.action); });
-// tell the host we're ready
-try { parent && parent !== window && parent.postMessage({ type: 'cat-ready' }, '*'); } catch (_) {}
-
-/* ---------------------------------------------------------------- input */
-const ray = new THREE.Raycaster(); const ptr = new THREE.Vector2();
-let look = { x: 0, y: 0 };
-renderer.domElement.addEventListener('pointerdown', (e) => {
-  ptr.x = (e.clientX / innerWidth) * 2 - 1; ptr.y = -(e.clientY / innerHeight) * 2 + 1;
-  ray.setFromCamera(ptr, camera);
-  if (ray.intersectObject(cat, true).length) { meow(); }
-});
-addEventListener('pointermove', (e) => { look.x = (e.clientX / innerWidth) * 2 - 1; look.y = -(e.clientY / innerHeight) * 2 + 1; });
-
-// buttons
-let walkSpeed = 1;
-const panel = document.getElementById('panel');
-panel?.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  doAction(b.dataset.act);
-});
-function updateActiveBtn() {
-  panel?.querySelectorAll('[data-act]').forEach(b => {
-    const on = (b.dataset.act === 'walk' && state === 'walk') || b.dataset.act === state;
-    b.classList.toggle('active', !!on);
-  });
-}
-updateActiveBtn();
-const speedEl = document.getElementById('speed');
-speedEl?.addEventListener('input', () => walkSpeed = +speedEl.value);
-function toggleCamera() {
-  controls.autoRotate = !controls.autoRotate;
-  panel?.querySelector('[data-act="camera"]')?.classList.toggle('active', controls.autoRotate);
-}
-
-/* ---------------------------------------------------------------- loop */
-const clock = new THREE.Clock(); let t = 0;
-function animate() {
-  requestAnimationFrame(animate);
+function update() {
   const dt = Math.min(clock.getDelta(), 0.05);
-
-  // blend toward target pose
-  const target = POSES[state];
-  for (const k in cur) cur[k] = lerp(cur[k], target[k], 1 - Math.pow(0.001, dt));
-
-  const gait = cur.walk * walkSpeed;
-  t += dt * (3.2 * gait + 0.0001);
   const now = performance.now();
 
-  // one-shot timers
-  if (meowT > 0) meowT -= dt;
-  if (jumpT > 0) jumpT -= dt;
-  if (happyT > 0) happyT -= dt;
-  if (groomT > 0) groomT -= dt;
-  if (spinT > 0) spinT -= dt;
-  if (startleT > 0) startleT -= dt;
-
-  // jump arc + squash/stretch
-  let jumpY = 0, stretch = 0;
-  if (jumpT > 0) { const p = 1 - jumpT / 0.7; jumpY = Math.sin(p * Math.PI) * 1.15; stretch = Math.sin(p * Math.PI - 0.5) * 0.18; }
-
-  // happy bounce
-  const happyBounce = happyT > 0 ? Math.abs(Math.sin(now * 0.02)) * 0.18 : 0;
-
-  // base body transform from pose
-  const breathe = Math.sin(now * 0.0016) * 0.02;
-  const purr = state === 'sleep' || groomT > 0 ? Math.sin(now * 0.08) * 0.006 : 0;
-  flexRoot.position.y = cur.height + Math.sin(t * 2) * 0.06 * gait + jumpY + happyBounce + purr;
-  flexRoot.rotation.x = cur.pitch;
-  flexRoot.rotation.z = Math.sin(t) * 0.04 * gait + (happyT > 0 ? Math.sin(now * 0.018) * 0.12 : 0);
-  flexRoot.scale.y = (1 - cur.crouch) * (1 + breathe) + stretch;
-  flexRoot.scale.x = flexRoot.scale.z = 1 - stretch * 0.5;
-
-  // legs: pose tuck + walk swing
-  legs.forEach((hip) => {
-    const phase = hip.userData.front ? (hip.userData.side < 0 ? 0 : Math.PI) : (hip.userData.side < 0 ? Math.PI : 0);
-    const swing = Math.sin(t + phase) * 0.5 * gait;
-    const tuck = hip.userData.front ? cur.front : cur.back;
-    hip.rotation.x = tuck + swing;
-    hip.userData.shin.rotation.x = tuck * 0.7 + Math.max(0, Math.cos(t + phase)) * 0.6 * gait;
-  });
-
-  // tail — mood driven
-  const tailMood = happyT > 0 ? -0.6 : 0;            // raises tail up when happy
-  tailBase.rotation.x = cur.tail + tailMood;
-  const swishAmp = happyT > 0 ? 0.4 : (state === 'sleep' ? 0.04 : 0.16);
-  tailSegs.forEach((seg, i) => {
-    seg.rotation.y = Math.sin(t * 1.4 - i * 0.55 + now * (happyT > 0 ? 0.004 : 0)) * (swishAmp + i * 0.015) + Math.sin(t * 0.5) * 0.05;
-    seg.rotation.x = Math.cos(t * 1.2 - i * 0.5) * 0.05 - 0.04;
-  });
-
-  // head: pose + bob + look toward cursor (not when sleeping)
-  const lookA = state === 'sleep' ? 0 : 1;
-  head.rotation.x = cur.headP + Math.sin(t * 2) * 0.04 * gait + look.y * 0.18 * lookA + (groomT > 0 ? 0.3 : 0);
-  head.rotation.y = look.x * 0.28 * lookA + (groomT > 0 ? 0.15 : 0);
-  head.rotation.z = Math.sin(t) * 0.03 * gait;
-
-  // ears: flatten on sleep/startle, perk on happy, twitch on walk
-  const earFlat = cur.ear + (startleT > 0 ? 0.8 : 0);
-  const earPerk = happyT > 0 ? -0.15 : 0;
-  earL.rotation.x = -0.18 - earFlat * 0.5 + earPerk + Math.sin(t * 3 + 1) * 0.06 * gait;
-  earR.rotation.x = -0.18 - earFlat * 0.5 + earPerk + Math.sin(t * 3) * 0.06 * gait;
-
-  // eyes: pose openness * blink, wide on startle
-  blinkUpdate(dt);
-  let open = cur.eye * blinkLid;
-  if (startleT > 0) open = Math.min(1.3, open + 0.4);
-  eyeL.scale.y = eyeR.scale.y = 0.12 + 0.9 * Math.min(1.3, open);
-  // pupils dilate on startle/happy
-  const pd = 1 + (startleT > 0 ? 0.5 : 0) + (happyT > 0 ? 0.2 : 0);
-  eyeL.userData.pupil.scale.set(0.7 * pd, pd, 1); eyeR.userData.pupil.scale.set(0.7 * pd, pd, 1);
-
-  // mouth + tongue for meow / groom
-  const mouthOpen = meowT > 0 ? Math.sin(Math.min(1, (1.6 - meowT) * 4) * Math.PI) : 0;
-  mouth.scale.y = 0.05 + mouthOpen * 0.9;
-  const tongueOut = groomT > 0 ? Math.abs(Math.sin(now * 0.012)) : (meowT > 0 ? mouthOpen * 0.5 : 0);
-  tongue.scale.setScalar(tongueOut * 0.9);
-  tongue.position.y = -0.3 - tongueOut * 0.04;
-
-  // meow bubble
-  if (meowT > 0) { const s = Math.min(1, (1.6 - meowT) * 6) * Math.min(1, meowT * 3); meowSprite.scale.setScalar(s * 1.1); meowSprite.position.y = 2.4 + (1 - Math.min(1, meowT * 2)) * 0.2; }
-  else meowSprite.scale.setScalar(0);
-
-  // hearts float up when happy
-  hearts.forEach((h, i) => {
-    if (happyT > 0) {
-      h.userData.t = (h.userData.t || 0) + dt;
-      const p = h.userData.t % 1.2;
-      h.position.set((h.userData.x || 0) + Math.sin(p * 6 + i) * 0.1, 1.8 + p * 1.4, 0.6);
-      h.scale.setScalar(Math.sin(Math.min(1, p * 2) * Math.PI) * 0.5);
-      h.material.opacity = 1 - p / 1.2;
-    } else h.scale.setScalar(0);
-  });
-
-  // spin (playful 360 of the whole cat)
-  if (spinT > 0) { const p = 1 - spinT / 1.0; cat.rotation.y = spinFrom + easeInOut(p) * Math.PI * 2; }
-  else cat.rotation.y = Math.sin(now * 0.0004) * (gait > 0.05 ? 0.05 : 0.12);
-
-  // startle little crouch-recover
-  if (startleT > 0) { const p = 1 - startleT / 1.2; flexRoot.position.y -= Math.sin(Math.min(1, p * 5) * Math.PI) * 0.15; }
-
-  // world motion (only full-screen mode)
-  if (!EMBED) {
-    tileTex.offset.y -= dt * 0.16 * gait;
-    bokeh.children.forEach((m) => {
-      m.position.z += dt * m.userData.sp * (0.6 + gait);
-      if (m.position.z > 6) { m.position.z = -18; m.position.x = (Math.random() - 0.5) * 22; }
-    });
+  /* --- roam AI --- */
+  let moving = 0;
+  if (ROAM) {
+    if (roam.state === 'walk') {
+      const dx = roam.target.x - root.position.x, dz = roam.target.z - root.position.z;
+      const dist = Math.hypot(dx, dz);
+      const desired = Math.atan2(dx, dz);
+      const diff = shortAngle(desired - roam.yaw);
+      roam.yaw += Math.sign(diff) * Math.min(Math.abs(diff), 2.4 * dt);
+      const align = Math.max(0, Math.cos(diff));
+      const targetSpeed = 1.5 * align;
+      roam.speed = lerp(roam.speed, targetSpeed, 1 - Math.pow(0.001, dt));
+      root.position.x += Math.sin(roam.yaw) * roam.speed * dt;
+      root.position.z += Math.cos(roam.yaw) * roam.speed * dt;
+      if (dist < 0.5) idleAction();
+    } else {
+      roam.speed = lerp(roam.speed, 0, 1 - Math.pow(0.001, dt));
+      roam.timer -= dt;
+      if (roam.state === 'look') roam.yaw += Math.sin(now * 0.001) * dt * 0.6;
+      if (roam.timer <= 0) { roam.state = 'walk'; pickTarget(); }
+    }
+    root.rotation.y = roam.yaw;
+    moving = roam.speed / 1.5;
+  } else {
+    moving = 1; // showcase walks in place gently? no — idle. keep subtle
   }
 
-  controls.update();
+  /* --- pose blend --- */
+  const targetPose = POSE[ROAM ? roam.state : 'idle'] || POSE.stand;
+  for (const k in curPose) curPose[k] = lerp(curPose[k], targetPose[k], 1 - Math.pow(0.0015, dt));
+
+  /* --- stride / walk cycle driven by real speed --- */
+  const gait = ROAM ? moving : 0;
+  roam.stride += dt * (6 * gait);
+  tWalk = roam.stride;
+
+  // jump
+  let jumpY = 0, squash = 0;
+  if (jumpT > 0) { jumpT -= dt; const p = 1 - jumpT / 0.6; jumpY = Math.sin(p * Math.PI) * 0.7; squash = Math.sin(p * Math.PI - 0.4) * 0.16; }
+  if (happyT > 0) happyT -= dt;
+  const happyHop = happyT > 0 ? Math.abs(Math.sin(now * 0.02)) * 0.12 : 0;
+
+  // body height: breathing + walk bob + pose crouch/sit + jump
+  const breathe = Math.sin(now * 0.0018) * 0.015;
+  const sitLift = curPose.sitBack * 0.0;             // sitting keeps rump down via leg fold
+  bob.position.y = -curPose.lieDown * 0.32 + jumpY + happyHop + Math.sin(tWalk * 2) * 0.04 * gait;
+  bob.scale.y = (1 - curPose.crouch * 0.5) * (1 + breathe) + squash;
+  bob.scale.x = bob.scale.z = 1 - squash * 0.4;
+  bodyG.rotation.z = Math.sin(tWalk) * 0.03 * gait + (happyT > 0 ? Math.sin(now * 0.017) * 0.08 : 0);
+  bodyG.rotation.x = curPose.lieDown * 0.05 - curPose.sitBack * 0.18; // sit tips chest up
+  bob.position.z = 0;
+
+  /* --- legs --- */
+  legs.forEach(hip => {
+    const phase = hip.userData.front ? (hip.userData.side < 0 ? 0 : Math.PI) : (hip.userData.side < 0 ? Math.PI : 0);
+    const swing = Math.sin(tWalk + phase) * 0.55 * gait;
+    const lift = Math.max(0, Math.cos(tWalk + phase)) * 0.5 * gait;
+    let base = 0, kneeBend = lift;
+    if (!hip.userData.front) { base += curPose.sitBack * 1.15; kneeBend += curPose.sitBack * 1.1; } // back legs fold to sit
+    if (curPose.lieDown > 0.01) { base += curPose.lieDown * 0.9; kneeBend += curPose.lieDown * 0.8; }
+    hip.rotation.x = base + swing;
+    hip.userData.knee.rotation.x = kneeBend;
+  });
+
+  /* --- tail: gentle curl at rest + sway, lifts when happy --- */
+  const happyTail = happyT > 0 ? -0.5 : 0;
+  tailBase.rotation.x = 0.3 + happyTail - curPose.lieDown * 0.2;   // base lifts up a bit
+  const amp = happyT > 0 ? 0.34 : (0.12 + gait * 0.1);
+  tailSegs.forEach((seg, i) => {
+    seg.rotation.x = seg.userData.rest;
+    seg.rotation.y = Math.sin(tWalk * 1.2 - i * 0.5 + now * (happyT > 0 ? 0.004 : 0.0012)) * (amp + i * 0.012);
+  });
+
+  /* --- head: bob, look toward travel/idle, groom dips down --- */
+  headPivot.rotation.x = curPose.headDown + Math.sin(tWalk * 2) * 0.03 * gait;
+  headPivot.rotation.y = ROAM && roam.state === 'look' ? Math.sin(now * 0.0012) * 0.4 : Math.sin(now * 0.0006) * 0.08;
+  headPivot.rotation.z = Math.sin(tWalk) * 0.02 * gait;
+
+  /* --- ears: perk on happy, swivel slightly, flat on sleep --- */
+  const earFlat = curPose.lieDown * 0.6;
+  const earPerk = happyT > 0 ? -0.12 : 0;
+  earL.rotation.x = earL.userData.baseZ - earFlat + earPerk + Math.sin(now * 0.003 + 1) * 0.05 * gait;
+  earR.rotation.x = earR.userData.baseZ - earFlat + earPerk + Math.sin(now * 0.003) * 0.05 * gait;
+
+  /* --- blink + eye openness --- */
+  blinkT += dt; blinkLid = 1;
+  if (blinkT > nextBlink) { const k = (blinkT - nextBlink) / 0.13; blinkLid = Math.abs(Math.cos(k * Math.PI)); if (blinkT > nextBlink + 0.13) { blinkT = 0; nextBlink = 2 + Math.random() * 3.5; } }
+  const open = Math.min(1, curPose.eyeOpen) * blinkLid;
+  [eyeL, eyeR].forEach(e => {
+    // close = lid slides down over the eye (scale eyeball Y + move lid down)
+    e.userData.ball.scale.y = 1.12 * (0.18 + 0.82 * open);
+    e.userData.lid.position.y = lerp(0.18, 0.0, open);
+  });
+
+  /* --- meow bubble --- */
+  if (meowT > 0) { meowT -= dt; const s = Math.min(1, (1.6 - meowT) * 6) * Math.min(1, meowT * 3); meow.scale.setScalar(s); meow.position.y = 1.7 + (1 - Math.min(1, meowT * 2)) * 0.15; }
+  else meow.scale.setScalar(0);
+
+  /* --- hearts --- */
+  hearts.forEach((h, i) => {
+    if (happyT > 0) { h.userData.t = (h.userData.t || 0) + dt; const p = h.userData.t % 1.2;
+      h.position.set((h.userData.x || 0) + Math.sin(p * 6 + i) * 0.1, 1.2 + p * 1.3, 0.4);
+      h.scale.setScalar(Math.sin(Math.min(1, p * 2) * Math.PI) * 0.42); h.material.opacity = 1 - p / 1.2; }
+    else h.scale.setScalar(0);
+  });
+
+  if (controls) {
+    if (!EMBED) controls.autoRotate = false;
+    controls.update();
+  }
   renderer.render(scene, camera);
 }
+renderer.setAnimationLoop(update);
+window.__CAT_OK = true;
 
-let blinkT = 0, nextBlink = 2, blinkLid = 1;
-function blinkUpdate(dt) {
-  blinkT += dt; blinkLid = 1;
-  if (blinkT > nextBlink) {
-    const k = (blinkT - nextBlink) / 0.14; blinkLid = Math.abs(Math.cos(k * Math.PI));
-    if (blinkT > nextBlink + 0.14) { blinkT = 0; nextBlink = 1.8 + Math.random() * 3; }
-  }
-}
-const easeInOut = (p) => p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-
-animate();
-window.__CAT_OK = true; // signals the whole module initialised without throwing
-setTimeout(() => document.getElementById('loader').classList.add('hide'), 500);
-
+/* ============================================================ resize */
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
+  if (ROAM) { roam.boundsX = Math.min(7, 4 + innerWidth / 320); }
 });
 
-/* ---------------------------------------------------------------- textures */
-function makeTabbyTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 512; const x = c.getContext('2d');
-  const g = x.createLinearGradient(0, 0, 0, 512);
-  g.addColorStop(0, '#b4ab9d'); g.addColorStop(0.6, '#a89f92'); g.addColorStop(1, '#cfc7b8');
-  x.fillStyle = g; x.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 4000; i++) { x.fillStyle = `rgba(${Math.random() > .5 ? 120 : 200},110,100,0.05)`; x.fillRect(Math.random() * 512, Math.random() * 512, 2, 2); }
-  x.lineCap = 'round';
-  for (let s = -2; s < 12; s++) { x.beginPath(); x.strokeStyle = `rgba(95,88,78,${0.35 + Math.random() * 0.2})`; x.lineWidth = 9 + Math.random() * 9;
-    const bx = s * 46 + 20; for (let yy = 0; yy <= 512; yy += 16) { const xx = bx + Math.sin(yy * 0.018 + s) * 16; yy === 0 ? x.moveTo(xx, yy) : x.lineTo(xx, yy); } x.stroke(); }
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping; return tex;
-}
-function makeTileTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
-  x.strokeStyle = 'rgba(255,255,255,0.5)'; x.lineWidth = 3; x.strokeRect(2, 2, 124, 124);
-  return new THREE.CanvasTexture(c);
-}
+/* ============================================================ sprites */
 function makeMeow() {
-  const c = document.createElement('canvas'); c.width = 256; c.height = 160; const x = c.getContext('2d');
-  x.fillStyle = '#fff'; roundRect(x, 16, 14, 224, 96, 26); x.fill();
-  x.beginPath(); x.moveTo(60, 104); x.lineTo(44, 150); x.lineTo(96, 104); x.closePath(); x.fill();
-  x.fillStyle = '#2a2440'; x.font = 'bold 56px Sarabun, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.fillText('เหมียว~', 128, 60);
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true })); sp.scale.set(1.6, 1.0, 1); return sp;
+  const c = document.createElement('canvas'); c.width = 256; c.height = 150; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; rr(x, 12, 12, 232, 92, 24); x.fill();
+  x.beginPath(); x.moveTo(58, 100); x.lineTo(40, 140); x.lineTo(96, 100); x.closePath(); x.fill();
+  x.fillStyle = '#2a2440'; x.font = 'bold 54px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText('เหมียว~', 128, 56);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true })); sp.scale.set(1.5, 0.9, 1); return sp;
 }
 function makeHeart() {
   const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
-  x.fillStyle = '#ff7aa2'; x.beginPath();
-  x.moveTo(32, 56); x.bezierCurveTo(2, 34, 8, 8, 32, 22); x.bezierCurveTo(56, 8, 62, 34, 32, 56); x.fill();
-  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true })); sp.scale.set(0.5, 0.5, 1); return sp;
+  x.fillStyle = '#ff7aa2'; x.beginPath(); x.moveTo(32, 56); x.bezierCurveTo(2, 34, 8, 8, 32, 22); x.bezierCurveTo(56, 8, 62, 34, 32, 56); x.fill();
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true }));
 }
-function roundRect(x, X, Y, w, h, r) {
-  x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r);
-  x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath();
-}
+function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
 </script>
 </body>
 </html>
