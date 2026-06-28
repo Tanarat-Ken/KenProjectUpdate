@@ -230,7 +230,7 @@ function makeLeg(x, z, front) {
   const hip = new THREE.Group(); hip.position.set(x, 0.62, z); flexRoot.add(hip);
   const thigh = ball(0.26, furMat, 1, 1.4, 1); thigh.position.y = -0.18; hip.add(thigh);
   const shin = new THREE.Group(); shin.position.y = -0.42; hip.add(shin);
-  shin.add(Object.assign(ball(0.18, furMat, 1, 1.3, 1), { position: new THREE.Vector3(0, -0.16, 0) }));
+  const lower = ball(0.18, furMat, 1, 1.3, 1); lower.position.set(0, -0.16, 0); shin.add(lower);
   const paw = ball(0.2, creamMat, 1.1, 0.7, 1.25); paw.position.set(0, -0.34, 0.06); shin.add(paw);
   hip.userData = { shin, front, side: Math.sign(x), paw }; legs.push(hip); return hip;
 }
