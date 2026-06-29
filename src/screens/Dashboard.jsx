@@ -95,7 +95,11 @@ export function Dashboard({ navigate }) {
             borderRadius: 9, padding: '8px 13px', width: 230,
           }}>
             <IconSearch size={15} />
-            <span style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight }}>ค้นหางาน ลูกค้า เอกสาร…</span>
+            <input
+              placeholder="ค้นหางาน ลูกค้า… (กด Enter)"
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate('projects', { q: e.target.value.trim() }) }}
+              style={{ border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 12.5, color: C.ink, width: '100%' }}
+            />
           </div>
           <button
             onClick={() => navigate('wizard')}

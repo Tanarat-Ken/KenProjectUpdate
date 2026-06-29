@@ -33,3 +33,20 @@ body {
 .btn:active { transform: scale(0.98); }
 .card-hover { transition: box-shadow 0.15s; }
 .card-hover:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+
+/* Print: show only the active A4 document, hide the app chrome */
+@media print {
+  body { background: #fff; }
+  body * { visibility: hidden; }
+  .ao-doc, .ao-doc * { visibility: visible; }
+  .ao-doc {
+    position: fixed; left: 50%; top: 0;
+    transform: translateX(-50%) scale(1.45); transform-origin: top center;
+    box-shadow: none !important; border-radius: 0 !important;
+  }
+}
+
+/* Hide horizontal scrollbar jank on small screens */
+@media (max-width: 760px) {
+  .ao-hide-mobile { display: none !important; }
+}

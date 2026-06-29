@@ -152,6 +152,14 @@ export function IconArrowRight({ size = 16, stroke = 'currentColor' }) {
   )
 }
 
+export function IconMenu({ size = 22, stroke = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2">
+      <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function LogoIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">

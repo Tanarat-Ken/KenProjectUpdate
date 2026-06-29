@@ -22,9 +22,9 @@ function matchesFilter(project, key) {
   return project.status === key
 }
 
-export function ProjectsList({ navigate }) {
+export function ProjectsList({ navigate, query }) {
   const [activeFilter, setActiveFilter] = useState('all')
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(query || '')
   const { data, loading, error, reload } = useAsync(getProjects, [])
 
   const projects = data || []
