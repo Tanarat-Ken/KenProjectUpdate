@@ -20,7 +20,7 @@ export function PartnerMode({ navigate }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: C.bg }}>
       {/* Teal header */}
-      <div style={{ height: 62, background: C.teal, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div className="ao-topbar" style={{ height: 62, background: C.teal, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
           <div style={{ width: 34, height: 34, borderRadius: 9, background: 'rgba(255,255,255,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <LogoIcon size={18} />
@@ -43,7 +43,7 @@ export function PartnerMode({ navigate }) {
         <div style={{ fontFamily: "'Sarabun'", fontSize: 13, color: C.grayLight, marginBottom: 22 }}>เลือกสิ่งที่ต้องทำ ระบบจะพาไปทีละขั้น ไม่ต้องคิดเยอะ</div>
 
         {/* Action cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 26 }}>
+        <div className="ao-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 26 }}>
           <ActionCard onClick={() => navigate('wizard')} icon={<IconFile size={24} stroke={C.teal} />} bg={C.tealLight} title="สร้างใบเสนอราคา" sub="เริ่มงานใหม่ให้ลูกค้า" />
           <ActionCard onClick={() => navigate('projects')} icon={<IconCreditCard size={24} stroke={C.burgundy} />} bg={C.burgundyLight} title="ออกใบแจ้งหนี้" sub="เลือกงานที่จะวางบิล" border={C.burgundy} badge={tasks.length ? `มีงานรอ ${tasks.length}` : null} />
           <ActionCard onClick={() => navigate('projects')} icon={<IconCheck size={24} stroke={C.blue} />} bg={C.blueLight} title="ออกใบส่งงาน" sub="เลือกงานที่ส่งมอบ" />
@@ -58,7 +58,7 @@ export function PartnerMode({ navigate }) {
           {tasks.map((p, i) => {
             const hint = ACTION_HINT[p.status] || { label: 'ดูรายละเอียด', color: C.grayMed, bg: C.panelAlt }
             return (
-              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: i < tasks.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
+              <div key={p.id} className="ao-row-wrap" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: i < tasks.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
                 <div style={{ width: 40, height: 40, borderRadius: 11, background: hint.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: hint.color }}>{i + 1}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 13.5, color: C.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>

@@ -74,7 +74,7 @@ export function Settings() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ height: 58, borderBottom: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
+      <div className="ao-topbar" style={{ height: 58, borderBottom: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
         <div>
           <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 16, color: C.ink }}>ตั้งค่าระบบ</div>
           <div style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>เฉพาะเจ้าของแก้ไขได้ · ไหลขึ้นทุกเอกสารอัตโนมัติ</div>
@@ -87,8 +87,8 @@ export function Settings() {
         </div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', background: C.bg, overflow: 'hidden' }}>
-        <div style={{ width: 190, borderRight: `1px solid ${C.border}`, padding: '16px 12px', flexShrink: 0, background: C.bg }}>
+      <div className="ao-settings-body" style={{ flex: 1, display: 'flex', background: C.bg, overflow: 'hidden' }}>
+        <div className="ao-settings-nav" style={{ width: 190, borderRight: `1px solid ${C.border}`, padding: '16px 12px', flexShrink: 0, background: C.bg }}>
           {SECTIONS.map((s, i) => (
             <div key={s} onClick={() => setSection(i)} style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: section === i ? 600 : 500, color: section === i ? C.white : C.grayMed, background: section === i ? C.ink : 'transparent', borderRadius: 8, padding: '8px 12px', marginBottom: 5, cursor: 'pointer' }}>{s}</div>
           ))}
@@ -98,7 +98,7 @@ export function Settings() {
           {section === 0 && (
             <>
               <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 16 }}>ข้อมูลผู้ออกเอกสาร</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620 }}>
+              <div className="ao-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620 }}>
                 <Input label="ชื่อ-นามสกุล" k="name" form={form} set={set} />
                 <Input label="ชื่อเรียกสั้น" k="short_name" form={form} set={set} />
                 <Input label="ตำแหน่ง / บริการ" k="role" form={form} set={set} span />
@@ -112,7 +112,7 @@ export function Settings() {
           {section === 1 && (
             <>
               <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 16 }}>บัญชี & การชำระเงิน</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620 }}>
+              <div className="ao-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620 }}>
                 <Input label="ธนาคาร" k="bank" form={form} set={set} />
                 <Input label="เลขบัญชี" k="bank_account" form={form} set={set} mono />
                 <Input label="ชื่อบัญชี" k="bank_name" form={form} set={set} />
@@ -125,7 +125,7 @@ export function Settings() {
             <>
               <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 16 }}>เลขรันเอกสาร</div>
               <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight, marginBottom: 14 }}>กำหนดอักษรนำหน้าและเลขถัดไปของแต่ละชนิดเอกสาร</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, maxWidth: 720 }}>
+              <div className="ao-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, maxWidth: 720 }}>
                 {[['prefix_qt', 'next_qt', 'ใบเสนอราคา'], ['prefix_dn', 'next_dn', 'ใบส่งงาน'], ['prefix_inv', 'next_inv', 'ใบแจ้งหนี้'], ['prefix_rc', 'next_rc', 'ใบเสร็จ']].map(([pk, nk, label]) => (
                   <div key={pk} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
                     <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 12.5, color: C.ink, marginBottom: 10 }}>{label}</div>
@@ -143,7 +143,7 @@ export function Settings() {
           {section === 3 && (
             <>
               <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 16 }}>ผู้ใช้ & สิทธิ์</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620, marginBottom: 18 }}>
+              <div className="ao-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 620, marginBottom: 18 }}>
                 <Input label="ชื่อผู้ช่วย (แฟน)" k="partner_name" form={form} set={set} />
                 <Input label="อักษรย่อผู้ช่วย" k="partner_initial" form={form} set={set} />
               </div>

@@ -79,7 +79,7 @@ export function Dashboard({ navigate }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Top bar */}
-      <div style={{
+      <div className="ao-topbar" style={{
         height: 64, borderBottom: `1px solid ${C.border}`,
         padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: C.white, flexShrink: 0,
@@ -89,7 +89,7 @@ export function Dashboard({ navigate }) {
           <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>{today}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
+          <div className="ao-search" style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: C.panel, border: `1px solid ${C.border}`,
             borderRadius: 9, padding: '8px 13px', width: 230,
@@ -124,7 +124,7 @@ export function Dashboard({ navigate }) {
         {data && (
           <>
             {/* Stat cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 22 }}>
+            <div className="ao-grid-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 22 }}>
               <StatCard label="งานค้าง (กำลังทำ)" value={data.counts.active} sub="กำลังพัฒนาอยู่" dotColor={C.teal} />
               <StatCard label="งานรอ (รอลูกค้า)" value={data.counts.waiting} sub="รอตอบรับ · รอชำระ" dotColor={C.amber} />
               <StatCard label="งานรีวิว (รอตรวจรับ)" value={data.counts.review} sub="ส่งมอบแล้ว รอเซ็น" dotColor={C.blue} />
@@ -132,7 +132,7 @@ export function Dashboard({ navigate }) {
             </div>
 
             {/* Main 2-col */}
-            <div style={{ display: 'flex', gap: 18 }}>
+            <div className="ao-stack-mobile" style={{ display: 'flex', gap: 18 }}>
               {/* Left */}
               <div style={{ flex: 1.6, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -153,7 +153,7 @@ export function Dashboard({ navigate }) {
 
                 {/* Revenue */}
                 <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, margin: '22px 0 12px' }}>รายได้ภาพรวม</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+                <div className="ao-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
                   {[
                     { label: 'เสนอราคาไป', value: baht(data.revenue.quoted), color: C.ink },
                     { label: 'รอเก็บ', value: baht(data.revenue.receivable), color: C.burgundy },

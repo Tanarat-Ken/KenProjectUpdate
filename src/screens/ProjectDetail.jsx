@@ -5,7 +5,7 @@ import { IconCheck, IconPrint, IconSend, IconEdit, IconUpload } from '../compone
 import { Loading, ErrorState, EmptyState } from '../components/States'
 import { FileViewer } from '../components/FileViewer'
 import { useAsync } from '../lib/useAsync'
-import { getProjectByCode, uploadFile, deleteFile, acceptQuotation, markDeveloped, recordPayment, updateProject, deleteProject } from '../lib/api'
+import { getProjectByCode, uploadFile, deleteFile, acceptQuotation, markDeveloped, recordPayment, updateProject, deleteProject, updateDocument } from '../lib/api'
 import { useOwner } from '../lib/settings'
 import { baht, timeThai } from '../lib/format'
 
@@ -225,12 +225,15 @@ function DocPreview({ type, project, owner }) {
   )
 }
 
-function DocumentsTab({ project }) {
+function DocumentsTab({ project, reload }) {
   const owner = useOwner()
+  const [editing, setEditing] = useState(false)
   const available = project.documents.filter((d) => !d.pending)
   const [activeId, setActiveId] = useState(available[available.length - 1]?.id || null)
   const current = project.documents.find((d) => d.id === activeId) || available[available.length - 1]
   const docColor = current ? DOC_COLORS[current.type] : C.grayMed
+  // RC has no editable underlying table row
+  const canEdit = current && ['QT', 'DN', 'INV'].includes(current.type)
 
   if (available.length === 0) {
     return <EmptyState title="ยังไม่มีเอกสารในงานนี้" sub="Create a document from the wizard" />
@@ -277,6 +280,11 @@ function DocumentsTab({ project }) {
             <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
               <IconPrint size={14} stroke="currentColor" />พิมพ์ PDF
             </button>
+            {canEdit && (
+              <button onClick={() => setEditing(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
+                <IconEdit size={14} stroke="currentColor" />แก้ไข
+              </button>
+            )}
             <button
               onClick={() => {
                 const total = project.lineItems.reduce((s, it) => s + it.amount, 0)
@@ -291,6 +299,110 @@ function DocumentsTab({ project }) {
         </div>
         <div style={{ flex: 1, overflow: 'auto', background: '#EFEDE5', display: 'flex', justifyContent: 'center', padding: '26px 20px' }}>
           {current && <DocPreview type={current.type} project={project} owner={owner} />}
+        </div>
+      </div>
+
+      {editing && canEdit && (
+        <EditDocModal
+          project={project}
+          doc={current}
+          onClose={() => setEditing(false)}
+          onSaved={async () => { setEditing(false); await reload() }}
+        />
+      )}
+    </div>
+  )
+}
+
+// Pull the stored DB row + its line items for the document being edited.
+function docRowFor(project, type) {
+  const row = project.raw?.[type.toLowerCase()] || null
+  // QT line items are also exposed on project.lineItems already in {desc, amount} shape
+  const items = (row?.items || []).map((it) => ({
+    desc: it.description || it.name || '',
+    amount: Number(it.qty ?? 1) * Number(it.unit_price ?? it.amount ?? 0),
+  }))
+  return { row, items }
+}
+
+function EditDocModal({ project, doc, onClose, onSaved }) {
+  const type = doc.type
+  const { row, items: initialItems } = docRowFor(project, type)
+  const seed = (type === 'QT' && initialItems.length === 0 ? project.lineItems : initialItems) || []
+  const [rows, setRows] = useState(seed.length ? seed.map((r) => ({ ...r })) : [{ desc: '', amount: 0 }])
+  const [note, setNote] = useState(row?.note || '')
+  const [dueDate, setDueDate] = useState(row?.due_date || '')
+  const [busy, setBusy] = useState(false)
+  const color = DOC_COLORS[type] || C.ink
+  const label = DOC_TH[type] || 'เอกสาร'
+  const total = rows.reduce((s, r) => s + (Number(r.amount) || 0), 0)
+
+  const f = { width: '100%', boxSizing: 'border-box', background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '9px 12px', fontFamily: "'Sarabun'", fontSize: 13.5, color: C.ink, outline: 'none' }
+  const lbl = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
+
+  const setRow = (i, patch) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)))
+  const addRow = () => setRows((rs) => [...rs, { desc: '', amount: 0 }])
+  const removeRow = (i) => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : rs))
+
+  const save = async () => {
+    if (!row?.id) { alert('ไม่พบเอกสารต้นทาง'); return }
+    const clean = rows.filter((r) => r.desc.trim())
+    if (clean.length === 0) { alert('ต้องมีอย่างน้อย 1 รายการ'); return }
+    setBusy(true)
+    try {
+      await updateDocument({ type, id: row.id, items: clean, note, dueDate: type === 'INV' ? dueDate : undefined })
+      await onSaved()
+    } catch (err) {
+      alert('บันทึกไม่สำเร็จ: ' + (err.message || err))
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(20,16,20,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: 520, maxWidth: '100%', maxHeight: '90vh', overflow: 'auto', background: C.white, borderRadius: 16, boxShadow: '0 16px 50px rgba(0,0,0,.25)' }}>
+        <div style={{ padding: '18px 22px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ width: 8, height: 30, borderRadius: 4, background: color }} />
+          <div>
+            <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 16, color: C.ink }}>แก้ไข{label}</div>
+            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: C.grayLight, marginTop: 2 }}>{doc.id}</div>
+          </div>
+        </div>
+
+        <div style={{ padding: '18px 22px' }}>
+          <label style={lbl}>รายการ</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {rows.map((r, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input value={r.desc} onChange={(e) => setRow(i, { desc: e.target.value })} placeholder="รายละเอียด" style={{ ...f, flex: 1 }} />
+                <input type="number" value={r.amount} onChange={(e) => setRow(i, { amount: Number(e.target.value) })} placeholder="0" style={{ ...f, width: 120, fontFamily: "'Space Grotesk'", fontWeight: 600, textAlign: 'right' }} />
+                <button onClick={() => removeRow(i)} title="ลบรายการ" style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, color: C.grayPale, fontSize: 17, cursor: 'pointer' }}>×</button>
+              </div>
+            ))}
+          </div>
+          <button onClick={addRow} style={{ marginTop: 9, fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: color, background: C.white, border: `1px dashed ${color}`, borderRadius: 9, padding: '8px 13px', cursor: 'pointer' }}>+ เพิ่มรายการ</button>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, background: C.panel, border: `1px solid ${C.borderLight}`, borderRadius: 9, padding: '9px 13px' }}>
+            <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink }}>ยอดรวม</span>
+            <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 16, color: C.ink }}>{baht(total)}</span>
+          </div>
+
+          {type === 'INV' && (
+            <div style={{ marginTop: 16 }}>
+              <label style={lbl}>วันครบกำหนดชำระ</label>
+              <input type="date" value={dueDate || ''} onChange={(e) => setDueDate(e.target.value)} style={f} />
+            </div>
+          )}
+
+          <div style={{ marginTop: 16 }}>
+            <label style={lbl}>หมายเหตุ</label>
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} style={{ ...f, resize: 'vertical', fontFamily: "'Sarabun'" }} />
+          </div>
+        </div>
+
+        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <button onClick={onClose} disabled={busy} style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 18px', cursor: busy ? 'wait' : 'pointer' }}>ยกเลิก</button>
+          <button onClick={save} disabled={busy} style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: '#fff', background: color, border: 'none', borderRadius: 9, padding: '10px 22px', cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.6 : 1 }}>{busy ? 'กำลังบันทึก…' : 'บันทึกการแก้ไข'}</button>
         </div>
       </div>
     </div>
@@ -493,7 +605,7 @@ export function ProjectDetail({ projectId, navigate }) {
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {tab === 0 && <OverviewTab project={project} navigate={navigate} actions={actions} busy={busy} />}
-        {tab === 1 && <DocumentsTab project={project} />}
+        {tab === 1 && <DocumentsTab project={project} reload={reload} />}
         {tab === 2 && <FilesTab project={project} reload={reload} />}
         {tab === 3 && <RevisionsTab project={project} />}
       </div>

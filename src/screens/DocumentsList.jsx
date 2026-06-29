@@ -25,10 +25,10 @@ export function DocumentsList({ navigate }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
+      <div className="ao-topbar" style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
         <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink }}>เอกสารทั้งหมด</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 9, padding: '8px 13px', width: 210 }}>
+          <div className="ao-search" style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 9, padding: '8px 13px', width: 210 }}>
             <IconSearch size={15} />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ค้นหาเลขที่ / ลูกค้า…" style={{ border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 12.5, color: C.ink, width: '100%' }} />
           </div>
@@ -58,7 +58,7 @@ export function DocumentsList({ navigate }) {
             <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px', borderBottom: `1px solid ${C.border}`, background: C.panel }}>
                 {['เลขที่ / ชนิด', 'ลูกค้า', 'วันที่', 'สถานะ', 'มูลค่า'].map((h, i) => (
-                  <div key={h} style={{ flex: [1.6, 1.6, 1, 0.9, 0.8][i], textAlign: i === 4 ? 'right' : 'left', fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>{h}</div>
+                  <div key={h} className={i === 2 ? 'ao-hide-mobile' : undefined} style={{ flex: [1.6, 1.6, 1, 0.9, 0.8][i], textAlign: i === 4 ? 'right' : 'left', fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>{h}</div>
                 ))}
               </div>
               {docs.length === 0 ? (
@@ -74,7 +74,7 @@ export function DocumentsList({ navigate }) {
                       </div>
                     </div>
                     <div style={{ flex: 1.6, fontFamily: "'Sarabun'", fontSize: 12.5, color: C.ink, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.client}</div>
-                    <div style={{ flex: 1, fontFamily: "'Sarabun'", fontSize: 12, color: C.grayMed }}>{thaiDate(d.date)}</div>
+                    <div className="ao-hide-mobile" style={{ flex: 1, fontFamily: "'Sarabun'", fontSize: 12, color: C.grayMed }}>{thaiDate(d.date)}</div>
                     <div style={{ flex: 0.9 }}><StatusBadge status={d.status} /></div>
                     <div style={{ flex: 0.8, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: C.ink }}>{baht(d.amount)}</div>
                   </div>

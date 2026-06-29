@@ -41,14 +41,14 @@ export function ProjectsList({ navigate, query }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       {/* Top bar */}
-      <div style={{
+      <div className="ao-topbar" style={{
         height: 64, borderBottom: `1px solid ${C.border}`,
         padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: C.white, flexShrink: 0,
       }}>
         <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink }}>งานทั้งหมด</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
+          <div className="ao-search" style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: C.panel, border: `1px solid ${C.border}`,
             borderRadius: 9, padding: '8px 13px', width: 210,
@@ -110,10 +110,10 @@ export function ProjectsList({ navigate, query }) {
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', padding: '12px 20px', borderBottom: `1px solid ${C.border}`, background: C.panel }}>
                 <div style={{ flex: 2.4, fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>งาน / ลูกค้า</div>
-                <div style={{ flex: 1.4, fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>ขั้นตอน (Q→D→I→R)</div>
+                <div className="ao-hide-mobile" style={{ flex: 1.4, fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>ขั้นตอน (Q→D→I→R)</div>
                 <div style={{ flex: 0.9, fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>สถานะ</div>
                 <div style={{ flex: 0.8, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>มูลค่า</div>
-                <div style={{ flex: 0.7, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>อัปเดต</div>
+                <div className="ao-hide-mobile" style={{ flex: 0.7, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: C.grayLight }}>อัปเดต</div>
               </div>
 
               {/* Rows */}
@@ -137,7 +137,7 @@ export function ProjectsList({ navigate, query }) {
                         {p.client} · <span style={{ fontFamily: "'Space Grotesk'" }}>{p.id}</span>
                       </div>
                     </div>
-                    <div style={{ flex: 1.4 }}>
+                    <div className="ao-hide-mobile" style={{ flex: 1.4 }}>
                       <Pipeline pipeline={p.pipeline} />
                     </div>
                     <div style={{ flex: 0.9 }}>
@@ -148,7 +148,7 @@ export function ProjectsList({ navigate, query }) {
                         {baht(p.value)}
                       </span>
                     </div>
-                    <div style={{ flex: 0.7, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>
+                    <div className="ao-hide-mobile" style={{ flex: 0.7, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>
                       {p.updatedAt}
                     </div>
                   </div>

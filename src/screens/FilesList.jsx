@@ -40,7 +40,7 @@ export function FilesList() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
+      <div className="ao-topbar" style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
         <div>
           <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink }}>ไฟล์ &amp; คอนเซป</div>
           <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>คลังไฟล์ .md / .html อธิบายคอนเซปงาน</div>
@@ -52,12 +52,12 @@ export function FilesList() {
         </label>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+      <div className="ao-twopane" style={{ flex: 1, minHeight: 0, display: 'flex' }}>
         {loading && <Loading />}
         {error && <ErrorState error={error} onRetry={reload} />}
         {files && (
           <>
-            <div style={{ width: 320, borderRight: `1px solid ${C.border}`, padding: '20px 18px', flexShrink: 0, overflow: 'auto', background: C.bg }}>
+            <div className="ao-pane-list" style={{ width: 320, borderRight: `1px solid ${C.border}`, padding: '20px 18px', flexShrink: 0, overflow: 'auto', background: C.bg }}>
               {list.length === 0 && (
                 <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight, lineHeight: 1.6, padding: '8px 4px' }}>
                   ยังไม่มีไฟล์ในคลัง<br />อัปโหลดไฟล์คอนเซป .md หรือ .html เพื่อเริ่มต้น

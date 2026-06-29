@@ -501,6 +501,57 @@ export async function createDocument({ type, project, items, issueDate, dueDate,
   return { number, created }
 }
 
+/* ---------------------------------------------------------------- update doc */
+
+// Edit an already-issued document (line items, note, and INV due date).
+// Does NOT change status (respects each table's CHECK constraint).
+// For QT, also keeps the parent project's `value` in sync with the new total.
+export async function updateDocument({ type, id, items, note, dueDate }) {
+  if (!TABLE_OF[type]) throw new Error('ชนิดเอกสารไม่ถูกต้อง')
+  if (!id) throw new Error('ไม่พบเลขอ้างอิงเอกสาร')
+
+  const storedItems = toItems((items || []).filter((r) => r.desc))
+  const total = itemsTotal(storedItems)
+
+  const patch = { items: storedItems, note: note || null }
+  if (type === 'INV') patch.due_date = dueDate || null
+
+  const { data: updated, error } = await supabase
+    .from(TABLE_OF[type])
+    .update(patch)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+
+  // Keep the project value aligned with the quotation total
+  if (type === 'QT' && updated?.project_id) {
+    await supabase
+      .from('agentoffice_projects')
+      .update({ value: total, updated_at: new Date().toISOString() })
+      .eq('id', updated.project_id)
+  }
+
+  // Log the edit as a revision
+  if (updated?.project_id) {
+    const settings = await getSettings()
+    await addRevision({
+      project_id: updated.project_id,
+      icon: 'edit',
+      color: DOC_META[type].color,
+      title: `แก้ไข${DOC_META[type].label}`,
+      doc_id: updated.number || null,
+      doc_color: DOC_META[type].color,
+      detail: updated.number ? `${updated.number}` : null,
+      user_name: settings.short_name || 'เจ้าของ',
+      user_initial: (settings.short_name || 'ธ').charAt(0),
+      user_color: DOC_META[type].color,
+    })
+  }
+
+  return { total, updated }
+}
+
 /* ---------------------------------------------------------------- create project */
 
 async function nextProjectCode() {
@@ -642,18 +693,20 @@ export async function deleteProject(uuid) {
 /* ---------------------------------------------------------------- dashboard */
 
 export async function getDashboard() {
-  const projects = await getProjects()
+  const [projects, docs] = await Promise.all([getProjects(), fetchAllDocs()])
   const isOpen = (p) => p.status !== 'ปิดงาน'
 
+  // Counts / open projects stay derived from project status
   const waiting = projects.filter((p) => ['รอชำระ', 'รอตอบรับ'].includes(p.status))
   const review = projects.filter((p) => p.status === 'รอตรวจรับ')
   const active = projects.filter((p) => p.status === 'กำลังทำ')
-  const receivable = projects
-    .filter((p) => p.status === 'รอชำระ')
-    .reduce((s, p) => s + p.value, 0)
 
-  const quoted = projects.reduce((s, p) => s + p.value, 0)
-  const collected = projects.filter((p) => p.status === 'ปิดงาน').reduce((s, p) => s + p.value, 0)
+  // Real money figures from the actual documents / payments
+  const quoted = docs.qt.reduce((s, d) => s + itemsTotal(d.items), 0)
+  const receivable = docs.inv
+    .filter((d) => d.status !== 'paid')
+    .reduce((s, d) => s + itemsTotal(d.items), 0)
+  const collected = docs.pay.reduce((s, p) => s + Number(p.amount || 0), 0)
 
   return {
     projects,

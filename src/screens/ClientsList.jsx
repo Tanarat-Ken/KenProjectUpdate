@@ -70,20 +70,20 @@ export function ClientsList() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
+      <div className="ao-topbar" style={{ height: 64, borderBottom: `1px solid ${C.border}`, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.white, flexShrink: 0 }}>
         <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink }}>ลูกค้า</div>
         <button onClick={() => setSelectedId('new')} className="btn" style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.white, background: C.teal, border: 'none', borderRadius: 9, padding: '9px 15px', cursor: 'pointer' }}>
           <IconPlus size={15} stroke={C.white} />เพิ่มลูกค้า
         </button>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, display: 'flex' }}>
+      <div className="ao-twopane" style={{ flex: 1, minHeight: 0, display: 'flex' }}>
         {loading && <Loading />}
         {error && <ErrorState error={error} onRetry={reload} />}
         {data && (
           <>
             {/* List */}
-            <div style={{ width: 340, borderRight: `1px solid ${C.border}`, overflow: 'auto', background: C.bg, padding: '18px 16px' }}>
+            <div className="ao-pane-list" style={{ width: 340, borderRight: `1px solid ${C.border}`, overflow: 'auto', background: C.bg, padding: '18px 16px' }}>
               {customers.length === 0 && (
                 <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight, padding: 8 }}>ยังไม่มีลูกค้า — กด “เพิ่มลูกค้า” เพื่อเริ่ม</div>
               )}
@@ -116,7 +116,7 @@ export function ClientsList() {
                   <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 16, color: C.ink, marginBottom: 18 }}>
                     {selectedId === 'new' ? 'เพิ่มลูกค้าใหม่' : 'แก้ไขข้อมูลลูกค้า'}
                   </div>
-                  <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: '20px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <div className="ao-grid-2" style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: '20px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     {FIELDS.map((f) => (
                       <div key={f.key} style={f.textarea || f.key === 'name' ? { gridColumn: 'span 2' } : {}}>
                         <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 500, color: C.grayMed, marginBottom: 6 }}>{f.label}{f.required ? ' *' : ''}</div>
