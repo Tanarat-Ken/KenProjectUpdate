@@ -394,11 +394,11 @@ const TABLE_OF = {
 }
 const PREFIX_KEY = { QT: 'prefix_qt', DN: 'prefix_dn', INV: 'prefix_inv', RC: 'prefix_rc' }
 const NEXT_KEY = { QT: 'next_qt', DN: 'next_dn', INV: 'next_inv', RC: 'next_rc' }
-// Project status + step after each document type is issued
+// Project status + the NEXT pending step after each document type is issued
 const AFTER = {
-  QT: { status: 'รอตอบรับ', step: 1 },
-  DN: { status: 'รอตรวจรับ', step: 4 },
-  INV: { status: 'รอชำระ', step: 5 },
+  QT: { status: 'รอตอบรับ', step: 2 },   // waiting for the customer to accept
+  DN: { status: 'รอตรวจรับ', step: 5 },  // delivered → ready to bill
+  INV: { status: 'รอชำระ', step: 6 },    // billed → waiting for payment
   RC: { status: 'ปิดงาน', step: 7 },
 }
 
@@ -565,6 +565,78 @@ export async function createProject({ customer, name, description, items }) {
     quotation = res.number
   }
   return { code, uuid: project.id, quotation }
+}
+
+/* ---------------------------------------------------------------- lifecycle actions */
+
+async function ownerStamp() {
+  const s = await getSettings()
+  return { user_name: s.short_name || 'เจ้าของ', user_initial: (s.short_name || 'ธ').charAt(0), user_color: '#0E8F7A' }
+}
+
+export async function advanceProject(uuid, { status, step }) {
+  const { error } = await supabase
+    .from('agentoffice_projects')
+    .update({ status, current_step: step, updated_at: new Date().toISOString() })
+    .eq('id', uuid)
+  if (error) throw error
+}
+
+// Customer accepted the quotation → work begins
+export async function acceptQuotation(project) {
+  const { data: q } = await supabase
+    .from('agentoffice_quotations').select('id').eq('project_id', project.uuid).limit(1).maybeSingle()
+  if (q) await supabase.from('agentoffice_quotations').update({ status: 'accepted' }).eq('id', q.id)
+  await advanceProject(project.uuid, { status: 'กำลังทำ', step: 3 })
+  await addRevision({ project_id: project.uuid, icon: 'check', color: '#1E8A4B', title: 'ลูกค้าตอบรับข้อเสนอ', detail: project.client, ...(await ownerStamp()) })
+}
+
+// Development finished, ready to deliver
+export async function markDeveloped(project) {
+  await advanceProject(project.uuid, { status: 'กำลังทำ', step: 4 })
+  await addRevision({ project_id: project.uuid, icon: 'check', color: '#0E8F7A', title: 'พัฒนางานเสร็จ พร้อมส่งมอบ', detail: project.name, ...(await ownerStamp()) })
+}
+
+// Record money received → closes the job
+export async function recordPayment(project, { amount, date, method = 'transfer', ref = '' }) {
+  const { data: inv } = await supabase
+    .from('agentoffice_invoices').select('id').eq('project_id', project.uuid).limit(1).maybeSingle()
+  if (!inv) throw new Error('ยังไม่มีใบแจ้งหนี้สำหรับงานนี้ — ออกใบแจ้งหนี้ก่อน')
+  const { error } = await supabase.from('agentoffice_payments').insert({
+    invoice_id: inv.id, amount: Number(amount) || 0,
+    paid_date: date || new Date().toISOString().slice(0, 10), method, ref: ref || null,
+  })
+  if (error) throw error
+  await supabase.from('agentoffice_invoices').update({ status: 'paid' }).eq('id', inv.id)
+  await advanceProject(project.uuid, { status: 'ปิดงาน', step: 7 })
+  await addRevision({
+    project_id: project.uuid, icon: 'check', color: '#1E8A4B', title: 'รับเงิน',
+    doc_id: `฿${(Number(amount) || 0).toLocaleString()}`, doc_color: '#1E8A4B',
+    detail: `งาน ${project.name}`, ...(await ownerStamp()),
+  })
+}
+
+// Update basic project fields (rename, value, dates)
+export async function updateProject(uuid, patch) {
+  const { error } = await supabase
+    .from('agentoffice_projects')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', uuid)
+  if (error) throw error
+}
+
+// Delete a project and everything attached to it
+export async function deleteProject(uuid) {
+  const { data: invs } = await supabase.from('agentoffice_invoices').select('id').eq('project_id', uuid)
+  const invIds = (invs || []).map((i) => i.id)
+  if (invIds.length) await supabase.from('agentoffice_payments').delete().in('invoice_id', invIds)
+  await supabase.from('agentoffice_invoices').delete().eq('project_id', uuid)
+  await supabase.from('agentoffice_delivery_notes').delete().eq('project_id', uuid)
+  await supabase.from('agentoffice_quotations').delete().eq('project_id', uuid)
+  await supabase.from('agentoffice_revisions').delete().eq('project_id', uuid)
+  await supabase.from('agentoffice_attachments').delete().eq('deal_id', uuid)
+  const { error } = await supabase.from('agentoffice_projects').delete().eq('id', uuid)
+  if (error) throw error
 }
 
 /* ---------------------------------------------------------------- dashboard */

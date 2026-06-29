@@ -5,7 +5,7 @@ import { IconCheck, IconPrint, IconSend, IconEdit, IconUpload } from '../compone
 import { Loading, ErrorState, EmptyState } from '../components/States'
 import { FileViewer } from '../components/FileViewer'
 import { useAsync } from '../lib/useAsync'
-import { getProjectByCode, uploadFile, deleteFile } from '../lib/api'
+import { getProjectByCode, uploadFile, deleteFile, acceptQuotation, markDeveloped, recordPayment, updateProject, deleteProject } from '../lib/api'
 import { useOwner } from '../lib/settings'
 import { baht, timeThai } from '../lib/format'
 
@@ -42,7 +42,19 @@ function buildSteps(project) {
   })
 }
 
-function OverviewTab({ project, navigate }) {
+function stepButton(n, project, navigate, actions) {
+  const map = {
+    1: { label: 'ออกใบเสนอราคา →', run: () => navigate('wizard', { projectId: project.id, type: 'QT' }) },
+    2: { label: '✓ ลูกค้าตอบรับแล้ว', run: actions.accept },
+    3: { label: '✓ พัฒนาเสร็จ พร้อมส่ง', run: actions.develop },
+    4: { label: 'ออกใบส่งงาน →', run: () => navigate('wizard', { projectId: project.id, type: 'DN' }) },
+    5: { label: 'ออกใบแจ้งหนี้ →', run: () => navigate('wizard', { projectId: project.id, type: 'INV' }) },
+    6: { label: 'บันทึกรับเงิน →', run: actions.openPayment },
+  }
+  return map[n] || null
+}
+
+function OverviewTab({ project, navigate, actions, busy }) {
   const steps = buildSteps(project)
   const c = project.customer
   return (
@@ -76,8 +88,8 @@ function OverviewTab({ project, navigate }) {
                   <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: step.pending ? C.grayPale : C.grayMed, marginTop: 2 }}>
                     {step.docId && <span style={{ fontFamily: "'Space Grotesk'", color: step.docColor }}>{step.docId} · </span>}{step.sub}
                   </div>
-                  {step.current && (
-                    <button onClick={() => navigate('wizard', { projectId: project.id })} style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: '#fff', background: dotBg, border: 'none', borderRadius: 8, padding: '6px 13px', marginTop: 9, cursor: 'pointer' }}>ทำขั้นนี้ →</button>
+                  {step.current && stepButton(step.n, project, navigate, actions) && (
+                    <button onClick={stepButton(step.n, project, navigate, actions).run} disabled={busy} style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: '#fff', background: dotBg, border: 'none', borderRadius: 8, padding: '6px 13px', marginTop: 9, cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.6 : 1 }}>{busy ? 'กำลังบันทึก…' : stepButton(step.n, project, navigate, actions).label}</button>
                   )}
                 </div>
                 {step.tag && (
@@ -265,8 +277,15 @@ function DocumentsTab({ project }) {
             <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
               <IconPrint size={14} stroke="currentColor" />พิมพ์ PDF
             </button>
-            <button style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: '#fff', background: docColor, border: 'none', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
-              <IconSend size={14} stroke="#fff" />ส่งให้ลูกค้า
+            <button
+              onClick={() => {
+                const total = project.lineItems.reduce((s, it) => s + it.amount, 0)
+                const pay = [owner.bank && `${owner.bank} ${owner.bankAccount}`, owner.promptPay && `พร้อมเพย์ ${owner.promptPay}`].filter(Boolean).join(' · ')
+                const msg = `เรียน ${project.client}\n\nส่ง${current?.label || 'เอกสาร'} เลขที่ ${current?.id}\nงาน: ${project.name}\nยอด: ${baht(total)}\n${pay ? `\nชำระเงิน: ${pay}\n` : ''}\nขอบคุณครับ\n${owner.name}`
+                navigator.clipboard?.writeText(msg).then(() => alert('คัดลอกข้อความแล้ว — เอาไปวางใน LINE/อีเมลส่งลูกค้าได้เลย')).catch(() => alert(msg))
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: '#fff', background: docColor, border: 'none', borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
+              <IconSend size={14} stroke="#fff" />คัดลอกข้อความส่งลูกค้า
             </button>
           </div>
         </div>
@@ -388,7 +407,31 @@ function RevisionsTab({ project }) {
 
 export function ProjectDetail({ projectId, navigate }) {
   const [tab, setTab] = useState(0)
+  const [busy, setBusy] = useState(false)
+  const [paying, setPaying] = useState(false)
   const { data: project, loading, error, reload } = useAsync(() => getProjectByCode(projectId), [projectId])
+
+  const run = async (fn) => {
+    setBusy(true)
+    try { await fn(); await reload() }
+    catch (err) { alert(err.message || String(err)) }
+    finally { setBusy(false) }
+  }
+  const actions = {
+    accept: () => run(() => acceptQuotation(project)),
+    develop: () => run(() => markDeveloped(project)),
+    openPayment: () => setPaying(true),
+  }
+  const onRename = async () => {
+    const name = prompt('ชื่องาน', project?.name || '')
+    if (name && name.trim() && name !== project.name) run(() => updateProject(project.uuid, { name: name.trim() }))
+  }
+  const onDelete = async () => {
+    if (!confirm(`ลบงาน "${project.name}" และเอกสาร/ไฟล์ทั้งหมดถาวร?\nยกเลิกไม่ได้`)) return
+    setBusy(true)
+    try { await deleteProject(project.uuid); navigate('projects') }
+    catch (err) { alert(err.message || String(err)); setBusy(false) }
+  }
 
   if (loading) {
     return <div style={{ height: '100vh', display: 'flex' }}><Loading /></div>
@@ -421,14 +464,20 @@ export function ProjectDetail({ projectId, navigate }) {
             <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 19, color: C.ink, lineHeight: 1.1 }}>{project.name}</div>
             {project.client && <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayMed, marginTop: 3 }}>{project.client}{project.startDate ? ` · เริ่ม ${project.startDate}` : ''}</div>}
           </div>
-          {tab === 0 && (
-            <div style={{ display: 'flex', gap: 9, alignItems: 'center' }}>
-              <span style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.burgundy, background: C.burgundyLight, padding: '6px 14px', borderRadius: 20 }}>
-                {project.status} · {baht(project.value)}
-              </span>
-              <button onClick={() => navigate('wizard', { projectId: project.id })} className="btn" style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: '#fff', background: C.teal, border: 'none', borderRadius: 9, padding: '8px 15px', cursor: 'pointer' }}>ทำขั้นต่อไป</button>
-            </div>
-          )}
+          <div style={{ display: 'flex', gap: 9, alignItems: 'center', flexWrap: 'wrap' }}>
+            <StatusBadge status={project.status} size="md" />
+            <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{baht(project.value)}</span>
+            {(() => {
+              const a = stepButton(project.currentStep, project, navigate, actions)
+              return a ? (
+                <button onClick={a.run} disabled={busy} className="btn" style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: '#fff', background: C.teal, border: 'none', borderRadius: 9, padding: '8px 15px', cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.6 : 1 }}>{busy ? 'กำลังบันทึก…' : a.label}</button>
+              ) : (
+                <span style={{ fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.green }}>ปิดงานแล้ว 🎉</span>
+              )
+            })()}
+            <button onClick={onRename} title="แก้ไขชื่องาน" style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '8px 12px', cursor: 'pointer' }}>แก้ชื่อ</button>
+            <button onClick={onDelete} title="ลบงานนี้" style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: C.burgundy, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '8px 12px', cursor: 'pointer' }}>ลบ</button>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: 26, marginTop: 14, overflowX: 'auto' }}>
@@ -443,10 +492,54 @@ export function ProjectDetail({ projectId, navigate }) {
       </div>
 
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        {tab === 0 && <OverviewTab project={project} navigate={navigate} />}
+        {tab === 0 && <OverviewTab project={project} navigate={navigate} actions={actions} busy={busy} />}
         {tab === 1 && <DocumentsTab project={project} />}
         {tab === 2 && <FilesTab project={project} reload={reload} />}
         {tab === 3 && <RevisionsTab project={project} />}
+      </div>
+
+      {paying && (
+        <PaymentModal
+          project={project}
+          onClose={() => setPaying(false)}
+          onSubmit={async (data) => { setPaying(false); await run(() => recordPayment(project, data)) }}
+        />
+      )}
+    </div>
+  )
+}
+
+function PaymentModal({ project, onClose, onSubmit }) {
+  const [amount, setAmount] = useState(project.value || 0)
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [method, setMethod] = useState('transfer')
+  const [ref, setRef] = useState('')
+  const methods = [['transfer', 'โอนเงิน'], ['promptpay', 'พร้อมเพย์'], ['cash', 'เงินสด'], ['cheque', 'เช็ค'], ['other', 'อื่น ๆ']]
+  const f = { width: '100%', boxSizing: 'border-box', background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 13px', fontFamily: "'Sarabun'", fontSize: 13.5, color: C.ink, outline: 'none' }
+  const lbl = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(20,16,20,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: 420, maxWidth: '100%', background: C.white, borderRadius: 16, boxShadow: '0 16px 50px rgba(0,0,0,.25)', overflow: 'hidden' }}>
+        <div style={{ padding: '18px 22px', borderBottom: `1px solid ${C.borderLight}` }}>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 16, color: C.ink }}>บันทึกรับเงิน</div>
+          <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight, marginTop: 2 }}>{project.name} · {project.client}</div>
+        </div>
+        <div style={{ padding: '20px 22px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ gridColumn: 'span 2' }}>
+            <label style={lbl}>ยอดที่รับ (บาท)</label>
+            <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} style={{ ...f, fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 18 }} />
+          </div>
+          <div><label style={lbl}>วันที่รับเงิน</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={f} /></div>
+          <div>
+            <label style={lbl}>ช่องทาง</label>
+            <select value={method} onChange={(e) => setMethod(e.target.value)} style={f}>{methods.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
+          </div>
+          <div style={{ gridColumn: 'span 2' }}><label style={lbl}>อ้างอิง / เลขสลิป (ไม่บังคับ)</label><input value={ref} onChange={(e) => setRef(e.target.value)} style={f} /></div>
+        </div>
+        <div style={{ padding: '0 22px 20px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <button onClick={onClose} style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 18px', cursor: 'pointer' }}>ยกเลิก</button>
+          <button onClick={() => onSubmit({ amount, date, method, ref })} className="btn" style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: '#fff', background: C.green, border: 'none', borderRadius: 9, padding: '10px 22px', cursor: 'pointer' }}>บันทึก + ออกใบเสร็จ</button>
+        </div>
       </div>
     </div>
   )
