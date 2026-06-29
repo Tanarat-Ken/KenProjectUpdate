@@ -45,8 +45,8 @@ export function PartnerMode({ navigate }) {
         {/* Action cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 26 }}>
           <ActionCard onClick={() => navigate('wizard')} icon={<IconFile size={24} stroke={C.teal} />} bg={C.tealLight} title="สร้างใบเสนอราคา" sub="เริ่มงานใหม่ให้ลูกค้า" />
-          <ActionCard onClick={() => navigate('wizard')} icon={<IconCreditCard size={24} stroke={C.burgundy} />} bg={C.burgundyLight} title="ออกใบแจ้งหนี้" sub="จากงานที่ส่งมอบแล้ว" border={C.burgundy} badge={tasks.length ? `มีงานรอ ${tasks.length}` : null} />
-          <ActionCard onClick={() => navigate('wizard')} icon={<IconCheck size={24} stroke={C.blue} />} bg={C.blueLight} title="ออกใบส่งงาน" sub="เมื่องานเสร็จพร้อมส่ง" />
+          <ActionCard onClick={() => navigate('projects')} icon={<IconCreditCard size={24} stroke={C.burgundy} />} bg={C.burgundyLight} title="ออกใบแจ้งหนี้" sub="เลือกงานที่จะวางบิล" border={C.burgundy} badge={tasks.length ? `มีงานรอ ${tasks.length}` : null} />
+          <ActionCard onClick={() => navigate('projects')} icon={<IconCheck size={24} stroke={C.blue} />} bg={C.blueLight} title="ออกใบส่งงาน" sub="เลือกงานที่ส่งมอบ" />
         </div>
 
         {/* Task list */}

@@ -33,7 +33,7 @@ export function DocumentsList({ navigate }) {
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ค้นหาเลขที่ / ลูกค้า…" style={{ border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 12.5, color: C.ink, width: '100%' }} />
           </div>
           <button onClick={() => navigate('wizard')} className="btn" style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.white, background: C.teal, border: 'none', borderRadius: 9, padding: '9px 15px', cursor: 'pointer' }}>
-            <IconPlus size={15} stroke={C.white} />สร้างเอกสาร
+            <IconPlus size={15} stroke={C.white} />สร้างงานใหม่
           </button>
         </div>
       </div>
