@@ -41,9 +41,10 @@ body {
   .ao-doc, .ao-doc * { visibility: visible; }
   .ao-doc {
     position: fixed; left: 50%; top: 0;
-    transform: translateX(-50%) scale(1.45); transform-origin: top center;
+    transform: translateX(-50%) scale(1.32); transform-origin: top center;
     box-shadow: none !important; border-radius: 0 !important;
   }
+  @page { margin: 12mm; }
 }
 
 /* Hide horizontal scrollbar jank on small screens */

@@ -7,7 +7,7 @@ import { FileViewer } from '../components/FileViewer'
 import { useAsync } from '../lib/useAsync'
 import { getProjectByCode, uploadFile, deleteFile, acceptQuotation, markDeveloped, recordPayment, updateProject, deleteProject, updateDocument } from '../lib/api'
 import { useOwner } from '../lib/settings'
-import { baht, timeThai } from '../lib/format'
+import { baht, timeThai, thaiDate } from '../lib/format'
 
 const TABS = ['ภาพรวม', 'เอกสาร', 'ไฟล์ & คอนเซป', 'ประวัติการแก้ไข']
 
@@ -157,72 +157,129 @@ function OverviewTab({ project, navigate, actions, busy }) {
 const DOC_EN = { QT: 'QUOTATION', DN: 'DELIVERY NOTE', INV: 'INVOICE', RC: 'RECEIPT' }
 const DOC_TH = { QT: 'ใบเสนอราคา', DN: 'ใบส่งงาน', INV: 'ใบแจ้งหนี้', RC: 'ใบเสร็จรับเงิน' }
 
-function DocPreview({ type, project, owner }) {
+// Pull the real items + meta of the document being previewed (falls back to
+// the quotation line items for RC, which has no document row of its own).
+function previewData(type, project) {
+  const raw = project.raw?.[type.toLowerCase()] || null
+  const src = raw?.items?.length ? raw.items : null
+  const items = src
+    ? src.map((it) => ({ desc: it.description || it.name || '', qty: Number(it.qty ?? 1), unit_price: Number(it.unit_price ?? it.amount ?? 0) }))
+    : project.lineItems.map((it) => ({ desc: it.desc, qty: Number(it.qty ?? 1), unit_price: Number(it.unit_price ?? it.amount ?? 0) }))
+  return {
+    items,
+    total: items.reduce((s, it) => s + it.qty * it.unit_price, 0),
+    issueDate: raw?.issue_date || null,
+    dueDate: raw?.due_date || null,
+    note: raw?.note || null,
+  }
+}
+
+function DocPreview({ type, project, owner, doc }) {
   const color = DOC_COLORS[type] || C.ink
-  const items = project.lineItems
-  const total = items.reduce((s, it) => s + it.amount, 0)
   const c = project.customer
+  const { items, total, issueDate, dueDate, note } = previewData(type, project)
+  const amountLabel = type === 'INV' ? 'ยอดที่ต้องชำระ' : type === 'RC' ? 'ยอดที่ชำระแล้ว' : 'ยอดรวมสุทธิ'
+  const ownerLines = [owner.email, owner.phone, owner.taxId ? `เลขผู้เสียภาษี ${owner.taxId}` : ''].filter(Boolean)
+
+  const th = { fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 8, color: '#fff' }
+  const td = { fontFamily: "'Sarabun'", fontSize: 8.5, color: C.ink }
+  const num = { fontFamily: "'Space Grotesk'", fontSize: 8.5, color: C.ink }
+  // column widths (rest flexes to รายละเอียด)
+  const wNo = 22, wQty = 46, wPrice = 70, wAmt = 78
+
   return (
-    <div className="ao-doc" style={{ width: 480, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', position: 'relative', borderRadius: 3 }}>
+    <div className="ao-doc" style={{ width: 520, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', position: 'relative', borderRadius: 3 }}>
       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, background: color }} />
-      <div style={{ padding: '30px 32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', gap: 9 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: C.ink, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" strokeWidth="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" strokeWidth="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" strokeWidth="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" strokeWidth="1.6" strokeLinecap="round"/></svg>
+      <div style={{ padding: '32px 34px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, background: C.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="#fff" strokeWidth="1.6"/><circle cx="18" cy="18" r="2.4" stroke="#fff" strokeWidth="1.6"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#fff" strokeWidth="1.6"/><path d="M8.2 6H17M6 8.2V14a3.8 3.8 0 0 0 3.8 3.8h5.8" stroke="#fff" strokeWidth="1.6" strokeLinecap="round"/></svg>
             </div>
             <div>
-              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 11, color: C.ink }}>{owner.name}</div>
+              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 11.5, color: C.ink }}>{owner.name}</div>
               <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed }}>{owner.role}</div>
+              {ownerLines.map((l, i) => (
+                <div key={i} style={{ fontFamily: "'Sarabun'", fontSize: 7.5, color: C.grayLight, lineHeight: 1.5 }}>{l}</div>
+              ))}
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 18, color }}>{DOC_EN[type]}</div>
+            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 19, color, letterSpacing: '.02em' }}>{DOC_EN[type]}</div>
             <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 9, color: C.ink }}>{DOC_TH[type]}</div>
+            {doc?.id && <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 11, color: C.ink, marginTop: 6 }}>{doc.id}</div>}
+            {issueDate && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed, marginTop: 2 }}>วันที่ {thaiDate(issueDate)}</div>}
+            {type === 'INV' && dueDate && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.burgundy }}>ครบกำหนด {thaiDate(dueDate)}</div>}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+        {/* Bill-to + amount */}
+        <div style={{ display: 'flex', gap: 12, marginTop: 18 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 7, letterSpacing: '.1em', textTransform: 'uppercase', color: C.grayLight, marginBottom: 3 }}>{type === 'INV' ? 'Bill to' : 'ลูกค้า'}</div>
-            <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 10, color: C.ink }}>{project.client}</div>
-            <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed, lineHeight: 1.5 }}>{c?.address || ''}{c?.tax_id ? ` · เลขผู้เสียภาษี ${c.tax_id}` : ''}</div>
+            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 7, letterSpacing: '.1em', textTransform: 'uppercase', color: C.grayLight, marginBottom: 4 }}>{type === 'INV' ? 'Bill to' : 'ลูกค้า'}</div>
+            <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 10.5, color: C.ink }}>{project.client}</div>
+            {c?.contact_name && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed }}>ผู้ติดต่อ: {c.contact_name}</div>}
+            {c?.address && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed, lineHeight: 1.5 }}>{c.address}</div>}
+            {c?.tax_id && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed }}>เลขผู้เสียภาษี {c.tax_id}</div>}
           </div>
-          <div style={{ width: 170, background: color, borderRadius: 8, padding: '11px 13px', color: '#fff' }}>
-            <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: 'rgba(255,255,255,.85)' }}>{type === 'INV' ? 'ยอดที่ต้องชำระ' : type === 'RC' ? 'ยอดที่ชำระแล้ว' : 'ยอดรวม'}</div>
-            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 23, lineHeight: 1.1 }}>{baht(total)}</div>
+          <div style={{ width: 180, background: color, borderRadius: 8, padding: '12px 14px', color: '#fff', alignSelf: 'flex-start' }}>
+            <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: 'rgba(255,255,255,.85)' }}>{amountLabel}</div>
+            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 24, lineHeight: 1.1 }}>{baht(total)}</div>
           </div>
         </div>
 
-        <div style={{ marginTop: 14, borderRadius: 6, overflow: 'hidden', border: `1px solid ${C.borderLight}` }}>
-          <div style={{ display: 'flex', background: C.ink, padding: '6px 10px' }}>
-            <span style={{ flex: 1, fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 7.5, color: '#fff' }}>รายละเอียด</span>
-            <span style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 7.5, color: '#fff' }}>รวม</span>
+        {/* Items table */}
+        <div style={{ marginTop: 16, borderRadius: 6, overflow: 'hidden', border: `1px solid ${C.borderLight}` }}>
+          <div style={{ display: 'flex', background: C.ink, padding: '7px 11px' }}>
+            <span style={{ ...th, width: wNo }}>#</span>
+            <span style={{ ...th, flex: 1 }}>รายละเอียด</span>
+            <span style={{ ...th, width: wQty, textAlign: 'center' }}>จำนวน</span>
+            <span style={{ ...th, width: wPrice, textAlign: 'right' }}>ราคา/หน่วย</span>
+            <span style={{ ...th, width: wAmt, textAlign: 'right' }}>จำนวนเงิน</span>
           </div>
-          {items.length === 0 && <div style={{ padding: '10px', fontFamily: "'Sarabun'", fontSize: 8, color: C.grayLight }}>— ไม่มีรายการ —</div>}
+          {items.length === 0 && <div style={{ padding: '10px 11px', fontFamily: "'Sarabun'", fontSize: 8, color: C.grayLight }}>— ไม่มีรายการ —</div>}
           {items.map((item, i) => (
-            <div key={i} style={{ display: 'flex', padding: '7px 10px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
-              <span style={{ flex: 1, fontFamily: "'Sarabun'", fontWeight: 500, fontSize: 8, color: C.ink }}>
-                {item.desc}
-                {Number(item.qty ?? 1) > 1 && <span style={{ color: C.grayMed }}>{`  (${item.qty} × ${Number(item.unit_price || 0).toLocaleString()})`}</span>}
-              </span>
-              <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 8, color: C.ink }}>{item.amount.toLocaleString()}</span>
+            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', padding: '8px 11px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none', background: i % 2 ? C.panel : '#fff' }}>
+              <span style={{ ...num, width: wNo, color: C.grayLight }}>{i + 1}</span>
+              <span style={{ ...td, flex: 1, fontWeight: 500, paddingRight: 8 }}>{item.desc}</span>
+              <span style={{ ...num, width: wQty, textAlign: 'center' }}>{item.qty}</span>
+              <span style={{ ...num, width: wPrice, textAlign: 'right' }}>{item.unit_price.toLocaleString()}</span>
+              <span style={{ ...num, width: wAmt, textAlign: 'right', fontWeight: 600 }}>{(item.qty * item.unit_price).toLocaleString()}</span>
             </div>
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, background: type === 'INV' ? C.burgundyLight : C.panel, border: `1px solid ${type === 'INV' ? C.burgundy : C.borderLight}`, borderRadius: 8, padding: '9px 13px' }}>
-          <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 9, color: type === 'INV' ? C.burgundy : C.ink }}>{type === 'INV' ? 'ยอดที่ต้องชำระ' : 'ยอดรวมทั้งสิ้น'}</span>
-          <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 15, color: type === 'INV' ? C.burgundy : C.ink }}>{baht(total)}</span>
+        {/* Grand total */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
+          <div style={{ width: 260, display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: type === 'INV' ? C.burgundyLight : C.panel, border: `1px solid ${type === 'INV' ? C.burgundy : C.borderLight}`, borderRadius: 8, padding: '10px 14px' }}>
+            <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 9.5, color: type === 'INV' ? C.burgundy : C.ink }}>{type === 'INV' ? 'ยอดที่ต้องชำระ' : 'ยอดรวมทั้งสิ้น'}</span>
+            <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 16, color: type === 'INV' ? C.burgundy : C.ink }}>{baht(total)}</span>
+          </div>
         </div>
 
-        {type === 'INV' && (owner.bank || owner.promptPay) && (
-          <div style={{ marginTop: 12, border: `1px solid ${C.borderLight}`, borderRadius: 8, padding: '9px 12px' }}>
-            <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 8, color: C.ink }}>{owner.bank}</div>
-            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 12, color: C.ink }}>{owner.bankAccount}</div>
-            {owner.promptPay && <div style={{ fontFamily: "'Sarabun'", fontSize: 7.5, color: C.grayMed }}>PromptPay {owner.promptPay}</div>}
+        {/* Note */}
+        {note && (
+          <div style={{ marginTop: 12, fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed, lineHeight: 1.6 }}>
+            <span style={{ fontWeight: 600, color: C.ink }}>หมายเหตุ: </span>{note}
           </div>
         )}
+
+        {/* Payment info on invoices */}
+        {type === 'INV' && (owner.bank || owner.promptPay) && (
+          <div style={{ marginTop: 12, border: `1px solid ${C.borderLight}`, borderRadius: 8, padding: '10px 13px' }}>
+            <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 7, letterSpacing: '.1em', textTransform: 'uppercase', color: C.grayLight, marginBottom: 4 }}>ช่องทางชำระเงิน</div>
+            {owner.bank && <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 8.5, color: C.ink }}>{owner.bank}{owner.bankName ? ` · ${owner.bankName}` : ''}</div>}
+            {owner.bankAccount && <div style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 12, color: C.ink }}>{owner.bankAccount}</div>}
+            {owner.promptPay && <div style={{ fontFamily: "'Sarabun'", fontSize: 8, color: C.grayMed }}>PromptPay {owner.promptPay}</div>}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={{ marginTop: 16, paddingTop: 10, borderTop: `1px solid ${C.borderLight}`, display: 'flex', justifyContent: 'space-between', fontFamily: "'Sarabun'", fontSize: 7.5, color: C.grayLight }}>
+          <span>ออกโดย {owner.name}</span>
+          <span>{owner.logoText}</span>
+        </div>
       </div>
     </div>
   )
@@ -301,7 +358,7 @@ function DocumentsTab({ project, reload }) {
           </div>
         </div>
         <div style={{ flex: 1, overflow: 'auto', background: '#EFEDE5', display: 'flex', justifyContent: 'center', padding: '26px 20px' }}>
-          {current && <DocPreview type={current.type} project={project} owner={owner} />}
+          {current && <DocPreview type={current.type} project={project} owner={owner} doc={current} />}
         </div>
       </div>
 
