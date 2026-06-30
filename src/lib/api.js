@@ -48,6 +48,10 @@ const DEFAULT_SETTINGS = {
   partner_initial: 'ป',
   logo_text: 'Agent Office',
   prefix_qt: 'QT', prefix_dn: 'DN', prefix_inv: 'INV', prefix_rc: 'RC',
+  // Single shared running number for the whole document chain of a job.
+  // เลขรันนิ่งเดียวต่อ 1 งาน — เปลี่ยนเฉพาะ prefix ตามชนิดเอกสาร (QT/DN/INV/RC)
+  next_no: 9,
+  // legacy per-type counters (ไม่ใช้แล้ว เก็บไว้กันพัง ถ้ามีข้อมูลเก่า)
   next_qt: 1, next_dn: 1, next_inv: 1, next_rc: 1,
 }
 
@@ -65,6 +69,37 @@ export async function saveSettings(patch) {
     .single()
   if (error) throw error
   return data
+}
+
+/* ---------------------------------------------------------------- item catalog */
+// คลังรายการที่เคยใช้ — กดเลือกซ้ำได้พร้อมราคาเดิมในครั้งถัดไป
+
+export async function getItemCatalog() {
+  const { data, error } = await supabase
+    .from('agentoffice_item_catalog')
+    .select('*')
+    .order('updated_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map((r) => ({ id: r.id, name: r.name, unit_price: Number(r.unit_price || 0) }))
+}
+
+// Remember every distinct line item (name + latest price) for quick re-pick later.
+async function rememberItems(rows) {
+  const seen = new Set()
+  const payload = []
+  for (const r of rows || []) {
+    const name = (r.desc || r.name || r.description || '').trim()
+    if (!name || seen.has(name)) continue
+    seen.add(name)
+    payload.push({ name, unit_price: Number(r.unit_price ?? r.amount ?? 0) || 0, updated_at: new Date().toISOString() })
+  }
+  if (!payload.length) return
+  // Best-effort — never block document creation if the catalog write fails.
+  try {
+    await supabase.from('agentoffice_item_catalog').upsert(payload, { onConflict: 'name' })
+  } catch (e) {
+    console.warn('catalog upsert skipped:', e?.message || e)
+  }
 }
 
 /* ---------------------------------------------------------------- customers */
@@ -206,7 +241,10 @@ export async function getProjectByCode(code) {
     documents,
     lineItems: (qt?.items || []).map((it) => ({
       desc: it.description || it.name,
-      amount: Number(it.qty ?? 1) * Number(it.unit_price ?? 0),
+      qty: Number(it.qty ?? 1),
+      unit_price: Number(it.unit_price ?? it.amount ?? 0),
+      // amount = ยอดรวมต่อบรรทัด (qty × ราคา/หน่วย) — เผื่อจุดที่ยังอ่าน .amount เดิม
+      amount: Number(it.qty ?? 1) * Number(it.unit_price ?? it.amount ?? 0),
     })),
     revisions,
     files,
@@ -393,7 +431,6 @@ const TABLE_OF = {
   INV: 'agentoffice_invoices',
 }
 const PREFIX_KEY = { QT: 'prefix_qt', DN: 'prefix_dn', INV: 'prefix_inv', RC: 'prefix_rc' }
-const NEXT_KEY = { QT: 'next_qt', DN: 'next_dn', INV: 'next_inv', RC: 'next_rc' }
 // Project status + the NEXT pending step after each document type is issued
 const AFTER = {
   QT: { status: 'รอตอบรับ', step: 2 },   // waiting for the customer to accept
@@ -402,26 +439,42 @@ const AFTER = {
   RC: { status: 'ปิดงาน', step: 7 },
 }
 
-function nextNumber(settings, type) {
-  const year = new Date().getFullYear()
-  const n = settings[NEXT_KEY[type]] || 1
-  return `${settings[PREFIX_KEY[type]] || type}-${year}-${String(n).padStart(3, '0')}`
+const pad3 = (n) => String(n || 0).padStart(3, '0')
+
+// One running number per job; only the prefix changes by document type.
+// เช่น งาน #009 → QT-009 / DN-009 / INV-009 / RC-009
+function docNumber(settings, type, no) {
+  return `${settings[PREFIX_KEY[type]] || type}-${pad3(no)}`
 }
 
-// Convert wizard rows {desc, amount} -> stored item shape
+// Resolve the job's running number (doc_no). Assign one lazily if missing
+// (e.g. legacy projects created before shared numbering existed).
+async function runningNumberFor(projectUuid, settings) {
+  const { data: proj } = await supabase
+    .from('agentoffice_projects').select('doc_no').eq('id', projectUuid).maybeSingle()
+  if (proj?.doc_no) return proj.doc_no
+  const no = settings.next_no || 9
+  await supabase.from('agentoffice_projects').update({ doc_no: no }).eq('id', projectUuid)
+  await supabase.from('agentoffice_settings').update({ next_no: no + 1 }).eq('id', 1)
+  return no
+}
+
+// Convert wizard rows {desc, qty, unit_price} -> stored item shape.
+// Accepts legacy {amount} rows too (amount treated as unit price, qty defaults 1).
 function toItems(rows) {
   return rows.map((r) => ({
     id: crypto.randomUUID(),
-    qty: r.qty ?? 1,
+    qty: Number(r.qty ?? 1) || 1,
     name: r.desc,
     description: r.desc,
-    unit_price: r.amount,
+    unit_price: Number(r.unit_price ?? r.amount ?? 0) || 0,
   }))
 }
 
 export async function createDocument({ type, project, items, issueDate, dueDate, note }) {
   const settings = await getSettings()
-  const number = nextNumber(settings, type)
+  const no = await runningNumberFor(project.uuid, settings)
+  const number = docNumber(settings, type, no)
   const today = issueDate || new Date().toISOString().slice(0, 10)
   const storedItems = toItems(items || [])
   const total = itemsTotal(storedItems)
@@ -471,11 +524,8 @@ export async function createDocument({ type, project, items, issueDate, dueDate,
     created = data
   }
 
-  // Advance running number
-  await supabase
-    .from('agentoffice_settings')
-    .update({ [NEXT_KEY[type]]: (settings[NEXT_KEY[type]] || 1) + 1 })
-    .eq('id', 1)
+  // Remember the line items for quick re-pick next time
+  if (storedItems.length) await rememberItems(storedItems)
 
   // Advance the project status / step (never go backwards)
   const after = AFTER[type]
@@ -512,6 +562,7 @@ export async function updateDocument({ type, id, items, note, dueDate }) {
 
   const storedItems = toItems((items || []).filter((r) => r.desc))
   const total = itemsTotal(storedItems)
+  if (storedItems.length) await rememberItems(storedItems)
 
   const patch = { items: storedItems, note: note || null }
   if (type === 'INV') patch.due_date = dueDate || null
@@ -589,6 +640,10 @@ export async function createProject({ customer, name, description, items }) {
   const cleanItems = (items || []).filter((it) => it.desc)
   const total = itemsTotal(toItems(cleanItems))
 
+  // Claim this job's running number now and store it on the project so every
+  // document in the chain (QT/DN/INV/RC) reuses the same number.
+  const no = settings.next_no || 9
+
   const { data: project, error } = await supabase
     .from('agentoffice_projects')
     .insert({
@@ -599,12 +654,15 @@ export async function createProject({ customer, name, description, items }) {
       status: 'กำลังทำ',
       description: description || null,
       current_step: 1,
+      doc_no: no,
       start_date: new Date().toISOString().slice(0, 10),
       managers: settings.short_name || null,
     })
     .select()
     .single()
   if (error) throw error
+
+  await supabase.from('agentoffice_settings').update({ next_no: no + 1 }).eq('id', 1)
 
   let quotation = null
   if (cleanItems.length) {

@@ -50,6 +50,7 @@ src/
     ProjectsList.jsx   ตารางงานทั้งหมด + pipeline ย่อ + ค้นหา/กรอง
     ProjectDetail.jsx  4 แท็บ: ภาพรวม+ขั้นตอน / เอกสาร / ไฟล์&คอนเซป / ประวัติแก้ไข
     DocumentsList.jsx  เอกสารทุกใบข้ามงาน
+    FlowDiagram.jsx    แผนผังโฟลว์ 7 ขั้น — งานอยู่ขั้นไหน + ต้องไปทำที่เมนูไหน
     FilesList.jsx      คลังไฟล์ .md/.html + viewer + อัปโหลด
     ClientsList.jsx    ลูกค้า (เพิ่ม/แก้ไข/ลบ)
     DocumentWizard.jsx สร้างเอกสารจริง (เลือกงาน→รายการ→เงื่อนไข→ออก)
@@ -67,13 +68,15 @@ src/
 | `agentoffice_payments` | การรับเงิน (= ใบเสร็จ RC) |
 | `agentoffice_revisions` | ประวัติแก้ไข / กิจกรรมต่อโปรเจกต์ |
 | `agentoffice_attachments` | ไฟล์แนบ (`deal_id` = project id) เก็บไฟล์จริงใน Storage bucket `agentoffice-files` |
-| `agentoffice_settings` | การตั้งค่าผู้ออกเอกสาร (singleton row id=1) |
+| `agentoffice_settings` | การตั้งค่าผู้ออกเอกสาร (singleton row id=1) + เลขรันร่วม `next_no` |
+| `agentoffice_item_catalog` | คลังรายการที่เคยใช้ (ชื่อ + ราคา) ไว้กดเลือกซ้ำตอนสร้างเอกสาร |
 
 > RLS เปิดให้ `anon` เข้าถึงได้ (ออกแบบสำหรับผู้ใช้คนเดียว — เจ้าของ + ผู้ช่วย ไม่มีระบบ login)
 
 ## หมายเหตุการพัฒนา
 
-- เลขเอกสารออกอัตโนมัติจาก prefix + เลขถัดไป ในตาราง `agentoffice_settings` (แก้ได้ในหน้า “ตั้งค่า”)
+- **เลขเอกสาร = เลขรันนิ่งเดียวต่อ 1 งาน** เก็บที่ `agentoffice_projects.doc_no` — เปลี่ยนเฉพาะ prefix ตามชนิดเอกสาร (เช่น งาน 009 → `QT-009` / `DN-009` / `INV-009` / `RC-009`). เลขถัดไปของงานใหม่อยู่ที่ `agentoffice_settings.next_no` (แก้ได้ในหน้า “ตั้งค่า”)
+- รายการในเอกสารมี `qty` (จำนวน, ดีฟอลต์ 1) × `unit_price` (ราคา/หน่วย) = ยอดต่อรายการ; รายการที่เคยใช้ถูกจำไว้ใน `agentoffice_item_catalog` เพื่อกดเลือกซ้ำได้
 - การสร้างเอกสารผ่าน Wizard จะบันทึกจริง, อัปเดตสถานะ/step ของงาน และเพิ่มรายการใน `agentoffice_revisions`
 - ฟอร์แมตวันที่ใช้ปี พ.ศ. (ดู `src/lib/format.js`)
 - ดีไซน์อ้างอิงจาก prototype เดิมใน `project/` และ transcript ใน `chats/`

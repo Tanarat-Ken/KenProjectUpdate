@@ -202,7 +202,10 @@ function DocPreview({ type, project, owner }) {
           {items.length === 0 && <div style={{ padding: '10px', fontFamily: "'Sarabun'", fontSize: 8, color: C.grayLight }}>— ไม่มีรายการ —</div>}
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', padding: '7px 10px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
-              <span style={{ flex: 1, fontFamily: "'Sarabun'", fontWeight: 500, fontSize: 8, color: C.ink }}>{item.desc}</span>
+              <span style={{ flex: 1, fontFamily: "'Sarabun'", fontWeight: 500, fontSize: 8, color: C.ink }}>
+                {item.desc}
+                {Number(item.qty ?? 1) > 1 && <span style={{ color: C.grayMed }}>{`  (${item.qty} × ${Number(item.unit_price || 0).toLocaleString()})`}</span>}
+              </span>
               <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 600, fontSize: 8, color: C.ink }}>{item.amount.toLocaleString()}</span>
             </div>
           ))}
@@ -317,10 +320,11 @@ function DocumentsTab({ project, reload }) {
 // Pull the stored DB row + its line items for the document being edited.
 function docRowFor(project, type) {
   const row = project.raw?.[type.toLowerCase()] || null
-  // QT line items are also exposed on project.lineItems already in {desc, amount} shape
+  // Carry qty + unit price so editing can recompute line totals (qty × ราคา)
   const items = (row?.items || []).map((it) => ({
     desc: it.description || it.name || '',
-    amount: Number(it.qty ?? 1) * Number(it.unit_price ?? it.amount ?? 0),
+    qty: Number(it.qty ?? 1),
+    unit_price: Number(it.unit_price ?? it.amount ?? 0),
   }))
   return { row, items }
 }
@@ -329,19 +333,20 @@ function EditDocModal({ project, doc, onClose, onSaved }) {
   const type = doc.type
   const { row, items: initialItems } = docRowFor(project, type)
   const seed = (type === 'QT' && initialItems.length === 0 ? project.lineItems : initialItems) || []
-  const [rows, setRows] = useState(seed.length ? seed.map((r) => ({ ...r })) : [{ desc: '', amount: 0 }])
+  const [rows, setRows] = useState(seed.length ? seed.map((r) => ({ desc: r.desc, qty: Number(r.qty ?? 1), unit_price: Number(r.unit_price ?? r.amount ?? 0) })) : [{ desc: '', qty: 1, unit_price: 0 }])
   const [note, setNote] = useState(row?.note || '')
   const [dueDate, setDueDate] = useState(row?.due_date || '')
   const [busy, setBusy] = useState(false)
   const color = DOC_COLORS[type] || C.ink
   const label = DOC_TH[type] || 'เอกสาร'
-  const total = rows.reduce((s, r) => s + (Number(r.amount) || 0), 0)
+  const lineTot = (r) => (Number(r.qty ?? 1) || 0) * (Number(r.unit_price ?? 0) || 0)
+  const total = rows.reduce((s, r) => s + lineTot(r), 0)
 
   const f = { width: '100%', boxSizing: 'border-box', background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '9px 12px', fontFamily: "'Sarabun'", fontSize: 13.5, color: C.ink, outline: 'none' }
   const lbl = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
 
   const setRow = (i, patch) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)))
-  const addRow = () => setRows((rs) => [...rs, { desc: '', amount: 0 }])
+  const addRow = () => setRows((rs) => [...rs, { desc: '', qty: 1, unit_price: 0 }])
   const removeRow = (i) => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : rs))
 
   const save = async () => {
@@ -374,8 +379,13 @@ function EditDocModal({ project, doc, onClose, onSaved }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {rows.map((r, i) => (
               <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input value={r.desc} onChange={(e) => setRow(i, { desc: e.target.value })} placeholder="รายละเอียด" style={{ ...f, flex: 1 }} />
-                <input type="number" value={r.amount} onChange={(e) => setRow(i, { amount: Number(e.target.value) })} placeholder="0" style={{ ...f, width: 120, fontFamily: "'Space Grotesk'", fontWeight: 600, textAlign: 'right' }} />
+                <input value={r.desc} onChange={(e) => setRow(i, { desc: e.target.value })} placeholder="รายละเอียด" style={{ ...f, flex: 1, minWidth: 0 }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                  <input type="number" min="0" value={r.qty} onChange={(e) => setRow(i, { qty: Number(e.target.value) })} title="จำนวน" style={{ ...f, width: 50, padding: '9px 7px', textAlign: 'center', fontFamily: "'Space Grotesk'", fontWeight: 600 }} />
+                  <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+                </div>
+                <input type="number" min="0" value={r.unit_price} onChange={(e) => setRow(i, { unit_price: Number(e.target.value) })} placeholder="0" title="ราคา/หน่วย" style={{ ...f, width: 96, flexShrink: 0, fontFamily: "'Space Grotesk'", fontWeight: 600, textAlign: 'right' }} />
+                <span style={{ width: 80, flexShrink: 0, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTot(r).toLocaleString()}</span>
                 <button onClick={() => removeRow(i)} title="ลบรายการ" style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, color: C.grayPale, fontSize: 17, cursor: 'pointer' }}>×</button>
               </div>
             ))}

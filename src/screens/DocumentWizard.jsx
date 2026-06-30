@@ -3,8 +3,8 @@ import { C } from '../theme'
 import { IconFile, IconCheck, IconPlus } from '../components/Icons'
 import { Loading } from '../components/States'
 import { useAsync } from '../lib/useAsync'
-import { getCustomers, getProjectByCode, createProject, createDocument } from '../lib/api'
-import { baht } from '../lib/format'
+import { getCustomers, getProjectByCode, createProject, createDocument, getItemCatalog } from '../lib/api'
+import { baht, itemsTotal } from '../lib/format'
 
 /* ------------------------------------------------------------------ shared shell */
 function StepDot({ n, label, state }) {
@@ -34,26 +34,71 @@ const fieldStyle = { width: '100%', boxSizing: 'border-box', background: C.white
 const labelStyle = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
 const sectionHint = { fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight, marginBottom: 16, lineHeight: 1.5 }
 
-function ItemsEditor({ items, setItems, accent }) {
-  const total = items.reduce((s, it) => s + Number(it.amount || 0), 0)
+export const emptyItem = () => ({ desc: '', qty: 1, unit_price: 0 })
+const lineTotal = (it) => (Number(it.qty ?? 1) || 0) * (Number(it.unit_price ?? 0) || 0)
+
+function ItemsEditor({ items, setItems, accent, catalog }) {
+  const total = items.reduce((s, it) => s + lineTotal(it), 0)
+  const patch = (i, p) => setItems(items.map((x, j) => (j === i ? { ...x, ...p } : x)))
+  const addRow = (seed = emptyItem()) => setItems([...items, seed])
+  const removeRow = (i) => setItems(items.length > 1 ? items.filter((_, j) => j !== i) : items)
+
+  // Catalog entries not already added — quick add with one tap
+  const used = new Set(items.map((it) => (it.desc || '').trim()))
+  const picks = (catalog || []).filter((c) => !used.has(c.name))
+
+  const numCell = { textAlign: 'right', background: C.panel, border: `1px solid ${C.border}`, borderRadius: 7, padding: '6px 9px', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: C.ink, outline: 'none', boxSizing: 'border-box' }
+
   return (
     <>
+      {/* Re-pick from previously used items */}
+      {picks.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayMed, marginBottom: 7 }}>เลือกจากรายการที่เคยใช้ (กดเพื่อเพิ่ม)</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+            {picks.map((c) => (
+              <span
+                key={c.id || c.name}
+                onClick={() => addRow({ desc: c.name, qty: 1, unit_price: c.unit_price })}
+                title="เพิ่มรายการนี้"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7, cursor: 'pointer',
+                  fontFamily: "'Sarabun'", fontSize: 12, color: C.ink,
+                  background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: '5px 12px',
+                }}
+              >
+                <span style={{ color: accent, fontWeight: 700 }}>+</span>
+                {c.name}
+                <span style={{ fontFamily: "'Space Grotesk'", fontSize: 11, color: C.grayMed }}>฿{Number(c.unit_price).toLocaleString()}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, overflow: 'hidden', marginBottom: 14 }}>
-        <div style={{ display: 'flex', padding: '9px 15px', background: C.panel, borderBottom: `1px solid ${C.borderLight}` }}>
-          <span style={{ flex: 1, fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>รายละเอียดงาน</span>
-          <span style={{ width: 120, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>ราคา (บาท)</span>
-          <span style={{ width: 24 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px', background: C.panel, borderBottom: `1px solid ${C.borderLight}` }}>
+          <span style={{ flex: 1, fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>รายละเอียด</span>
+          <span style={{ width: 78, textAlign: 'center', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>จำนวน</span>
+          <span style={{ width: 104, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>ราคา/หน่วย</span>
+          <span style={{ width: 96, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>รวม</span>
+          <span style={{ width: 22 }} />
         </div>
         {items.map((it, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
-            <input value={it.desc} onChange={(e) => setItems(items.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} placeholder="เช่น พัฒนาบอทดึงรายงาน" style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }} />
-            <input type="number" value={it.amount} onChange={(e) => setItems(items.map((x, j) => j === i ? { ...x, amount: Number(e.target.value) } : x))} style={{ width: 120, textAlign: 'right', background: C.panel, border: `1px solid ${C.border}`, borderRadius: 7, padding: '6px 11px', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: C.ink, outline: 'none' }} />
-            <span onClick={() => setItems(items.length > 1 ? items.filter((_, j) => j !== i) : items)} style={{ width: 24, textAlign: 'center', color: C.grayPale, cursor: items.length > 1 ? 'pointer' : 'default', fontSize: 17 }}>×</span>
+            <input value={it.desc} onChange={(e) => patch(i, { desc: e.target.value })} placeholder="เช่น พัฒนาบอทดึงรายงาน" style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }} />
+            <div style={{ width: 78, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <input type="number" min="0" value={it.qty} onChange={(e) => patch(i, { qty: Number(e.target.value) })} style={{ ...numCell, width: 48, textAlign: 'center', padding: '6px 6px' }} />
+              <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+            </div>
+            <input type="number" min="0" value={it.unit_price} onChange={(e) => patch(i, { unit_price: Number(e.target.value) })} style={{ ...numCell, width: 104 }} />
+            <span style={{ width: 96, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTotal(it).toLocaleString()}</span>
+            <span onClick={() => removeRow(i)} style={{ width: 22, textAlign: 'center', color: C.grayPale, cursor: items.length > 1 ? 'pointer' : 'default', fontSize: 17 }}>×</span>
           </div>
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div onClick={() => setItems([...items, { desc: '', amount: 0 }])} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: accent, cursor: 'pointer' }}>
+        <div onClick={() => addRow()} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: accent, cursor: 'pointer' }}>
           <IconPlus size={15} stroke={accent} /> เพิ่มรายการ
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
@@ -72,13 +117,14 @@ const emptyCust = { name: '', contact_name: '', phone: '', email: '' }
 function NewJobWizard({ navigate }) {
   const accent = C.teal
   const { data: customers } = useAsync(getCustomers, [])
+  const { data: catalog } = useAsync(getItemCatalog, [])
   const [step, setStep] = useState(1)
   const [custMode, setCustMode] = useState('existing')
   const [custId, setCustId] = useState(null)
   const [newCust, setNewCust] = useState(emptyCust)
   const [name, setName] = useState('')
   const [desc, setDesc] = useState('')
-  const [items, setItems] = useState([{ desc: '', amount: 0 }])
+  const [items, setItems] = useState([emptyItem()])
   const [busy, setBusy] = useState(false)
 
   // default to "new customer" if there are none yet
@@ -174,8 +220,8 @@ function NewJobWizard({ navigate }) {
       {step === 3 && (
         <div>
           <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>จะเสนอราคาเท่าไหร่?</div>
-          <div style={sectionHint}>ใส่งานที่จะทำพร้อมราคาแต่ละรายการ — รายการเหล่านี้จะกลายเป็น “ใบเสนอราคา” ใบแรกของงานอัตโนมัติ</div>
-          <ItemsEditor items={items} setItems={setItems} accent={accent} />
+          <div style={sectionHint}>ใส่งานที่จะทำ จำนวน (EA) และราคาต่อหน่วย — ระบบคูณให้เป็นยอดต่อรายการ และรวมเป็น “ใบเสนอราคา” ใบแรกอัตโนมัติ</div>
+          <ItemsEditor items={items} setItems={setItems} accent={accent} catalog={catalog} />
         </div>
       )}
 
@@ -186,7 +232,7 @@ function NewJobWizard({ navigate }) {
             ['ลูกค้า', chosenCustomer?.name || '—'],
             ['ชื่องาน', name || '—'],
             ['จำนวนรายการ', `${items.filter((it) => it.desc.trim()).length} รายการ`],
-            ['ยอดเสนอราคา', baht(items.reduce((s, it) => s + Number(it.amount || 0), 0))],
+            ['ยอดเสนอราคา', baht(itemsTotal(items))],
           ]} />
           <div style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginTop: 14, background: C.tealLight, border: `1px solid ${C.tealMid}`, borderRadius: 10, padding: '11px 14px' }}>
             <IconCheck size={16} stroke={C.teal} />
@@ -216,6 +262,7 @@ function recommendType(project) {
 
 function DocWizard({ navigate, projectCode, initialType }) {
   const { data: project, loading } = useAsync(() => getProjectByCode(projectCode), [projectCode])
+  const { data: catalog } = useAsync(getItemCatalog, [])
   const [step, setStep] = useState(1)
   const [type, setType] = useState(initialType || null)
   const [items, setItems] = useState([])
@@ -227,7 +274,7 @@ function DocWizard({ navigate, projectCode, initialType }) {
     if (project && !type) setType(recommendType(project))
   }, [project]) // eslint-disable-line
   useEffect(() => {
-    if (project) setItems(project.lineItems?.length ? project.lineItems.map((it) => ({ ...it })) : [{ desc: '', amount: 0 }])
+    if (project) setItems(project.lineItems?.length ? project.lineItems.map((it) => ({ ...it })) : [emptyItem()])
   }, [project])
 
   if (loading || !project) return <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: C.bg }}><Loading /></div>
@@ -235,7 +282,7 @@ function DocWizard({ navigate, projectCode, initialType }) {
   const info = DOC_INFO[type] || DOC_INFO.DN
   const accent = info.color
   const recommended = recommendType(project)
-  const total = items.reduce((s, it) => s + Number(it.amount || 0), 0)
+  const total = itemsTotal(items)
   const canNext = step === 1 ? !!type : true
 
   const submit = async () => {
@@ -294,8 +341,8 @@ function DocWizard({ navigate, projectCode, initialType }) {
       {step === 2 && (
         <div>
           <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>รายการในเอกสาร</div>
-          <div style={sectionHint}>ดึงมาจากใบเสนอราคาของงานนี้แล้ว — แก้ได้ตามจริง</div>
-          <ItemsEditor items={items} setItems={setItems} accent={accent} />
+          <div style={sectionHint}>ดึงมาจากใบเสนอราคาของงานนี้แล้ว — แก้จำนวน/ราคาได้ตามจริง</div>
+          <ItemsEditor items={items} setItems={setItems} accent={accent} catalog={catalog} />
         </div>
       )}
 

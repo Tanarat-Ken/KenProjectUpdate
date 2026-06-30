@@ -69,8 +69,8 @@ export function Settings() {
     return <div style={{ height: '100vh', display: 'flex' }}><Loading /></div>
   }
 
-  const year = new Date().getFullYear() + 543
-  const preview = (prefix, n) => `${form[prefix] || ''}-${year - 543}-${String(n || 1).padStart(3, '0')}`
+  const pad3 = (n) => String(n || 0).padStart(3, '0')
+  const preview = (prefix, n) => `${form[prefix] || ''}-${pad3(n)}`
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -123,17 +123,25 @@ export function Settings() {
 
           {section === 2 && (
             <>
-              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 16 }}>เลขรันเอกสาร</div>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight, marginBottom: 14 }}>กำหนดอักษรนำหน้าและเลขถัดไปของแต่ละชนิดเอกสาร</div>
-              <div className="ao-grid-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, maxWidth: 720 }}>
-                {[['prefix_qt', 'next_qt', 'ใบเสนอราคา'], ['prefix_dn', 'next_dn', 'ใบส่งงาน'], ['prefix_inv', 'next_inv', 'ใบแจ้งหนี้'], ['prefix_rc', 'next_rc', 'ใบเสร็จ']].map(([pk, nk, label]) => (
+              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 8 }}>เลขรันเอกสาร</div>
+              <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayMed, marginBottom: 16, lineHeight: 1.5, maxWidth: 620 }}>
+                1 งานใช้ <b>เลขรันนิ่งเดียว</b> ตลอดสายเอกสาร — เปลี่ยนเฉพาะอักษรนำหน้า (prefix) ตามชนิดเอกสาร
+                <br />เช่น งานเลข 009 จะได้ <span style={{ fontFamily: "'Space Grotesk'", color: C.teal }}>QT-009 → DN-009 → INV-009 → RC-009</span>
+              </div>
+
+              {/* Shared running number */}
+              <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, maxWidth: 280, marginBottom: 18 }}>
+                <NumInput label="เลขรันถัดไป (งานใหม่ถัดไป)" k="next_no" form={form} set={set} />
+                <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight, marginTop: 8 }}>งานถัดไปจะเริ่มที่เลขนี้ แล้วเพิ่มทีละ 1 อัตโนมัติ</div>
+              </div>
+
+              <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 12.5, color: C.ink, marginBottom: 10 }}>อักษรนำหน้า (prefix) แต่ละชนิดเอกสาร</div>
+              <div className="ao-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 14, maxWidth: 560 }}>
+                {[['prefix_qt', 'ใบเสนอราคา'], ['prefix_dn', 'ใบส่งงาน'], ['prefix_inv', 'ใบแจ้งหนี้'], ['prefix_rc', 'ใบเสร็จ']].map(([pk, label]) => (
                   <div key={pk} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16 }}>
                     <div style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 12.5, color: C.ink, marginBottom: 10 }}>{label}</div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <div style={{ width: 70 }}><Input label="prefix" k={pk} form={form} set={set} mono /></div>
-                      <div style={{ flex: 1 }}><NumInput label="เลขถัดไป" k={nk} form={form} set={set} /></div>
-                    </div>
-                    <div style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: C.teal, marginTop: 10 }}>→ {preview(pk, form[nk])}</div>
+                    <Input label="prefix" k={pk} form={form} set={set} mono />
+                    <div style={{ fontFamily: "'Space Grotesk'", fontSize: 12, color: C.teal, marginTop: 10 }}>→ {preview(pk, form.next_no)}</div>
                   </div>
                 ))}
               </div>
