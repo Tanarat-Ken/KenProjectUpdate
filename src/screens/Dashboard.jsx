@@ -1,7 +1,11 @@
 import { C } from '../theme'
 import { StatusBadge } from '../components/StatusBadge'
-import { IconSearch, IconPlus, IconFile, IconBriefcase, IconCheck, IconClock, IconInfo } from '../components/Icons'
-import { PROJECTS, ACTIVITY } from '../data'
+import { IconSearch, IconPlus, IconFile } from '../components/Icons'
+import { Loading, ErrorState, EmptyState } from '../components/States'
+import { useAsync } from '../lib/useAsync'
+import { getDashboard, getRecentActivity } from '../lib/api'
+import { useOwner } from '../lib/settings'
+import { baht, timeThai } from '../lib/format'
 
 function StatCard({ label, value, sub, dotColor, inverted }) {
   if (inverted) {
@@ -59,33 +63,43 @@ function ProjectRow({ project, onClick }) {
       </div>
       <StatusBadge status={project.status} />
       <span style={{ fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: C.ink, width: 78, textAlign: 'right' }}>
-        ฿{project.value.toLocaleString()}
+        {baht(project.value)}
       </span>
     </div>
   )
 }
 
 export function Dashboard({ navigate }) {
+  const owner = useOwner()
+  const { data, loading, error, reload } = useAsync(getDashboard, [])
+  const activity = useAsync(() => getRecentActivity(5), [])
+
+  const today = new Date().toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Top bar */}
-      <div style={{
+      <div className="ao-topbar" style={{
         height: 64, borderBottom: `1px solid ${C.border}`,
         padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: C.white, flexShrink: 0,
       }}>
         <div>
-          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink, lineHeight: 1.1 }}>สวัสดี ธนารัตน์ 👋</div>
-          <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>วันศุกร์ที่ 6 ก.พ. 2569</div>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 17, color: C.ink, lineHeight: 1.1 }}>สวัสดี {owner.shortName} 👋</div>
+          <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>{today}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
+          <div className="ao-search" style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: C.panel, border: `1px solid ${C.border}`,
             borderRadius: 9, padding: '8px 13px', width: 230,
           }}>
             <IconSearch size={15} />
-            <span style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight }}>ค้นหางาน ลูกค้า เอกสาร…</span>
+            <input
+              placeholder="ค้นหางาน ลูกค้า… (กด Enter)"
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate('projects', { q: e.target.value.trim() }) }}
+              style={{ border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 12.5, color: C.ink, width: '100%' }}
+            />
           </div>
           <button
             onClick={() => navigate('wizard')}
@@ -105,88 +119,102 @@ export function Dashboard({ navigate }) {
 
       {/* Content */}
       <div style={{ flex: 1, padding: '26px 28px', background: C.bg, overflow: 'auto' }}>
-        {/* Stat cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 22 }}>
-          <StatCard label="งานค้าง (กำลังทำ)" value="1" sub="กำลังพัฒนาอยู่" dotColor={C.teal} />
-          <StatCard label="งานรอ (รอลูกค้า)" value="2" sub="รอตอบรับ · รอชำระ" dotColor={C.amber} />
-          <StatCard label="งานรีวิว (รอตรวจรับ)" value="1" sub="ส่งมอบแล้ว รอเซ็น" dotColor={C.blue} />
-          <StatCard label="เงินรอเก็บ" value="฿170,000" sub="1 ใบแจ้งหนี้ค้างชำระ" inverted />
-        </div>
-
-        {/* Main 2-col */}
-        <div style={{ display: 'flex', gap: 18 }}>
-          {/* Left */}
-          <div style={{ flex: 1.6, minWidth: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink }}>งานที่ต้องดำเนินการ</span>
-              <span
-                onClick={() => navigate('projects')}
-                style={{ fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 500, color: C.teal, cursor: 'pointer' }}
-              >ดูทั้งหมด →</span>
+        {loading && <Loading />}
+        {error && <ErrorState error={error} onRetry={reload} />}
+        {data && (
+          <>
+            {/* Stat cards */}
+            <div className="ao-grid-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 22 }}>
+              <StatCard label="งานค้าง (กำลังทำ)" value={data.counts.active} sub="กำลังพัฒนาอยู่" dotColor={C.teal} />
+              <StatCard label="งานรอ (รอลูกค้า)" value={data.counts.waiting} sub="รอตอบรับ · รอชำระ" dotColor={C.amber} />
+              <StatCard label="งานรีวิว (รอตรวจรับ)" value={data.counts.review} sub="ส่งมอบแล้ว รอเซ็น" dotColor={C.blue} />
+              <StatCard label="เงินรอเก็บ" value={baht(data.receivable)} sub="ใบแจ้งหนี้ค้างชำระ" inverted />
             </div>
 
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, overflow: 'hidden' }}>
-              {PROJECTS.filter(p => p.status !== 'ปิดงาน').map((p) => (
-                <ProjectRow key={p.id} project={p} onClick={() => navigate('project', { projectId: p.id })} />
-              ))}
-            </div>
-
-            {/* Revenue */}
-            <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, margin: '22px 0 12px' }}>รายได้เดือนนี้</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
-              {[
-                { label: 'เสนอราคาไป', value: '฿262,000', color: C.ink },
-                { label: 'รอเก็บ', value: '฿170,000', color: C.burgundy },
-                { label: 'เก็บแล้ว', value: '฿35,000', color: C.green },
-              ].map(({ label, value, color }) => (
-                <div key={label} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: 16 }}>
-                  <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 500, color: C.grayMed }}>{label}</div>
-                  <div style={{ fontFamily: "'Space Grotesk'", fontSize: 21, fontWeight: 700, color, marginTop: 4 }}>{value}</div>
+            {/* Main 2-col */}
+            <div className="ao-stack-mobile" style={{ display: 'flex', gap: 18 }}>
+              {/* Left */}
+              <div style={{ flex: 1.6, minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink }}>งานที่ต้องดำเนินการ</span>
+                  <span
+                    onClick={() => navigate('projects')}
+                    style={{ fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 500, color: C.teal, cursor: 'pointer' }}
+                  >ดูทั้งหมด →</span>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Right */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 12 }}>กิจกรรมล่าสุด</div>
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: 18 }}>
-              {ACTIVITY.map((a, i) => (
-                <div key={i} style={{ display: 'flex', gap: 12, paddingBottom: i < ACTIVITY.length - 1 ? 15 : 0 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ width: 9, height: 9, borderRadius: '50%', background: a.color, marginTop: 4 }} />
-                    {i < ACTIVITY.length - 1 && <div style={{ flex: 1, width: 2, background: C.borderLight, marginTop: 4 }} />}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.ink, lineHeight: 1.4 }}>
-                      {a.text}<span style={{ fontFamily: "'Space Grotesk'", color: a.codeColor }}>{a.code}</span>{a.codeSuffix}
+                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, overflow: 'hidden' }}>
+                  {data.openProjects.length === 0
+                    ? <EmptyState title="ไม่มีงานที่ต้องดำเนินการ" sub="All caught up" />
+                    : data.openProjects.map((p) => (
+                        <ProjectRow key={p.id} project={p} onClick={() => navigate('project', { projectId: p.id })} />
+                      ))}
+                </div>
+
+                {/* Revenue */}
+                <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, margin: '22px 0 12px' }}>รายได้ภาพรวม</div>
+                <div className="ao-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+                  {[
+                    { label: 'เสนอราคาไป', value: baht(data.revenue.quoted), color: C.ink },
+                    { label: 'รอเก็บ', value: baht(data.revenue.receivable), color: C.burgundy },
+                    { label: 'เก็บแล้ว', value: baht(data.revenue.collected), color: C.green },
+                  ].map(({ label, value, color }) => (
+                    <div key={label} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: 16 }}>
+                      <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 500, color: C.grayMed }}>{label}</div>
+                      <div style={{ fontFamily: "'Space Grotesk'", fontSize: 21, fontWeight: 700, color, marginTop: 4 }}>{value}</div>
                     </div>
-                    <div style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight, marginTop: 2 }}>{a.time}</div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Shortcuts */}
-            <div style={{ background: C.panel, border: `1px dashed ${C.borderDash}`, borderRadius: 13, padding: 16, marginTop: 16 }}>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: C.ink, marginBottom: 9 }}>ทางลัด</div>
-              {[
-                { label: 'สร้างใบเสนอราคา', color: C.teal, page: 'wizard' },
-                { label: 'ออกใบแจ้งหนี้จากงานที่ส่งแล้ว', color: C.burgundy, page: 'wizard' },
-                { label: 'อัปโหลดไฟล์คอนเซป (.md/.html)', color: C.grayLight, page: 'files' },
-              ].map(({ label, color, page }) => (
-                <div
-                  key={label}
-                  onClick={() => navigate(page)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.grayMed, marginBottom: 8, cursor: 'pointer' }}
-                >
-                  <span style={{ width: 24, height: 24, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, fontSize: 16, fontWeight: 700 }}>+</span>
-                  {label}
+              {/* Right */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 12 }}>กิจกรรมล่าสุด</div>
+                <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: 18 }}>
+                  {activity.loading && <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>กำลังโหลด…</div>}
+                  {activity.data && activity.data.length === 0 && (
+                    <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>ยังไม่มีกิจกรรม</div>
+                  )}
+                  {(activity.data || []).map((a, i, arr) => (
+                    <div key={i} style={{ display: 'flex', gap: 12, paddingBottom: i < arr.length - 1 ? 15 : 0 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ width: 9, height: 9, borderRadius: '50%', background: a.color, marginTop: 4 }} />
+                        {i < arr.length - 1 && <div style={{ flex: 1, width: 2, background: C.borderLight, marginTop: 4 }} />}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.ink, lineHeight: 1.4 }}>
+                          {a.text} {a.code && <span style={{ fontFamily: "'Space Grotesk'", color: a.codeColor }}>{a.code}</span>}{a.codeSuffix}
+                        </div>
+                        <div style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight, marginTop: 2 }}>
+                          {timeThai(a.time)}{a.user ? ` · โดย${a.user}` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {/* Shortcuts */}
+                <div style={{ background: C.panel, border: `1px dashed ${C.borderDash}`, borderRadius: 13, padding: 16, marginTop: 16 }}>
+                  <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: C.ink, marginBottom: 9 }}>ทางลัด</div>
+                  {[
+                    { label: 'สร้างใบเสนอราคา', color: C.teal, page: 'wizard' },
+                    { label: 'ออกใบแจ้งหนี้จากงานที่ส่งแล้ว', color: C.burgundy, page: 'wizard' },
+                    { label: 'อัปโหลดไฟล์คอนเซป (.md/.html)', color: C.grayLight, page: 'files' },
+                  ].map(({ label, color, page }) => (
+                    <div
+                      key={label}
+                      onClick={() => navigate(page)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.grayMed, marginBottom: 8, cursor: 'pointer' }}
+                    >
+                      <span style={{ width: 24, height: 24, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, fontSize: 16, fontWeight: 700 }}>+</span>
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   )

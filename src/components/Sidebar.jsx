@@ -1,8 +1,10 @@
 import { C } from '../theme'
-import { LogoIcon, IconGrid, IconBriefcase, IconFile, IconPaperclip, IconUsers, IconSettings } from './Icons'
+import { LogoIcon, IconGrid, IconBriefcase, IconFile, IconPaperclip, IconUsers, IconSettings, IconFlow } from './Icons'
+import { useOwner } from '../lib/settings'
 
 const NAV = [
   { key: 'dashboard', label: 'ภาพรวม',      Icon: IconGrid },
+  { key: 'flow',      label: 'โฟลว์งาน',     Icon: IconFlow },
   { key: 'projects',  label: 'งานทั้งหมด',   Icon: IconBriefcase },
   { key: 'documents', label: 'เอกสาร',        Icon: IconFile },
   { key: 'files',     label: 'ไฟล์ & คอนเซป', Icon: IconPaperclip },
@@ -11,6 +13,7 @@ const NAV = [
 
 export function Sidebar({ nav, navigate }) {
   const activePage = nav.page
+  const owner = useOwner()
 
   const navItemStyle = (key) => {
     const active = activePage === key || (key === 'projects' && activePage === 'project')
@@ -46,7 +49,7 @@ export function Sidebar({ nav, navigate }) {
           <LogoIcon size={18} />
         </div>
         <div style={{ fontFamily: "'Sarabun', sans-serif", fontWeight: 700, fontSize: 15, color: C.ink }}>
-          Agent Office
+          {owner.logoText}
         </div>
       </div>
 
@@ -80,10 +83,10 @@ export function Sidebar({ nav, navigate }) {
           width: 32, height: 32, borderRadius: '50%', background: C.teal,
           color: C.white, display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontFamily: "'Space Grotesk', sans-serif", fontSize: 13, fontWeight: 700, flexShrink: 0,
-        }}>ธ</div>
+        }}>{owner.initial}</div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontFamily: "'Sarabun', sans-serif", fontWeight: 600, fontSize: 12.5, color: C.ink, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            ธนารัตน์
+            {owner.shortName}
           </div>
           <div style={{ fontFamily: "'Sarabun', sans-serif", fontSize: 10.5, color: C.grayLight }}>เจ้าของ · Owner</div>
         </div>

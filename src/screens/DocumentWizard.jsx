@@ -1,264 +1,430 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { C } from '../theme'
 import { IconFile, IconCheck, IconPlus } from '../components/Icons'
-import { PROJECTS, LINE_ITEMS, OWNER } from '../data'
+import { Loading } from '../components/States'
+import { useAsync } from '../lib/useAsync'
+import { getCustomers, getProjectByCode, createProject, createDocument, getItemCatalog } from '../lib/api'
+import { baht, itemsTotal } from '../lib/format'
 
-const DOC_TYPES = [
-  { key: 'QT', label: 'ใบเสนอราคา', color: C.teal, bg: C.tealLight },
-  { key: 'DN', label: 'ใบส่งงาน', color: C.blue, bg: C.blueLight },
-  { key: 'INV', label: 'ใบแจ้งหนี้', color: C.burgundy, bg: C.burgundyLight },
-  { key: 'RC', label: 'ใบเสร็จรับเงิน', color: C.green, bg: C.greenLight },
-]
-
-const STEP_LABELS = ['เลือกลูกค้า', 'รายการ', 'เงื่อนไข', 'ตรวจ & ออก']
-
+/* ------------------------------------------------------------------ shared shell */
 function StepDot({ n, label, state }) {
-  // state: 'done' | 'current' | 'pending'
-  const bgColor = state === 'done' ? C.green : state === 'current' ? C.burgundy : C.white
-  const borderColor = state === 'pending' ? C.border : 'none'
-  const textColor = state === 'pending' ? C.grayPale : '#fff'
-  const labelColor = state === 'current' ? C.burgundy : state === 'done' ? C.ink : C.grayLight
-  const labelWeight = state === 'current' ? 600 : 500
-
+  const bg = state === 'done' ? C.green : state === 'current' ? C.teal : C.white
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <div style={{ width: 26, height: 26, borderRadius: '50%', background: bgColor, border: state === 'pending' ? `2px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {state === 'done'
-          ? <IconCheck size={13} stroke="#fff" />
-          : <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12, fontWeight: 700, color: textColor }}>{n}</span>
-        }
+      <div style={{ width: 26, height: 26, borderRadius: '50%', background: bg, border: state === 'pending' ? `2px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {state === 'done' ? <IconCheck size={13} stroke="#fff" /> : <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12, fontWeight: 700, color: state === 'pending' ? C.grayPale : '#fff' }}>{n}</span>}
       </div>
-      <span style={{ fontFamily: "'Sarabun'", fontSize: 12, fontWeight: labelWeight, color: labelColor }}>{label}</span>
+      <span style={{ fontFamily: "'Sarabun'", fontSize: 12, fontWeight: state === 'current' ? 600 : 500, color: state === 'current' ? C.teal : state === 'done' ? C.ink : C.grayLight }}>{label}</span>
     </div>
   )
 }
-
-function StepBar({ step }) {
-  const lineColor = (i) => i < step - 1 ? C.green : C.border
+function StepBar({ labels, step, accent }) {
   return (
-    <div style={{ padding: '18px 26px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-      {STEP_LABELS.map((label, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < 3 ? 1 : 'none' }}>
-          <StepDot
-            n={i + 1}
-            label={label}
-            state={i < step - 1 ? 'done' : i === step - 1 ? 'current' : 'pending'}
-          />
-          {i < 3 && <div style={{ flex: 1, height: 2, background: lineColor(i), margin: '0 12px' }} />}
+    <div style={{ padding: '18px 26px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', alignItems: 'center', flexShrink: 0, overflowX: 'auto' }}>
+      {labels.map((label, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < labels.length - 1 ? 1 : 'none', minWidth: 'fit-content' }}>
+          <StepDot n={i + 1} label={label} state={i < step - 1 ? 'done' : i === step - 1 ? 'current' : 'pending'} />
+          {i < labels.length - 1 && <div style={{ flex: 1, height: 2, background: i < step - 1 ? C.green : C.border, margin: '0 12px', minWidth: 18 }} />}
+        </div>
+      ))}
+    </div>
+  )
+}
+const fieldStyle = { width: '100%', boxSizing: 'border-box', background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 13px', fontFamily: "'Sarabun'", fontSize: 13.5, color: C.ink, outline: 'none' }
+const labelStyle = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
+const sectionHint = { fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight, marginBottom: 16, lineHeight: 1.5 }
+
+export const emptyItem = () => ({ desc: '', qty: 1, unit_price: 0 })
+const lineTotal = (it) => (Number(it.qty ?? 1) || 0) * (Number(it.unit_price ?? 0) || 0)
+
+function ItemsEditor({ items, setItems, accent, catalog }) {
+  const total = items.reduce((s, it) => s + lineTotal(it), 0)
+  const patch = (i, p) => setItems(items.map((x, j) => (j === i ? { ...x, ...p } : x)))
+  const addRow = (seed = emptyItem()) => setItems([...items, seed])
+  const removeRow = (i) => setItems(items.length > 1 ? items.filter((_, j) => j !== i) : items)
+
+  // Catalog entries not already added — quick add with one tap
+  const used = new Set(items.map((it) => (it.desc || '').trim()))
+  const picks = (catalog || []).filter((c) => !used.has(c.name))
+
+  const numCell = { textAlign: 'right', background: C.panel, border: `1px solid ${C.border}`, borderRadius: 7, padding: '6px 9px', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 600, color: C.ink, outline: 'none', boxSizing: 'border-box' }
+
+  return (
+    <>
+      {/* Re-pick from previously used items */}
+      {picks.length > 0 && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayMed, marginBottom: 7 }}>เลือกจากรายการที่เคยใช้ (กดเพื่อเพิ่ม)</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+            {picks.map((c) => (
+              <span
+                key={c.id || c.name}
+                onClick={() => addRow({ desc: c.name, qty: 1, unit_price: c.unit_price })}
+                title="เพิ่มรายการนี้"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7, cursor: 'pointer',
+                  fontFamily: "'Sarabun'", fontSize: 12, color: C.ink,
+                  background: C.white, border: `1px solid ${C.border}`, borderRadius: 20, padding: '5px 12px',
+                }}
+              >
+                <span style={{ color: accent, fontWeight: 700 }}>+</span>
+                {c.name}
+                <span style={{ fontFamily: "'Space Grotesk'", fontSize: 11, color: C.grayMed }}>฿{Number(c.unit_price).toLocaleString()}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, overflow: 'hidden', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px', background: C.panel, borderBottom: `1px solid ${C.borderLight}` }}>
+          <span style={{ flex: 1, fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>รายละเอียด</span>
+          <span style={{ width: 78, textAlign: 'center', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>จำนวน</span>
+          <span style={{ width: 104, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>ราคา/หน่วย</span>
+          <span style={{ width: 96, textAlign: 'right', fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 600, color: C.grayLight }}>รวม</span>
+          <span style={{ width: 22 }} />
+        </div>
+        {items.map((it, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
+            <input value={it.desc} onChange={(e) => patch(i, { desc: e.target.value })} placeholder="เช่น พัฒนาบอทดึงรายงาน" style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }} />
+            <div style={{ width: 78, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <input type="number" min="0" value={it.qty} onChange={(e) => patch(i, { qty: Number(e.target.value) })} style={{ ...numCell, width: 48, textAlign: 'center', padding: '6px 6px' }} />
+              <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+            </div>
+            <input type="number" min="0" value={it.unit_price} onChange={(e) => patch(i, { unit_price: Number(e.target.value) })} style={{ ...numCell, width: 104 }} />
+            <span style={{ width: 96, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTotal(it).toLocaleString()}</span>
+            <span onClick={() => removeRow(i)} style={{ width: 22, textAlign: 'center', color: C.grayPale, cursor: items.length > 1 ? 'pointer' : 'default', fontSize: 17 }}>×</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div onClick={() => addRow()} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: accent, cursor: 'pointer' }}>
+          <IconPlus size={15} stroke={accent} /> เพิ่มรายการ
+        </div>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <span style={{ fontFamily: "'Sarabun'", fontSize: 13, color: C.grayMed }}>ยอดรวม</span>
+          <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 22, color: accent }}>{baht(total)}</span>
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* ================================================================ NEW-JOB FLOW */
+const NEWJOB_STEPS = ['ลูกค้า', 'รายละเอียดงาน', 'รายการ & ราคา', 'ตรวจ & สร้าง']
+const emptyCust = { name: '', contact_name: '', phone: '', email: '' }
+
+function NewJobWizard({ navigate }) {
+  const accent = C.teal
+  const { data: customers } = useAsync(getCustomers, [])
+  const { data: catalog } = useAsync(getItemCatalog, [])
+  const [step, setStep] = useState(1)
+  const [custMode, setCustMode] = useState('existing')
+  const [custId, setCustId] = useState(null)
+  const [newCust, setNewCust] = useState(emptyCust)
+  const [name, setName] = useState('')
+  const [desc, setDesc] = useState('')
+  const [items, setItems] = useState([emptyItem()])
+  const [busy, setBusy] = useState(false)
+
+  // default to "new customer" if there are none yet
+  useEffect(() => { if (customers && customers.length === 0) setCustMode('new') }, [customers])
+
+  const chosenCustomer = custMode === 'new'
+    ? (newCust.name.trim() ? newCust : null)
+    : (customers || []).find((c) => c.id === custId) || null
+
+  const canNext =
+    step === 1 ? !!chosenCustomer :
+    step === 2 ? !!name.trim() :
+    step === 3 ? items.some((it) => it.desc.trim()) : true
+
+  const submit = async () => {
+    setBusy(true)
+    try {
+      const { code } = await createProject({
+        customer: custMode === 'new' ? newCust : { id: custId, name: chosenCustomer?.name },
+        name, description: desc, items,
+      })
+      alert(`สร้างงานสำเร็จ — ออกใบเสนอราคาให้แล้ว ✓`)
+      navigate('project', { projectId: code })
+    } catch (err) {
+      alert('สร้างงานไม่สำเร็จ: ' + (err.message || err))
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <Shell
+      title="สร้างงานใหม่"
+      subtitle="เริ่มต้นด้วยการออกใบเสนอราคาให้ลูกค้า"
+      accent={accent}
+      labels={NEWJOB_STEPS}
+      step={step}
+      onClose={() => navigate('dashboard')}
+      onBack={() => (step > 1 ? setStep(step - 1) : navigate('dashboard'))}
+      next={step < 4
+        ? { label: ['', 'ถัดไป', 'ถัดไป', 'ถัดไป'][step] + ' →', disabled: !canNext, onClick: () => setStep(step + 1) }
+        : { label: busy ? 'กำลังสร้าง…' : 'สร้างงาน + ออกใบเสนอราคา', disabled: busy, onClick: submit }}
+    >
+      {step === 1 && (
+        <div>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>งานนี้ทำให้ลูกค้าคนไหน?</div>
+          <div style={sectionHint}>เลือกลูกค้าที่เคยทำ หรือเพิ่มลูกค้าใหม่ (ใส่แค่ชื่อก็พอ ที่เหลือเติมทีหลังได้)</div>
+
+          <div style={{ display: 'inline-flex', background: C.panel, border: `1px solid ${C.border}`, borderRadius: 10, padding: 3, marginBottom: 16 }}>
+            {[['existing', 'ลูกค้าเดิม'], ['new', 'ลูกค้าใหม่']].map(([k, lb]) => (
+              <span key={k} onClick={() => setCustMode(k)} style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: custMode === k ? '#fff' : C.grayMed, background: custMode === k ? accent : 'transparent', padding: '7px 16px', borderRadius: 8, cursor: 'pointer' }}>{lb}</span>
+            ))}
+          </div>
+
+          {custMode === 'existing' ? (
+            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, overflow: 'hidden' }}>
+              {(customers || []).length === 0 && <div style={{ padding: 16, fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight }}>ยังไม่มีลูกค้า — กดแท็บ “ลูกค้าใหม่” เพื่อเพิ่ม</div>}
+              {(customers || []).map((c, i, arr) => (
+                <div key={c.id} onClick={() => setCustId(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '13px 16px', borderBottom: i < arr.length - 1 ? `1px solid ${C.borderLight}` : 'none', cursor: 'pointer', background: custId === c.id ? C.tealLight : 'transparent' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${custId === c.id ? accent : C.border}`, background: custId === c.id ? accent : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {custId === c.id && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: "'Sarabun'", fontSize: 13.5, fontWeight: 600, color: C.ink }}>{c.name}</div>
+                    {(c.contact_name || c.email) && <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>{c.contact_name || c.email}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 13, maxWidth: 560 }}>
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={labelStyle}>ชื่อบริษัท / ลูกค้า *</label>
+                <input autoFocus value={newCust.name} onChange={(e) => setNewCust({ ...newCust, name: e.target.value })} placeholder="เช่น บริษัท ตัวอย่าง จำกัด" style={fieldStyle} />
+              </div>
+              <div><label style={labelStyle}>ผู้ติดต่อ</label><input value={newCust.contact_name} onChange={(e) => setNewCust({ ...newCust, contact_name: e.target.value })} style={fieldStyle} /></div>
+              <div><label style={labelStyle}>เบอร์โทร</label><input value={newCust.phone} onChange={(e) => setNewCust({ ...newCust, phone: e.target.value })} style={fieldStyle} /></div>
+              <div style={{ gridColumn: 'span 2' }}><label style={labelStyle}>อีเมล</label><input value={newCust.email} onChange={(e) => setNewCust({ ...newCust, email: e.target.value })} style={fieldStyle} /></div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {step === 2 && (
+        <div style={{ maxWidth: 560 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>งานนี้ทำเรื่องอะไร?</div>
+          <div style={sectionHint}>ตั้งชื่อให้จำง่าย จะได้หาเจอภายหลัง</div>
+          <label style={labelStyle}>ชื่องาน *</label>
+          <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="เช่น ทำบอทดึงรายงานยอดขายรายวัน" style={{ ...fieldStyle, marginBottom: 16 }} />
+          <label style={labelStyle}>รายละเอียด / โน้ต (ไม่บังคับ)</label>
+          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} placeholder="ขอบเขตงานคร่าว ๆ หรือสิ่งที่ลูกค้าต้องการ" style={{ ...fieldStyle, resize: 'vertical' }} />
+        </div>
+      )}
+
+      {step === 3 && (
+        <div>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>จะเสนอราคาเท่าไหร่?</div>
+          <div style={sectionHint}>ใส่งานที่จะทำ จำนวน (EA) และราคาต่อหน่วย — ระบบคูณให้เป็นยอดต่อรายการ และรวมเป็น “ใบเสนอราคา” ใบแรกอัตโนมัติ</div>
+          <ItemsEditor items={items} setItems={setItems} accent={accent} catalog={catalog} />
+        </div>
+      )}
+
+      {step === 4 && (
+        <div style={{ maxWidth: 540 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 14 }}>ตรวจสอบก่อนสร้าง</div>
+          <SummaryCard rows={[
+            ['ลูกค้า', chosenCustomer?.name || '—'],
+            ['ชื่องาน', name || '—'],
+            ['จำนวนรายการ', `${items.filter((it) => it.desc.trim()).length} รายการ`],
+            ['ยอดเสนอราคา', baht(itemsTotal(items))],
+          ]} />
+          <div style={{ display: 'flex', gap: 9, alignItems: 'flex-start', marginTop: 14, background: C.tealLight, border: `1px solid ${C.tealMid}`, borderRadius: 10, padding: '11px 14px' }}>
+            <IconCheck size={16} stroke={C.teal} />
+            <span style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.tealDark, lineHeight: 1.5 }}>ระบบจะสร้างงานใหม่ และออก<b>ใบเสนอราคา</b>ให้อัตโนมัติ — ข้อมูลผู้ออก/บัญชีดึงจากหน้า “ตั้งค่า”</span>
+          </div>
+        </div>
+      )}
+    </Shell>
+  )
+}
+
+/* ================================================================ FOLLOW-UP DOC FLOW */
+const DOC_STEPS = ['ชนิดเอกสาร', 'รายการ', 'เงื่อนไข', 'ตรวจ & ออก']
+const DOC_INFO = {
+  DN:  { label: 'ใบส่งงาน', color: C.blue, bg: C.blueLight, when: 'เมื่อทำงานเสร็จและส่งมอบให้ลูกค้าตรวจรับ' },
+  INV: { label: 'ใบแจ้งหนี้', color: C.burgundy, bg: C.burgundyLight, when: 'เมื่อต้องการเรียกเก็บเงินจากลูกค้า' },
+  QT:  { label: 'ใบเสนอราคา (ใหม่)', color: C.teal, bg: C.tealLight, when: 'เสนอราคาเพิ่ม หรือแก้ไขข้อเสนอเดิม' },
+}
+const DOC_ORDER = ['DN', 'INV', 'QT']
+
+function recommendType(project) {
+  const p = project.pipeline || {}
+  if (!p.DN) return 'DN'
+  if (!p.INV) return 'INV'
+  return 'INV'
+}
+
+function DocWizard({ navigate, projectCode, initialType }) {
+  const { data: project, loading } = useAsync(() => getProjectByCode(projectCode), [projectCode])
+  const { data: catalog } = useAsync(getItemCatalog, [])
+  const [step, setStep] = useState(1)
+  const [type, setType] = useState(initialType || null)
+  const [items, setItems] = useState([])
+  const [dueDate, setDueDate] = useState('')
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (project && !type) setType(recommendType(project))
+  }, [project]) // eslint-disable-line
+  useEffect(() => {
+    if (project) setItems(project.lineItems?.length ? project.lineItems.map((it) => ({ ...it })) : [emptyItem()])
+  }, [project])
+
+  if (loading || !project) return <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: C.bg }}><Loading /></div>
+
+  const info = DOC_INFO[type] || DOC_INFO.DN
+  const accent = info.color
+  const recommended = recommendType(project)
+  const total = itemsTotal(items)
+  const canNext = step === 1 ? !!type : true
+
+  const submit = async () => {
+    setBusy(true)
+    try {
+      const { number } = await createDocument({ type, project, items: items.filter((it) => it.desc.trim()), dueDate, note })
+      alert(`ออก${info.label}สำเร็จ: ${number}`)
+      navigate('project', { projectId: project.id })
+    } catch (err) {
+      alert('ออกเอกสารไม่สำเร็จ: ' + (err.message || err))
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <Shell
+      title={`ออก${info.label}`}
+      subtitle={`${project.name} · ${project.client}`}
+      accent={accent}
+      labels={DOC_STEPS}
+      step={step}
+      onClose={() => navigate('project', { projectId: project.id })}
+      onBack={() => (step > 1 ? setStep(step - 1) : navigate('project', { projectId: project.id }))}
+      next={step < 4
+        ? { label: 'ถัดไป →', disabled: !canNext, onClick: () => setStep(step + 1) }
+        : { label: busy ? 'กำลังออกเอกสาร…' : `ออก${info.label}`, disabled: busy, onClick: submit }}
+    >
+      {step === 1 && (
+        <div>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>จะออกเอกสารอะไร?</div>
+          <div style={sectionHint}>เลือกตามขั้นที่งานไปถึง — ระบบดึงรายการจากใบเสนอราคามาให้อัตโนมัติ</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {DOC_ORDER.map((k) => {
+              const d = DOC_INFO[k]; const on = type === k
+              return (
+                <div key={k} onClick={() => setType(k)} style={{ display: 'flex', alignItems: 'center', gap: 14, border: on ? `2px solid ${d.color}` : `1px solid ${C.border}`, background: on ? d.bg : C.white, borderRadius: 12, padding: '14px 16px', cursor: 'pointer' }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 10, background: d.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <IconFile size={20} stroke="#fff" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink }}>{d.label}</span>
+                      {k === recommended && <span style={{ fontFamily: "'Sarabun'", fontSize: 10, fontWeight: 700, color: '#fff', background: d.color, padding: '2px 8px', borderRadius: 10 }}>แนะนำ</span>}
+                    </div>
+                    <div style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayMed, marginTop: 2 }}>{d.when}</div>
+                  </div>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${on ? d.color : C.border}`, background: on ? d.color : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {on && <IconCheck size={12} stroke="#fff" />}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
+        <div>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>รายการในเอกสาร</div>
+          <div style={sectionHint}>ดึงมาจากใบเสนอราคาของงานนี้แล้ว — แก้จำนวน/ราคาได้ตามจริง</div>
+          <ItemsEditor items={items} setItems={setItems} accent={accent} catalog={catalog} />
+        </div>
+      )}
+
+      {step === 3 && (
+        <div style={{ maxWidth: 540 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 5 }}>เงื่อนไข</div>
+          <div style={sectionHint}>{type === 'INV' ? 'กำหนดวันครบชำระและหมายเหตุ' : 'เพิ่มหมายเหตุถ้ามี (ไม่บังคับ)'}</div>
+          {type === 'INV' && (
+            <div style={{ marginBottom: 16, maxWidth: 240 }}>
+              <label style={labelStyle}>วันครบกำหนดชำระ</label>
+              <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} style={fieldStyle} />
+            </div>
+          )}
+          <label style={labelStyle}>หมายเหตุ</label>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={3} placeholder="เช่น เงื่อนไขการชำระเงิน" style={{ ...fieldStyle, resize: 'vertical' }} />
+        </div>
+      )}
+
+      {step === 4 && (
+        <div style={{ maxWidth: 540 }}>
+          <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 14 }}>ตรวจสอบก่อนออกเอกสาร</div>
+          <SummaryCard rows={[
+            ['ชนิดเอกสาร', info.label],
+            ['งาน', project.name],
+            ['ลูกค้า', project.client],
+            ['จำนวนรายการ', `${items.filter((it) => it.desc.trim()).length} รายการ`],
+            ['ยอดรวม', baht(total)],
+            ...(type === 'INV' && dueDate ? [['ครบกำหนด', dueDate]] : []),
+          ]} />
+          <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight, marginTop: 12 }}>เลขเอกสารออกอัตโนมัติตามที่ตั้งค่าไว้ และบันทึกลงฐานข้อมูลจริง</div>
+        </div>
+      )}
+    </Shell>
+  )
+}
+
+/* ------------------------------------------------------------------ shared bits */
+function SummaryCard({ rows }) {
+  return (
+    <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: '6px 20px' }}>
+      {rows.map(([label, value]) => (
+        <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '11px 0', borderBottom: `1px solid ${C.borderLight}` }}>
+          <span style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight }}>{label}</span>
+          <span style={{ fontFamily: "'Sarabun'", fontSize: 13.5, fontWeight: 600, color: C.ink, textAlign: 'right' }}>{value}</span>
         </div>
       ))}
     </div>
   )
 }
 
-function Step1({ selectedProject, setSelectedProject, selectedType, setSelectedType }) {
-  return (
-    <div style={{ flex: 1, padding: '22px 26px', background: C.bg, overflow: 'auto' }}>
-      <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink, marginBottom: 11 }}>เลือกโปรเจกต์</div>
-      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, overflow: 'hidden', marginBottom: 20 }}>
-        {PROJECTS.filter(p => p.status !== 'ปิดงาน').map((p, i, arr) => (
-          <div
-            key={p.id}
-            onClick={() => setSelectedProject(p.id)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
-              borderBottom: i < arr.length - 1 ? `1px solid ${C.borderLight}` : 'none',
-              cursor: 'pointer',
-              background: selectedProject === p.id ? C.tealLight : 'transparent',
-            }}
-          >
-            <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${selectedProject === p.id ? C.teal : C.border}`, background: selectedProject === p.id ? C.teal : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {selectedProject === p.id && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.ink }}>{p.name}</div>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>{p.client} · <span style={{ fontFamily: "'Space Grotesk'" }}>{p.id}</span></div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink, marginBottom: 11 }}>ประเภทเอกสาร</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
-        {DOC_TYPES.map(dt => (
-          <div
-            key={dt.key}
-            onClick={() => setSelectedType(dt.key)}
-            style={{
-              border: selectedType === dt.key ? `2px solid ${dt.color}` : `1px solid ${C.border}`,
-              borderRadius: 11, padding: '14px 12px', textAlign: 'center', cursor: 'pointer',
-              background: selectedType === dt.key ? dt.bg : C.white,
-            }}
-          >
-            <div style={{ fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: selectedType === dt.key ? dt.color : C.grayMed, marginBottom: 4 }}>{dt.key}</div>
-            <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: selectedType === dt.key ? dt.color : C.grayLight }}>{dt.label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function Step2() {
-  const [items, setItems] = useState(LINE_ITEMS.map(it => ({ ...it })))
-  const total = items.reduce((s, it) => s + it.amount, 0)
-
-  return (
-    <div style={{ flex: 1, padding: '22px 26px', background: C.bg, overflow: 'auto' }}>
-      <div style={{ background: C.tealLight, border: `1px solid ${C.tealMid}`, borderRadius: 10, padding: '11px 15px', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={C.teal} strokeWidth="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1" strokeLinecap="round"/></svg>
-        <span style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.tealDark }}>ดึงรายการจากใบเสนอราคา <b style={{ fontFamily: "'Space Grotesk'" }}>QT-2026-009</b> มาให้แล้ว — แก้ได้ตามจริง</span>
-      </div>
-
-      <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink, marginBottom: 11 }}>รายการในใบแจ้งหนี้</div>
-      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, overflow: 'hidden', marginBottom: 16 }}>
-        {items.map((it, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '11px 15px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.ink }}>{it.desc}</div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 7, padding: '5px 11px' }}>
-              <span style={{ fontFamily: "'Space Grotesk'", fontSize: 12.5, fontWeight: 600, color: C.ink }}>{it.amount.toLocaleString()}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 500, color: C.teal, marginBottom: 16, cursor: 'pointer' }}>
-        <IconPlus size={14} stroke={C.teal} />
-        เพิ่มรายการ
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <div style={{ width: 260, background: C.white, border: `1px solid ${C.border}`, borderRadius: 11, padding: '13px 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Sarabun'", fontWeight: 600, fontSize: 13, color: C.ink }}>ยอดที่ต้องชำระ</span>
-            <span style={{ fontFamily: "'Space Grotesk'", fontWeight: 700, fontSize: 19, color: C.burgundy }}>฿{total.toLocaleString()}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function Step3() {
-  return (
-    <div style={{ flex: 1, padding: '22px 26px', background: C.bg, overflow: 'auto' }}>
-      <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink, marginBottom: 11 }}>เงื่อนไขการชำระเงิน</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, maxWidth: 500 }}>
-        {[
-          { label: 'วันครบกำหนด', value: '15 มี.ค. 2569' },
-          { label: 'เครดิต', value: '15 วัน' },
-          { label: 'หมายเหตุ', value: 'กรุณาโอนพร้อม VAT 7%' },
-        ].map(({ label, value }) => (
-          <div key={label} style={label === 'หมายเหตุ' ? { gridColumn: 'span 2' } : {}}>
-            <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, fontWeight: 500, color: C.grayMed, marginBottom: 6 }}>{label}</div>
-            <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 13px', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }}>{value}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function Step4({ selectedProject, selectedType, onClose }) {
-  const project = PROJECTS.find(p => p.id === selectedProject)
-  const total = LINE_ITEMS.reduce((s, it) => s + it.amount, 0)
-  const dt = DOC_TYPES.find(d => d.key === selectedType) || DOC_TYPES[2]
-
-  return (
-    <div style={{ flex: 1, padding: '22px 26px', background: C.bg, overflow: 'auto' }}>
-      <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 13, color: C.ink, marginBottom: 14 }}>ตรวจสอบก่อนออกเอกสาร</div>
-      <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 13, padding: '18px 20px', maxWidth: 520 }}>
-        {[
-          { label: 'ประเภทเอกสาร', value: dt.label },
-          { label: 'โปรเจกต์', value: project ? project.name : '-' },
-          { label: 'ลูกค้า', value: project ? project.client : '-' },
-          { label: 'ยอดชำระ', value: `฿${total.toLocaleString()}` },
-          { label: 'ครบกำหนด', value: '15 มี.ค. 2569' },
-        ].map(({ label, value }) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid ${C.borderLight}` }}>
-            <span style={{ fontFamily: "'Sarabun'", fontSize: 12, color: C.grayLight }}>{label}</span>
-            <span style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.ink }}>{value}</span>
-          </div>
-        ))}
-      </div>
-      <button
-        onClick={onClose}
-        style={{ marginTop: 18, fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: '#fff', background: C.burgundy, border: 'none', borderRadius: 9, padding: '11px 26px', cursor: 'pointer' }}
-        className="btn"
-      >
-        ออกเอกสาร →
-      </button>
-    </div>
-  )
-}
-
-export function DocumentWizard({ navigate }) {
-  const [step, setStep] = useState(2)
-  const [selectedProject, setSelectedProject] = useState('P-2026-009')
-  const [selectedType, setSelectedType] = useState('INV')
-
-  const NEXT_LABELS = ['', 'ถัดไป: รายการ →', 'ถัดไป: เงื่อนไข →', 'ถัดไป: ตรวจ & ออก →', 'ออกเอกสาร →']
-
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1)
-    else navigate('projects')
-  }
-
-  const handleBack = () => {
-    if (step > 1) setStep(step - 1)
-    else navigate('dashboard')
-  }
-
-  const docTypeLabel = DOC_TYPES.find(d => d.key === selectedType)?.label || 'เอกสาร'
-  const docTypeColor = DOC_TYPES.find(d => d.key === selectedType)?.color || C.burgundy
-  const docTypeBg = DOC_TYPES.find(d => d.key === selectedType)?.bg || C.burgundyLight
-
+function Shell({ title, subtitle, accent, labels, step, children, onClose, onBack, next }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: C.bg, padding: 20 }}>
-      <div style={{ width: 880, background: C.white, borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.08)', display: 'flex', flexDirection: 'column', height: 760 }}>
-        {/* Header */}
-        <div style={{ height: 58, borderBottom: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: docTypeColor, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <IconFile size={16} stroke="#fff" />
+      <div style={{ width: 880, maxWidth: '100%', background: C.white, borderRadius: 14, boxShadow: '0 8px 40px rgba(0,0,0,.12)', display: 'flex', flexDirection: 'column', height: 760, maxHeight: '92vh' }}>
+        <div style={{ height: 60, borderBottom: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IconFile size={17} stroke="#fff" />
             </div>
             <div>
-              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15, color: C.ink }}>สร้าง{docTypeLabel}</div>
-              <div style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>จากงาน {selectedProject || '—'}</div>
+              <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 15.5, color: C.ink }}>{title}</div>
+              <div style={{ fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}>{subtitle}</div>
             </div>
           </div>
-          <button
-            onClick={() => navigate('dashboard')}
-            style={{ fontFamily: "'Sarabun'", fontSize: 18, color: C.grayPale, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}
-          >✕</button>
+          <button onClick={onClose} style={{ fontFamily: "'Sarabun'", fontSize: 19, color: C.grayPale, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1 }}>✕</button>
         </div>
 
-        {/* Step bar */}
-        <StepBar step={step} />
+        <StepBar labels={labels} step={step} accent={accent} />
 
-        {/* Step content */}
-        {step === 1 && <Step1 selectedProject={selectedProject} setSelectedProject={setSelectedProject} selectedType={selectedType} setSelectedType={setSelectedType} />}
-        {step === 2 && <Step2 />}
-        {step === 3 && <Step3 />}
-        {step === 4 && <Step4 selectedProject={selectedProject} selectedType={selectedType} onClose={() => navigate('projects')} />}
+        <div style={{ flex: 1, overflow: 'auto', background: C.bg, padding: '24px 26px' }}>{children}</div>
 
-        {/* Footer */}
-        <div style={{ height: 62, borderTop: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <button
-            onClick={handleBack}
-            style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '9px 18px', cursor: 'pointer' }}
-          >← ย้อนกลับ</button>
-          {step < 4 && (
-            <button
-              onClick={handleNext}
-              style={{ fontFamily: "'Sarabun'", fontSize: 12.5, fontWeight: 600, color: '#fff', background: docTypeColor, border: 'none', borderRadius: 9, padding: '9px 22px', cursor: 'pointer' }}
-              className="btn"
-            >{NEXT_LABELS[step]}</button>
-          )}
+        <div style={{ height: 64, borderTop: `1px solid ${C.border}`, padding: '0 26px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <button onClick={onBack} style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 9, padding: '10px 18px', cursor: 'pointer' }}>← ย้อนกลับ</button>
+          <button onClick={next.onClick} disabled={next.disabled} className="btn" style={{ fontFamily: "'Sarabun'", fontSize: 13, fontWeight: 600, color: '#fff', background: accent, border: 'none', borderRadius: 9, padding: '10px 24px', cursor: next.disabled ? 'not-allowed' : 'pointer', opacity: next.disabled ? 0.5 : 1 }}>{next.label}</button>
         </div>
       </div>
     </div>
   )
+}
+
+/* ------------------------------------------------------------------ entry */
+export function DocumentWizard({ navigate, initial }) {
+  if (initial?.projectId) return <DocWizard navigate={navigate} projectCode={initial.projectId} initialType={initial.type} />
+  return <NewJobWizard navigate={navigate} />
 }
