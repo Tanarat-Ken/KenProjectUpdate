@@ -1,9 +1,10 @@
 import { C } from '../theme'
-import { LogoIcon, IconGrid, IconBriefcase, IconFile, IconPaperclip, IconUsers, IconSettings } from './Icons'
+import { LogoIcon, IconGrid, IconBriefcase, IconFile, IconPaperclip, IconUsers, IconSettings, IconFlow } from './Icons'
 import { useOwner } from '../lib/settings'
 
 const NAV = [
   { key: 'dashboard', label: 'ภาพรวม',      Icon: IconGrid },
+  { key: 'flow',      label: 'โฟลว์งาน',     Icon: IconFlow },
   { key: 'projects',  label: 'งานทั้งหมด',   Icon: IconBriefcase },
   { key: 'documents', label: 'เอกสาร',        Icon: IconFile },
   { key: 'files',     label: 'ไฟล์ & คอนเซป', Icon: IconPaperclip },

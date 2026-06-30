@@ -8,6 +8,7 @@ import { DocumentWizard } from './screens/DocumentWizard'
 import { Settings } from './screens/Settings'
 import { PartnerMode } from './screens/PartnerMode'
 import { DocumentsList } from './screens/DocumentsList'
+import { FlowDiagram } from './screens/FlowDiagram'
 import { FilesList } from './screens/FilesList'
 import { ClientsList } from './screens/ClientsList'
 import { SettingsProvider, useOwner } from './lib/settings'
@@ -49,6 +50,7 @@ function AppShell({ nav, navigate }) {
       {nav.page === 'projects' && <ProjectsList navigate={navigate} query={nav.q} />}
       {nav.page === 'project' && <ProjectDetail projectId={nav.projectId} navigate={navigate} />}
       {nav.page === 'documents' && <DocumentsList navigate={navigate} />}
+      {nav.page === 'flow' && <FlowDiagram navigate={navigate} />}
       {nav.page === 'files' && <FilesList navigate={navigate} />}
       {nav.page === 'clients' && <ClientsList navigate={navigate} />}
       {nav.page === 'settings' && <Settings navigate={navigate} />}

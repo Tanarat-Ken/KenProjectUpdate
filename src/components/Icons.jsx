@@ -160,6 +160,17 @@ export function IconMenu({ size = 22, stroke = 'currentColor' }) {
   )
 }
 
+export function IconFlow({ size = 17, stroke = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+      <rect x="3" y="4" width="6" height="5" rx="1.5" />
+      <rect x="15" y="9" width="6" height="5" rx="1.5" />
+      <rect x="3" y="15" width="6" height="5" rx="1.5" />
+      <path d="M9 6.5h3a2 2 0 0 1 2 2v3M9 17.5h3a2 2 0 0 0 2-2v-3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function LogoIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
