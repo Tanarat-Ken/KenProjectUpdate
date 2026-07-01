@@ -70,7 +70,8 @@ export function Settings() {
   }
 
   const pad3 = (n) => String(n || 0).padStart(3, '0')
-  const preview = (prefix, n) => `${form[prefix] || ''}-${pad3(n)}`
+  const previewYear = new Date().getFullYear()
+  const preview = (prefix, n) => `${form[prefix] || ''}-${previewYear}-${pad3(n)}`
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -125,8 +126,8 @@ export function Settings() {
             <>
               <div style={{ fontFamily: "'Sarabun'", fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 8 }}>เลขรันเอกสาร</div>
               <div style={{ fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayMed, marginBottom: 16, lineHeight: 1.5, maxWidth: 620 }}>
-                1 งานใช้ <b>เลขรันนิ่งเดียว</b> ตลอดสายเอกสาร — เปลี่ยนเฉพาะอักษรนำหน้า (prefix) ตามชนิดเอกสาร
-                <br />เช่น งานเลข 009 จะได้ <span style={{ fontFamily: "'Space Grotesk'", color: C.teal }}>QT-009 → DN-009 → INV-009 → RC-009</span>
+                1 งานใช้ <b>เลขรันนิ่งเดียว</b> ตลอดสายเอกสาร — เปลี่ยนเฉพาะอักษรนำหน้า (prefix) ตามชนิดเอกสาร แต่ละใบมีปีที่ออกเอกสารจริงต่อท้าย prefix
+                <br />เช่น งานเลข 009 ออกปี {previewYear} จะได้ <span style={{ fontFamily: "'Space Grotesk'", color: C.teal }}>QT-{previewYear}-009 → DN-{previewYear}-009 → INV-{previewYear}-009 → RC-{previewYear}-009</span>
               </div>
 
               {/* Shared running number */}

@@ -442,9 +442,10 @@ const AFTER = {
 const pad3 = (n) => String(n || 0).padStart(3, '0')
 
 // One running number per job; only the prefix changes by document type.
-// เช่น งาน #009 → QT-009 / DN-009 / INV-009 / RC-009
-function docNumber(settings, type, no) {
-  return `${settings[PREFIX_KEY[type]] || type}-${pad3(no)}`
+// ปีในเลขเอกสาร = ปีที่ออกเอกสารใบนั้นจริง (ค.ศ.) เช่น งาน #009 ออกปี 2026
+// → QT-2026-009 / DN-2026-009 / INV-2026-009 / RC-2026-009
+function docNumber(settings, type, no, year) {
+  return `${settings[PREFIX_KEY[type]] || type}-${year}-${pad3(no)}`
 }
 
 // Resolve the job's running number (doc_no). Assign one lazily if missing
@@ -474,8 +475,8 @@ function toItems(rows) {
 export async function createDocument({ type, project, items, issueDate, dueDate, note }) {
   const settings = await getSettings()
   const no = await runningNumberFor(project.uuid, settings)
-  const number = docNumber(settings, type, no)
   const today = issueDate || new Date().toISOString().slice(0, 10)
+  const number = docNumber(settings, type, no, today.slice(0, 4))
   const storedItems = toItems(items || [])
   const total = itemsTotal(storedItems)
 
