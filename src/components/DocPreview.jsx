@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { C, DOC_COLORS } from '../theme'
 import { baht, thaiDate } from '../lib/format'
 
@@ -34,7 +35,7 @@ function previewData(type, project) {
 // printer — see index.css). The screen preview and the printed page render
 // the exact same markup at the exact same size, so there's nothing left to
 // go wrong between the two.
-export function DocPreview({ type, project, owner, doc }) {
+export const DocPreview = forwardRef(function DocPreview({ type, project, owner, doc }, ref) {
   const color = DOC_COLORS[type] || C.ink
   const c = project.customer
   const { items, total, issueDate, dueDate, note } = previewData(type, project)
@@ -48,7 +49,7 @@ export function DocPreview({ type, project, owner, doc }) {
   const wNo = 28, wQty = 58, wPrice = 88, wAmt = 98
 
   return (
-    <div className="ao-doc" style={{ width: 650, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', position: 'relative', borderRadius: 3 }}>
+    <div ref={ref} className="ao-doc" style={{ width: 650, background: '#fff', boxShadow: '0 4px 20px rgba(0,0,0,.1)', position: 'relative', borderRadius: 3 }}>
       <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, background: color }} />
       <div style={{ padding: '40px 42px' }}>
         {/* Header */}
@@ -146,4 +147,4 @@ export function DocPreview({ type, project, owner, doc }) {
       </div>
     </div>
   )
-}
+})
