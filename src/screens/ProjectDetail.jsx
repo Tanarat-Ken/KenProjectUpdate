@@ -249,7 +249,9 @@ function docRowFor(project, type) {
   const row = project.raw?.[type.toLowerCase()] || null
   // Carry qty + unit price so editing can recompute line totals (qty × ราคา)
   const items = (row?.items || []).map((it) => ({
-    desc: it.description || it.name || '',
+    desc: it.name || it.description || '',
+    // legacy rows had description === name; only surface it as a note when it's genuinely distinct
+    note: it.description && it.description !== it.name ? it.description : '',
     qty: Number(it.qty ?? 1),
     unit_price: Number(it.unit_price ?? it.amount ?? 0),
   }))
@@ -260,7 +262,7 @@ function EditDocModal({ project, doc, onClose, onSaved }) {
   const type = doc.type
   const { row, items: initialItems } = docRowFor(project, type)
   const seed = (type === 'QT' && initialItems.length === 0 ? project.lineItems : initialItems) || []
-  const [rows, setRows] = useState(seed.length ? seed.map((r) => ({ desc: r.desc, qty: Number(r.qty ?? 1), unit_price: Number(r.unit_price ?? r.amount ?? 0) })) : [{ desc: '', qty: 1, unit_price: 0 }])
+  const [rows, setRows] = useState(seed.length ? seed.map((r) => ({ desc: r.desc, note: r.note || '', qty: Number(r.qty ?? 1), unit_price: Number(r.unit_price ?? r.amount ?? 0) })) : [{ desc: '', note: '', qty: 1, unit_price: 0 }])
   const [note, setNote] = useState(row?.note || '')
   const [dueDate, setDueDate] = useState(row?.due_date || '')
   const [busy, setBusy] = useState(false)
@@ -273,7 +275,7 @@ function EditDocModal({ project, doc, onClose, onSaved }) {
   const lbl = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
 
   const setRow = (i, patch) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)))
-  const addRow = () => setRows((rs) => [...rs, { desc: '', qty: 1, unit_price: 0 }])
+  const addRow = () => setRows((rs) => [...rs, { desc: '', note: '', qty: 1, unit_price: 0 }])
   const removeRow = (i) => setRows((rs) => (rs.length > 1 ? rs.filter((_, j) => j !== i) : rs))
 
   const save = async () => {
@@ -305,15 +307,23 @@ function EditDocModal({ project, doc, onClose, onSaved }) {
           <label style={lbl}>รายการ</label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {rows.map((r, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <input value={r.desc} onChange={(e) => setRow(i, { desc: e.target.value })} placeholder="รายละเอียด" style={{ ...f, flex: 1, minWidth: 0 }} />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                  <input type="number" min="0" value={r.qty} onChange={(e) => setRow(i, { qty: Number(e.target.value) })} title="จำนวน" style={{ ...f, width: 50, padding: '9px 7px', textAlign: 'center', fontFamily: "'Space Grotesk'", fontWeight: 600 }} />
-                  <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+              <div key={i} style={{ border: `1px solid ${C.borderLight}`, borderRadius: 9, padding: 8 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input value={r.desc} onChange={(e) => setRow(i, { desc: e.target.value })} placeholder="รายละเอียด" style={{ ...f, flex: 1, minWidth: 0, border: 'none', padding: '1px 0' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                    <input type="number" min="0" value={r.qty} onChange={(e) => setRow(i, { qty: Number(e.target.value) })} title="จำนวน" style={{ ...f, width: 50, padding: '9px 7px', textAlign: 'center', fontFamily: "'Space Grotesk'", fontWeight: 600 }} />
+                    <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+                  </div>
+                  <input type="number" min="0" value={r.unit_price} onChange={(e) => setRow(i, { unit_price: Number(e.target.value) })} placeholder="0" title="ราคา/หน่วย" style={{ ...f, width: 96, flexShrink: 0, fontFamily: "'Space Grotesk'", fontWeight: 600, textAlign: 'right' }} />
+                  <span style={{ width: 80, flexShrink: 0, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTot(r).toLocaleString()}</span>
+                  <button onClick={() => removeRow(i)} title="ลบรายการ" style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, color: C.grayPale, fontSize: 17, cursor: 'pointer' }}>×</button>
                 </div>
-                <input type="number" min="0" value={r.unit_price} onChange={(e) => setRow(i, { unit_price: Number(e.target.value) })} placeholder="0" title="ราคา/หน่วย" style={{ ...f, width: 96, flexShrink: 0, fontFamily: "'Space Grotesk'", fontWeight: 600, textAlign: 'right' }} />
-                <span style={{ width: 80, flexShrink: 0, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTot(r).toLocaleString()}</span>
-                <button onClick={() => removeRow(i)} title="ลบรายการ" style={{ flexShrink: 0, width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.white, color: C.grayPale, fontSize: 17, cursor: 'pointer' }}>×</button>
+                <input
+                  value={r.note || ''}
+                  onChange={(e) => setRow(i, { note: e.target.value })}
+                  placeholder="รายละเอียดเพิ่มเติม (ไม่บังคับ) — จะพิมพ์ในเอกสารด้วย"
+                  style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight, padding: '4px 0 1px' }}
+                />
               </div>
             ))}
           </div>

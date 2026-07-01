@@ -240,7 +240,9 @@ export async function getProjectByCode(code) {
     pipeline: pipelineFor(project.id, docs),
     documents,
     lineItems: (qt?.items || []).map((it) => ({
-      desc: it.description || it.name,
+      desc: it.name || it.description,
+      // legacy rows had description === name; only surface it as a note when it's genuinely distinct
+      note: it.description && it.description !== it.name ? it.description : '',
       qty: Number(it.qty ?? 1),
       unit_price: Number(it.unit_price ?? it.amount ?? 0),
       // amount = ยอดรวมต่อบรรทัด (qty × ราคา/หน่วย) — เผื่อจุดที่ยังอ่าน .amount เดิม
@@ -460,14 +462,16 @@ async function runningNumberFor(projectUuid, settings) {
   return no
 }
 
-// Convert wizard rows {desc, qty, unit_price} -> stored item shape.
-// Accepts legacy {amount} rows too (amount treated as unit price, qty defaults 1).
+// Convert wizard rows {desc, qty, unit_price, note} -> stored item shape.
+// `description` = the optional per-item note (not the title) — printed under
+// the item name on the document. Accepts legacy {amount} rows too (amount
+// treated as unit price, qty defaults 1).
 function toItems(rows) {
   return rows.map((r) => ({
     id: crypto.randomUUID(),
     qty: Number(r.qty ?? 1) || 1,
     name: r.desc,
-    description: r.desc,
+    description: r.note || '',
     unit_price: Number(r.unit_price ?? r.amount ?? 0) || 0,
   }))
 }
