@@ -34,7 +34,7 @@ const fieldStyle = { width: '100%', boxSizing: 'border-box', background: C.white
 const labelStyle = { fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, marginBottom: 6, display: 'block' }
 const sectionHint = { fontFamily: "'Sarabun'", fontSize: 12.5, color: C.grayLight, marginBottom: 16, lineHeight: 1.5 }
 
-export const emptyItem = () => ({ desc: '', qty: 1, unit_price: 0 })
+export const emptyItem = () => ({ desc: '', qty: 1, unit_price: 0, note: '' })
 const lineTotal = (it) => (Number(it.qty ?? 1) || 0) * (Number(it.unit_price ?? 0) || 0)
 
 function ItemsEditor({ items, setItems, accent, catalog }) {
@@ -85,15 +85,25 @@ function ItemsEditor({ items, setItems, accent, catalog }) {
           <span style={{ width: 22 }} />
         </div>
         {items.map((it, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
-            <input value={it.desc} onChange={(e) => patch(i, { desc: e.target.value })} placeholder="เช่น พัฒนาบอทดึงรายงาน" style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }} />
-            <div style={{ width: 78, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <input type="number" min="0" value={it.qty} onChange={(e) => patch(i, { qty: Number(e.target.value) })} style={{ ...numCell, width: 48, textAlign: 'center', padding: '6px 6px' }} />
-              <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+          <div key={i} style={{ borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 15px 3px' }}>
+              <input value={it.desc} onChange={(e) => patch(i, { desc: e.target.value })} placeholder="เช่น พัฒนาบอทดึงรายงาน" style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 13, color: C.ink }} />
+              <div style={{ width: 78, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <input type="number" min="0" value={it.qty} onChange={(e) => patch(i, { qty: Number(e.target.value) })} style={{ ...numCell, width: 48, textAlign: 'center', padding: '6px 6px' }} />
+                <span style={{ fontFamily: "'Sarabun'", fontSize: 11, color: C.grayLight }}>EA</span>
+              </div>
+              <input type="number" min="0" value={it.unit_price} onChange={(e) => patch(i, { unit_price: Number(e.target.value) })} style={{ ...numCell, width: 104 }} />
+              <span style={{ width: 96, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTotal(it).toLocaleString()}</span>
+              <span onClick={() => removeRow(i)} style={{ width: 22, textAlign: 'center', color: C.grayPale, cursor: items.length > 1 ? 'pointer' : 'default', fontSize: 17 }}>×</span>
             </div>
-            <input type="number" min="0" value={it.unit_price} onChange={(e) => patch(i, { unit_price: Number(e.target.value) })} style={{ ...numCell, width: 104 }} />
-            <span style={{ width: 96, textAlign: 'right', fontFamily: "'Space Grotesk'", fontSize: 13, fontWeight: 700, color: C.ink }}>{lineTotal(it).toLocaleString()}</span>
-            <span onClick={() => removeRow(i)} style={{ width: 22, textAlign: 'center', color: C.grayPale, cursor: items.length > 1 ? 'pointer' : 'default', fontSize: 17 }}>×</span>
+            <div style={{ padding: '0 15px 8px 15px' }}>
+              <input
+                value={it.note || ''}
+                onChange={(e) => patch(i, { note: e.target.value })}
+                placeholder="รายละเอียดเพิ่มเติม (ไม่บังคับ) — จะพิมพ์ในเอกสารด้วย"
+                style={{ width: '100%', boxSizing: 'border-box', border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Sarabun'", fontSize: 11.5, color: C.grayLight }}
+              />
+            </div>
           </div>
         ))}
       </div>

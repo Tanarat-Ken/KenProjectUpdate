@@ -10,8 +10,14 @@ function previewData(type, project) {
   const raw = project.raw?.[type.toLowerCase()] || null
   const src = raw?.items?.length ? raw.items : null
   const items = src
-    ? src.map((it) => ({ desc: it.description || it.name || '', qty: Number(it.qty ?? 1), unit_price: Number(it.unit_price ?? it.amount ?? 0) }))
-    : project.lineItems.map((it) => ({ desc: it.desc, qty: Number(it.qty ?? 1), unit_price: Number(it.unit_price ?? it.amount ?? 0) }))
+    ? src.map((it) => ({
+        desc: it.name || it.description || '',
+        // legacy rows had description === name; only show it as a note when it's genuinely distinct
+        note: it.description && it.description !== it.name ? it.description : '',
+        qty: Number(it.qty ?? 1),
+        unit_price: Number(it.unit_price ?? it.amount ?? 0),
+      }))
+    : project.lineItems.map((it) => ({ desc: it.desc, note: it.note || '', qty: Number(it.qty ?? 1), unit_price: Number(it.unit_price ?? it.amount ?? 0) }))
   return {
     items,
     total: items.reduce((s, it) => s + it.qty * it.unit_price, 0),
@@ -96,7 +102,10 @@ export function DocPreview({ type, project, owner, doc }) {
           {items.map((item, i) => (
             <div key={i} className="ao-doc-row" style={{ display: 'flex', alignItems: 'flex-start', padding: '10px 14px', borderBottom: i < items.length - 1 ? `1px solid ${C.borderLight}` : 'none', background: i % 2 ? C.panel : '#fff' }}>
               <span style={{ ...num, width: wNo, color: C.grayLight }}>{i + 1}</span>
-              <span style={{ ...td, flex: 1, fontWeight: 500, paddingRight: 10 }}>{item.desc}</span>
+              <div style={{ ...td, flex: 1, fontWeight: 500, paddingRight: 10 }}>
+                <div>{item.desc}</div>
+                {item.note && <div style={{ fontWeight: 400, fontSize: 9, color: C.grayLight, marginTop: 2, lineHeight: 1.4 }}>{item.note}</div>}
+              </div>
               <span style={{ ...num, width: wQty, textAlign: 'center' }}>{item.qty}</span>
               <span style={{ ...num, width: wPrice, textAlign: 'right' }}>{item.unit_price.toLocaleString()}</span>
               <span style={{ ...num, width: wAmt, textAlign: 'right', fontWeight: 600 }}>{(item.qty * item.unit_price).toLocaleString()}</span>
