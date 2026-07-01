@@ -34,16 +34,40 @@ body {
 .card-hover { transition: box-shadow 0.15s; }
 .card-hover:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
 
-/* Print: show only the active A4 document, hide the app chrome */
+/* Print: show only the active A4 document, hide the app chrome.
+   `zoom` (not `transform: scale`) is used deliberately — it reflows the box
+   model itself, so the browser's page-break math for tall multi-page
+   documents matches what's actually painted. A `transform: scale` here
+   previously let long item lists overflow one printed page: the browser
+   picked page breaks against the pre-scale height, so rows were clipped
+   and duplicated across pages, plus `position: fixed` centered via
+   `translateX(-50%)` against the pre-scale width, cutting off the right
+   edge of every printed document. */
 @media print {
+  .ao-print-root, .ao-print-tabbody, .ao-print-doctab, .ao-print-doccol, .ao-print-area {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  /* App chrome around the doc (page header, document list, toolbar) — visibility:hidden
+     alone keeps their box on the page and pushes the printed document down. */
+  .ao-print-hide { display: none !important; }
   body { background: #fff; }
   body * { visibility: hidden; }
   .ao-doc, .ao-doc * { visibility: visible; }
   .ao-doc {
-    position: fixed; left: 50%; top: 0;
-    transform: translateX(-50%) scale(1.32); transform-origin: top center;
-    box-shadow: none !important; border-radius: 0 !important;
+    position: static;
+    zoom: 1.32;
+    margin: 0 auto;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
+  .ao-doc-thead { break-after: avoid; }
+  .ao-doc-row, .ao-doc-total { break-inside: avoid; }
   @page { margin: 12mm; }
 }
 
