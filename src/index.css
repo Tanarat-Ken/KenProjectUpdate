@@ -35,14 +35,16 @@ body {
 .card-hover:hover { box-shadow: 0 2px 8px rgba(0,0,0,.12); }
 
 /* Print: show only the active A4 document, hide the app chrome.
-   `zoom` (not `transform: scale`) is used deliberately — it reflows the box
-   model itself, so the browser's page-break math for tall multi-page
-   documents matches what's actually painted. A `transform: scale` here
-   previously let long item lists overflow one printed page: the browser
-   picked page breaks against the pre-scale height, so rows were clipped
-   and duplicated across pages, plus `position: fixed` centered via
-   `translateX(-50%)` against the pre-scale width, cutting off the right
-   edge of every printed document. */
+   Printed at its native (unscaled) size, in normal document flow — no
+   `transform: scale` or `zoom`. Both were tried and both broke in real
+   printer/PDF output: `transform: scale` doesn't reflow the box, so the
+   browser picks page breaks against the pre-scale height (rows got
+   clipped/duplicated across pages) and `position: fixed` + `translateX(-50%)`
+   centered against the pre-scale width (the right edge got cut off). `zoom`
+   avoided the page-break issue in headless testing but still produced a
+   cut-off/oversized result on a real printer. Printing at 1:1 trades a
+   slightly smaller (but fully intact, correctly paginated) document for
+   guaranteed-correct output on every printer and browser. */
 @media print {
   .ao-print-root, .ao-print-tabbody, .ao-print-doctab, .ao-print-doccol, .ao-print-area {
     display: block !important;
@@ -61,7 +63,6 @@ body {
   .ao-doc, .ao-doc * { visibility: visible; }
   .ao-doc {
     position: static;
-    zoom: 1.32;
     margin: 0 auto;
     box-shadow: none !important;
     border-radius: 0 !important;
