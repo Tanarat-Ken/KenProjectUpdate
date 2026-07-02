@@ -101,6 +101,14 @@ export function IconEdit({ size = 14, stroke = 'currentColor' }) {
   )
 }
 
+export function IconDownload({ size = 14, stroke = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+      <path d="M12 4v12M6 10l6 6 6-6M4 20h16" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function IconUpload({ size = 15, stroke = 'currentColor' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2">

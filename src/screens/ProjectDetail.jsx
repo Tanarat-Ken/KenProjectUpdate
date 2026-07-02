@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { C, DOC_COLORS } from '../theme'
 import { StatusBadge } from '../components/StatusBadge'
-import { IconCheck, IconPrint, IconSend, IconEdit, IconUpload } from '../components/Icons'
+import { IconCheck, IconDownload, IconSend, IconEdit, IconUpload } from '../components/Icons'
 import { Loading, ErrorState, EmptyState } from '../components/States'
 import { FileViewer } from '../components/FileViewer'
 import { DocPreview, DOC_TH } from '../components/DocPreview'
 import { useAsync } from '../lib/useAsync'
 import { getProjectByCode, uploadFile, deleteFile, acceptQuotation, markDeveloped, recordPayment, updateProject, deleteProject, updateDocument } from '../lib/api'
+import { downloadDocAsPdf } from '../lib/exportPdf'
 import { useOwner } from '../lib/settings'
 import { baht, timeThai } from '../lib/format'
 
@@ -158,12 +159,26 @@ function OverviewTab({ project, navigate, actions, busy }) {
 function DocumentsTab({ project, reload }) {
   const owner = useOwner()
   const [editing, setEditing] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const docNodeRef = useRef(null)
   const available = project.documents.filter((d) => !d.pending)
   const [activeId, setActiveId] = useState(available[available.length - 1]?.id || null)
   const current = project.documents.find((d) => d.id === activeId) || available[available.length - 1]
   const docColor = current ? DOC_COLORS[current.type] : C.grayMed
   // RC has no editable underlying table row
   const canEdit = current && ['QT', 'DN', 'INV'].includes(current.type)
+
+  async function handleDownloadPdf() {
+    if (!docNodeRef.current || exporting) return
+    setExporting(true)
+    try {
+      await downloadDocAsPdf(docNodeRef.current, `${current?.id || DOC_TH[current?.type] || 'document'}.pdf`)
+    } catch (err) {
+      alert('สร้าง PDF ไม่สำเร็จ: ' + (err?.message || err))
+    } finally {
+      setExporting(false)
+    }
+  }
 
   if (available.length === 0) {
     return <EmptyState title="ยังไม่มีเอกสารในงานนี้" sub="Create a document from the wizard" />
@@ -207,8 +222,8 @@ function DocumentsTab({ project, reload }) {
             {current && <StatusBadge status={current.status} />}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
-              <IconPrint size={14} stroke="currentColor" />พิมพ์ PDF
+            <button onClick={handleDownloadPdf} disabled={exporting} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1 }}>
+              <IconDownload size={14} stroke="currentColor" />{exporting ? 'กำลังสร้าง PDF…' : 'ดาวน์โหลด PDF'}
             </button>
             {canEdit && (
               <button onClick={() => setEditing(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Sarabun'", fontSize: 12, fontWeight: 600, color: C.grayMed, background: C.white, border: `1px solid ${C.border}`, borderRadius: 8, padding: '7px 12px', cursor: 'pointer' }}>
@@ -228,7 +243,7 @@ function DocumentsTab({ project, reload }) {
           </div>
         </div>
         <div className="ao-print-area" style={{ flex: 1, overflow: 'auto', background: '#EFEDE5', display: 'flex', justifyContent: 'center', padding: '26px 20px' }}>
-          {current && <DocPreview type={current.type} project={project} owner={owner} doc={current} />}
+          {current && <DocPreview ref={docNodeRef} type={current.type} project={project} owner={owner} doc={current} />}
         </div>
       </div>
 
